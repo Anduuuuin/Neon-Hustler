@@ -84,14 +84,16 @@
     P.querySelectorAll('[data-raid]').forEach(b=>b.onclick=()=>{const f=(cache.friends||[]).find(x=>x.code===b.dataset.raid);if(!f)return;close();if(window.NH_GAME)NH_GAME.startRaid(f);});
   }
   const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  async function raidFinish(victim,success){if(!ON)return -1;try{return Number(await rpc('nh_raid_finish',{p_code:ON.code,p_secret:ON.secret,p_victim:victim,p_success:success}));}
+  async function saveBase(b){if(!ON)return 'kein Profil';try{await rpc('nh_save_base',{p_code:ON.code,p_secret:ON.secret,p_base:b});return true;}catch(e){return /nh_save_base|function|404/i.test(e.message)?'Supabase-Update (v3) fehlt noch':e.message;}}
+  async function getBase(code){try{return await rpc('nh_get_base',{p_victim:code});}catch(e){return null;}}
+  async function raidFinish(victim,success,bounty){if(!ON)return -1;try{try{return Number(await rpc('nh_raid_finish2',{p_code:ON.code,p_secret:ON.secret,p_victim:victim,p_success:success,p_bounty:Math.round(bounty||0)}));}catch(e2){if(/shield/.test(e2.message))throw e2;}return Number(await rpc('nh_raid_finish',{p_code:ON.code,p_secret:ON.secret,p_victim:victim,p_success:success}));}
     catch(e){if(/shield/.test(e.message)&&window.NH_GAME)NH_GAME.toast('ZU SPÄT – ER HAT SCHUTZ');return -1;}}
   async function factionPoints(p){if(!ON)return;try{await sync(false);await rpc('nh_add_faction_points',{p_code:ON.code,p_secret:ON.secret,p_points:Math.round(p)});}catch(e){}}
   let checking=false;
   async function checkRaids(){if(!ON||checking||!window.NH_GAME||!NH_GAME.inGame())return;checking=true;
-    try{const L=await rpc('nh_my_raids',{p_code:ON.code,p_secret:ON.secret});if(L&&L.length){let lost=0;L.forEach(r=>{if(r.success)lost+=Number(r.amount);});
-      if(lost)NH_GAME.adjustCash(-lost);
-      NH_GAME.say('<div class="rbig bad">ÜBERFALL!</div>'+L.map(r=>`<b>${esc(r.attacker_name)}</b> ${r.success?`hat deinen Tresor geknackt: <b style="color:#ff6f6f">−$${fmt(Number(r.amount))}</b>`:'wollte dich ausrauben – und ist gescheitert.'}`).join('<br>')+'<div class="dsub">Du hast jetzt einige Stunden Schutz. Rache? Handy → Netzwerk → Freunde.</div>');}}
+    try{const L=await rpc('nh_my_raids',{p_code:ON.code,p_secret:ON.secret});if(L&&L.length){let lost=0,gain=0;L.forEach(r=>{if(r.success)lost+=Number(r.amount);else gain+=Number(r.amount);});
+      if(lost||gain)NH_GAME.adjustCash(gain-lost);
+      NH_GAME.say('<div class="rbig bad">ÜBERFALL!</div>'+L.map(r=>`<b>${esc(r.attacker_name)}</b> ${r.success?`hat deinen Tresor geknackt: <b style="color:#ff6f6f">−$${fmt(Number(r.amount))}</b>`:`wollte dich ausrauben – und ist in deinem Unterschlupf gescheitert.${Number(r.amount)?` Kopfgeld: <b style="color:#7dffb2">+$${fmt(Number(r.amount))}</b>`:''}`}`).join('<br>')+'<div class="dsub">Du hast jetzt einige Stunden Schutz. Rache? Handy → Netzwerk → Freunde.</div>');}}
     catch(e){}checking=false;}
   setTimeout(checkRaids,6000);
   const st2=document.createElement('style');st2.textContent=`
@@ -110,5 +112,5 @@
     .nwar{background:#1d1030;border:2px solid #4b3a6e;border-radius:8px;padding:8px;margin-bottom:6px}.nwar.me{border-color:#ffe14d}.nwar b{font-size:16px}.nwar .pb{height:10px;background:#0b0616;border-radius:5px;overflow:hidden;margin:4px 0}.nwar .pb i{display:block;height:100%}.nwar small{font-size:12px;color:#cbbbe6}`;
   document.head.appendChild(st2);
   render();
-  window.NH_ONLINE={rpc,get me(){return ON;},sync,open,raidFinish,factionPoints,badge:()=>0};
+  window.NH_ONLINE={rpc,get me(){return ON;},sync,open,raidFinish,saveBase,getBase,factionPoints,badge:()=>0};
 })();

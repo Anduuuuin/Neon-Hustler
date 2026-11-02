@@ -1905,7 +1905,8 @@
   window.NH_GAME={adjustCash:n=>{cash=Math.max(0,cash+n);hud();saveGame();},say:(h)=>sayRaw('erz',h,[{t:'Okay',f:closeDlg}]),
     startRaid:(f)=>{if(spindFull()){toastMsg('SPIND VOLL');return;}if(nrg<3){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}let h=0;for(const c of f.code)h=(h*31+c.charCodeAt(0))|0;
       PEND={kind:'gen',type:f.lvl>=8?'villa':f.lvl>=4?'lagerhalle':'werkstatt',name:'Versteck von '+f.name,diff:Math.min(3,1+Math.floor(f.lvl/5)),e:3,seed:Math.abs(h)+Math.floor(Date.now()/36e5),raid:f.code,story:'raid'};
-      if(scene!=='hide'){show('hide');fitAll();}invOpen('heist');},
+      const go=()=>{if(scene!=='hide'){show('hide');fitAll();}invOpen('heist');};
+      if(window.NH_ONLINE&&NH_ONLINE.getBase){toastMsg('LADE SEINEN UNTERSCHLUPF …');NH_ONLINE.getBase(f.code).then(b=>{if(b&&b.t&&b.w){PEND.kind='base';PEND.base=b;PEND.owner=f.name;PEND.name='Unterschlupf von '+f.name;}go();});}else go();},
     snap:()=>snap(),stats:()=>({lvl,prestige:PRESTIGE,loot:STAT.loot||0,heists:STAT.heists||0,faction:FACTION,cash}),writeSave:d=>{try{localStorage.setItem(SKEY,JSON.stringify(d));}catch(e){}},inGame:()=>scene!=='start'&&scene!=='intro',toast:t=>toastMsg(t),hasSave,wipe:()=>{try{localStorage.removeItem(SKEY);}catch(e){}},cheat:(k)=>{if(k==='cash')addReward(500,0,0);if(k==='lvl'){addReward(0,100,0);}if(k==='nrg'){nrg=NMAX;hud();}if(k==='mat'){['metall','metall','kabel','kabel','klebeband','klebeband','chemie','platine','pillen'].forEach(i=>STASH.push(i));toastMsg('MATERIAL IM SPIND');}saveGame();},
     info:()=>({lvl,Q,cash})};
   // ================= LANGZEIT: AUFGABEN, LOGIN, ERFOLGE, ALBUM, PRESTIGE, WERBUNG, SPIND =================
@@ -2089,7 +2090,7 @@
         const s2=s.lv?bst(k):null;const cp=s.lv?bizCapS(s2):6;const h=s.lv?Math.min(cp,(Date.now()-s.t)/36e5):0;const ups=s2?bizRank(k):0;
         return `<div class="mrow ${lk?'cl':''}"><div><b>${b.n}${s.lv?' · Rang '+ups+'/10':''}</b><small>${b.where} · ${s.lv?'$'+fmt(bizIncS(k,s2))+'/h · Kasse '+Math.floor(h/cp*100)+' %':'$'+fmt(b.inc)+'/h'}</small>${s.lv?`<div class="pb"><i style="width:${h/cp*100}%"></i></div>`:''}</div>
           ${lk?`<span style="font-size:11px;color:#cbbbe6">ab Stufe ${b.req}</span>`:`<button type="button" data-visit="${k}">${s.lv?'BESUCHEN':'ANSEHEN'}<br><small>${s.lv?'ausbauen':'$'+fmt(b.cost)}</small></button>`}</div>`;}).join('');}
-    if(empTab==='mods'){body=`<div class="mh">VERSTECK-MODULE<small>Produktion läuft rund um die Uhr</small></div>`+Object.entries(MODS).map(([k,m])=>{const s=EMP.mods[k]||{lv:0},lk=lvl<m.req,L=s.lv?m.lv[s.lv-1]:null,nx=m.lv[s.lv];
+    if(empTab==='mods'){body=`<button type="button" class="mbig" id="empbase" style="margin-bottom:8px">🏰 UNTERSCHLUPF BAUEN<br><small style="font-size:12px">Wände, Fallen, Wachen, Hunde – gegen Überfälle</small></button><div class="mh">VERSTECK-MODULE<small>Produktion läuft rund um die Uhr</small></div>`+Object.entries(MODS).map(([k,m])=>{const s=EMP.mods[k]||{lv:0},lk=lvl<m.req,L=s.lv?m.lv[s.lv-1]:null,nx=m.lv[s.lv];
         const desc=L?(L.cash?`$${L.cash}/h`:`1× ${L.item==='_mat'?'Material':ITEMS[L.item].n} alle ${L.min} min (max ${m.cap})`):m.txt;
         return `<div class="mrow ${lk?'cl':''}"><img src="${ico(m.ic)}" alt="" style="width:34px;height:34px;object-fit:contain"><div><b>${m.n}${s.lv?' · Stufe '+s.lv:''}</b><small>${desc}</small></div>
           ${lk?`<span style="font-size:11px;color:#cbbbe6">ab Stufe ${m.req}</span>`:!nx?'<span>MAX</span>':`<button type="button" data-mod="${k}">${s.lv?'AUSBAU':'BAUEN'}<br><small>$${fmt(nx.c)}</small></button>`}</div>`;}).join('')+
@@ -2102,7 +2103,7 @@
     $('empx').onclick=closeEmp;
     $('empc').onclick=()=>{const t=empCollect();if(t)toastMsg('KASSIERT: '+t);renderEmp();};
     const ad=$('empad');if(ad)ad.onclick=()=>{const v=EMP.last;EMP.last=0;watchAd({cash:v});setTimeout(renderEmp,3300);};
-    P.querySelectorAll('[data-et]').forEach(b=>b.onclick=()=>{empTab=b.dataset.et;renderEmp();});
+    P.querySelectorAll('[data-et]').forEach(b=>b.onclick=()=>{empTab=b.dataset.et;renderEmp();});const eb=$('empbase');if(eb)eb.onclick=()=>{closeEmp();openBase();};
     P.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>{closeEmp();openBiz(b.dataset.visit);});
     P.querySelectorAll('[data-biz]').forEach(b=>b.onclick=()=>{const k=b.dataset.biz,s=EMP.biz[k]||{lv:0,t:Date.now()};const c=s.lv?bizUp(k,s.lv):BIZ[k].cost;if(cash<c){toastMsg('ZU WENIG GELD');return;}
       if(s.lv)empCollect();cash-=c;s.lv++;if(s.lv===1)s.t=Date.now();EMP.biz[k]=s;track('biz');sfx('stamp');hud();renderEmp();});
@@ -2146,7 +2147,7 @@
     const top=`<div class="phst"><span>NEON-TEL</span><span>${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}</span><span>▮▮▮ ⚡${nrg}</span></div>`;
     const open=OFFERS.list.filter(o=>!o.taken).length;const call=CALLS.includes(Q);
     let body='';
-    if(phApp==='home'){const apps=[['net','🌐','Netzwerk',window.NH_ONLINE?NH_ONLINE.badge():0],['mail','📧','Aufträge',open],['call','📞','Anrufe',call?1:0],['fence','💰','Hehler',0],['cars','🚗','Fuhrpark',0],['emp','💼','Imperium',0],['meta','🏆','Zentrale',claimable()]];
+    if(phApp==='home'){const apps=[['net','🌐','Netzwerk',window.NH_ONLINE?NH_ONLINE.badge():0],['mail','📧','Aufträge',open],['call','📞','Anrufe',call?1:0],['fence','💰','Hehler',0],['cars','🚗','Fuhrpark',0],['emp','💼','Imperium',0],['base','🏰','Unterschlupf',0],['meta','🏆','Zentrale',claimable()]];
       body=`<div class="phhome"><div class="phclock">${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}</div><div class="phgrid">${apps.map(a=>`<button type="button" data-app="${a[0]}"><i>${a[1]}</i><span>${a[2]}</span>${a[3]?`<em>${a[3]}</em>`:''}</button>`).join('')}</div></div>`;}
     if(phApp==='mail'){const left=15-Math.floor((Date.now()/6e4)%15);
       body=`<div class="phh">📧 Aufträge<small>neue Mails in ${left} min</small></div>`+OFFERS.list.map((o,i)=>{const j=offerJob(o);const nm=people[o.who].n;
@@ -2158,7 +2159,7 @@
     if(phApp==='detail'){const o=OFFERS.list[phDet],j=offerJob(o);
       body=`<div class="phh">📧 ${people[o.who].n}</div><div class="phmailt"><img src="${people[o.who].p}" alt=""><p><b>Betreff: ${j.n}</b><br>Hab was für dich. Bezahlung $${j.m}${o.bonus>1?' – eilig, deshalb mehr Kohle':''}. Dauert ein paar Minuten. Du kannst in der Zwischenzeit was anderes machen.</p><small>${j.stat} · Energie ${j.e}${j.h?' · Heat-Risiko':''}</small></div>${o.taken?'<div class="phnote">Schon angenommen.</div>':'<button type="button" class="phbig" data-do="take">Annehmen</button>'}`;}
     S_.innerHTML=top+`<div class="phbody">${body}</div><div class="phnav"><button type="button" data-nav="back">◀</button><button type="button" data-nav="home">●</button><button type="button" data-nav="close">✕</button></div>`;
-    S_.querySelectorAll('[data-app]').forEach(b=>b.onclick=()=>{const a=b.dataset.app;if(a==='emp'){phoneClose();openEmp();return;}if(a==='net'){phoneClose();if(window.NH_ONLINE)NH_ONLINE.open();return;}if(a==='meta'){phoneClose();openMeta();return;}phApp=a;renderPhone();});
+    S_.querySelectorAll('[data-app]').forEach(b=>b.onclick=()=>{const a=b.dataset.app;if(a==='emp'){phoneClose();openEmp();return;}if(a==='base'){phoneClose();openBase();return;}if(a==='net'){phoneClose();if(window.NH_ONLINE)NH_ONLINE.open();return;}if(a==='meta'){phoneClose();openMeta();return;}phApp=a;renderPhone();});
     S_.querySelectorAll('[data-of]').forEach(b=>b.onclick=()=>{phDet=+b.dataset.of;phApp='detail';renderPhone();});
     S_.querySelectorAll('[data-car]').forEach(b=>b.onclick=()=>{CAR=b.dataset.car;sfx('ok');renderPhone();saveGame();});
     S_.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{const n=b.dataset.nav;if(n==='close'){phoneClose();return;}phApp=n==='back'&&phApp==='detail'?'mail':'home';renderPhone();});
@@ -2319,6 +2320,91 @@
   setInterval(()=>{if(!window.__nhReady||(EMP.dirty||0)<2000||heat<4)return;if(EMP.rz&&Date.now()-EMP.rz<2*36e5)return;if(Math.random()<.04){EMP.rz=Date.now();const l=Math.round(EMP.dirty*.2);EMP.dirty-=l;hud();toastMsg('RAZZIA! $'+fmt(l)+' SCHWARZGELD WEG');}},30000);
   ACHS.push(AC('bizmax','Ein Laden auf Rang 10',()=>Object.keys(BIZ).some(k=>EMP.biz[k]&&EMP.biz[k].lv&&bizRank(k)>=10),{cash:15000,cloth:1}),
     AC('wash10k','$10.000 gewaschen',()=>(STAT.laundered||0)>=10000,{cash:2000}),AC('team5','5 Angestellte',()=>Object.values(EMP.biz).reduce((a,s)=>a+((s.staff||[]).length),0)>=5,{cash:3000}));
+  // ================= UNTERSCHLUPF BAUEN (Feld für Feld) =================
+  const BW=12,BH=14,BEX=6;
+  const BT={
+    '.':{n:'Abriss',ic:'⛏',p:0,c:'#2a1a36',d:'Feld wird wieder Boden'},
+    '#':{n:'Wand',ic:'🧱',p:40,c:'#4a2a5c',d:'Blockiert den Weg'},
+    'd':{n:'Tür',ic:'🚪',p:60,c:'#8a5a2a',d:'Offene Tür'},
+    'L':{n:'Schloss-Tür',ic:'🔒',p:250,c:'#c08a2a',d:'Muss geknackt werden',max:8},
+    'B':{n:'Laser',ic:'🔴',p:350,c:'#5a1020',d:'Löst Alarm aus',max:10},
+    'F':{n:'Stromkasten',ic:'⚡',p:0,c:'#2a5a6a',d:'Schaltet Laser ab – Pflicht bei Lasern',max:1},
+    'c':{n:'Kamera',ic:'📹',p:500,c:'#1d3a5a',d:'Sieht den Eindringling',max:4},
+    'T':{n:'Bodenfalle',ic:'🪤',p:200,c:'#3a3a44',d:'Hält fest, Alarm, Hunde kommen',max:8},
+    'g':{n:'Wachmann',ic:'💂',p:1500,c:'#26398a',d:'Patrouilliert, oft bewaffnet',max:3},
+    'h':{n:'Wachhund',ic:'🐕',p:900,c:'#6a4424',d:'Schnell, riecht dich hinter Wänden',max:3},
+    'C':{n:'Attrappe',ic:'📦',p:120,c:'#5a4a2a',d:'Leere Kiste – kostet Zeit',max:6},
+    'X':{n:'Tresor',ic:'💰',p:0,c:'#8a7a1a',d:'Dein Geld – genau 1 Stück',max:1}};
+  const BORD=['#','d','L','B','T','c','g','h','C','F','X','.'];
+  function baseDefault(){const r=[];for(let y=0;y<BH;y++){let s='';for(let x=0;x<BW;x++){const edge=x===0||x===BW-1||y===0||y===BH-1;s+=edge?'#':'.';}r.push(s);}
+    const set=(x,y,c)=>{r[y]=r[y].slice(0,x)+c+r[y].slice(x+1);};for(let x=1;x<BW-1;x++)set(x,5,'#');set(6,5,'d');set(2,2,'X');set(BEX,BH-1,'E');return {w:BW,h:BH,t:r,v:1};}
+  function baseGet(){if(!EMP.base||!EMP.base.t||EMP.base.w!==BW)EMP.base=baseDefault();return EMP.base;}
+  const bAt=(B,x,y)=>B.t[y][x];
+  function bSet(B,x,y,c){B.t[y]=B.t[y].slice(0,x)+c+B.t[y].slice(x+1);}
+  const bLocked=(x,y)=>x===0||y===0||x===BW-1||y===BH-1;
+  function bCount(B,c){let n=0;B.t.forEach(r=>{for(const ch of r)if(ch===c)n++;});return n;}
+  function bCheck(B){const X=[];B.t.forEach((r,y)=>{for(let x=0;x<r.length;x++)if(r[x]==='X')X.push([x,y]);});
+    if(X.length!==1)return {ok:false,m:'Du brauchst genau einen Tresor.'};
+    if(bCount(B,'B')&&!bCount(B,'F'))return {ok:false,m:'Laser brauchen einen Stromkasten irgendwo in der Base.'};
+    const seen=new Set([BEX+','+(BH-1)]),q=[[BEX,BH-1]];let found=false;
+    while(q.length){const[x,y]=q.shift();for(const[a,b]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+a,ny=y+b,k=nx+','+ny;if(nx<0||ny<0||nx>=BW||ny>=BH||seen.has(k))continue;const c=bAt(B,nx,ny);
+      if(c==='X'){found=true;continue;}if(c==='#'||c==='C'||c==='F')continue;seen.add(k);q.push([nx,ny]);}}
+    if(!found)return {ok:false,m:'Kein Weg vom Eingang zum Tresor. Einbrecher müssen ihn erreichen können.'};
+    return {ok:true,m:'Alles bereit.'};}
+  function baseValue(B){let v=0;B.t.forEach(r=>{for(const ch of r)if(BT[ch])v+=BT[ch].p;});return v;}
+  let BTOOL='#',bDrag=false,bLast='',bMsg='';
+  function openBase(){baseGet();$('baseov').classList.add('on');renderBase();}
+  function closeBase(){$('baseov').classList.remove('on');saveGame();}
+  function bPlace(x,y){const B=baseGet();if(bLocked(x,y)){bMsg='Außenmauer und Eingang lassen sich nicht ändern.';return renderBaseInfo();}
+    const old=bAt(B,x,y),nw=BTOOL;if(old===nw)return;
+    const T=BT[nw];if(T.max&&nw!=='.'&&bCount(B,nw)>=T.max){if(nw==='X'||nw==='F'){B.t=B.t.map(r=>r.split(nw).join('.'));}else{bMsg=`Maximal ${T.max}× ${T.n}.`;return renderBaseInfo();}}
+    const refund=Math.floor((BT[old]?BT[old].p:0)*.5),cost=T.p;
+    if(cash+refund<cost){bMsg='Zu wenig Geld.';return renderBaseInfo();}
+    cash+=refund-cost;bSet(B,x,y,nw);B.dirty=1;if(cost)track('basebuild');sfx(nw==='.'?'whoosh':'click');bMsg='';hud();drawBase();renderBaseInfo();}
+  function renderBase(){const P=$('basep');
+    P.innerHTML=`<div class="seth"><b>UNTERSCHLUPF</b><button type="button" id="basex">✕</button></div>
+      <div class="bsub">Bau Feld für Feld. Freunde, die dich überfallen, laufen genau durch diese Base. Abriss gibt 50 % zurück.</div>
+      <div class="bwrap"><canvas id="bcv"></canvas></div><div id="binfo"></div>
+      <div class="btools">${BORD.map(k=>`<button type="button" data-bt="${k}" class="${BTOOL===k?'on':''}"><i>${BT[k].ic}</i><b>${BT[k].n}</b><small>${BT[k].p?'$'+fmt(BT[k].p):'gratis'}</small></button>`).join('')}</div>
+      <div class="bbtns"><button type="button" id="btest">🏃 TESTLAUF</button><button type="button" id="bsave">☁ SPEICHERN &amp; ONLINE</button></div>`;
+    $('basex').onclick=closeBase;
+    P.querySelectorAll('[data-bt]').forEach(b=>b.onclick=()=>{BTOOL=b.dataset.bt;P.querySelectorAll('[data-bt]').forEach(x=>x.classList.toggle('on',x===b));bMsg=BT[BTOOL].d;renderBaseInfo();});
+    const cv=$('bcv');const pos=e=>{const r=cv.getBoundingClientRect();return [Math.floor((e.clientX-r.left)/r.width*BW),Math.floor((e.clientY-r.top)/r.height*BH)];};
+    cv.onpointerdown=e=>{e.preventDefault();bDrag=true;cv.setPointerCapture(e.pointerId);const[x,y]=pos(e);bLast=x+','+y;bPlace(x,y);};
+    cv.onpointermove=e=>{if(!bDrag||!['#','.','d'].includes(BTOOL))return;const[x,y]=pos(e);if(x<0||y<0||x>=BW||y>=BH||bLast===x+','+y)return;bLast=x+','+y;bPlace(x,y);};
+    cv.onpointerup=cv.onpointercancel=()=>{bDrag=false;};
+    $('btest').onclick=()=>{const ck=bCheck(baseGet());if(!ck.ok){bMsg=ck.m;return renderBaseInfo();}closeBase();
+      startPixHeist({kind:'base',type:'villa',name:'Testlauf: Dein Unterschlupf',diff:2,e:0,seed:Date.now()%1e6,base:JSON.parse(JSON.stringify(baseGet())),owner:'',practice:true});};
+    $('bsave').onclick=async()=>{const B=baseGet(),ck=bCheck(B);if(!ck.ok){bMsg=ck.m;return renderBaseInfo();}
+      if(!window.NH_ONLINE||!NH_ONLINE.me){bMsg='Lokal gespeichert. Für online: Zahnrad → 🌐 ONLINE → Profil anlegen.';saveGame();return renderBaseInfo();}
+      bMsg='Lade hoch …';renderBaseInfo();const r=await NH_ONLINE.saveBase({w:B.w,h:B.h,t:B.t,v:1});B.dirty=0;
+      bMsg=r===true?'✔ Online gespeichert – so sehen Angreifer deine Base.':'Hochladen fehlgeschlagen: '+r;saveGame();renderBaseInfo();};
+    drawBase();renderBaseInfo();}
+  function renderBaseInfo(){const B=baseGet(),ck=bCheck(B),e=$('binfo');if(!e)return;
+    const cnt=['g','h','c','T','B','L'].map(k=>`${BT[k].ic} ${bCount(B,k)}/${BT[k].max}`).join(' · ');
+    e.innerHTML=`<div class="bstat"><span>💵 $${fmt(cash)}</span><span>Wert $${fmt(baseValue(B))}</span><span class="${ck.ok?'ok':'bad'}">${ck.ok?'✔ Weg zum Tresor':'✖ '+ck.m}</span></div><div class="bcnt">${cnt}</div>${bMsg?`<div class="bmsg">${bMsg}</div>`:''}${B.dirty?'<div class="bmsg" style="color:#ff9f43">Änderungen noch nicht online.</div>':''}`;}
+  function drawBase(){const cv=$('bcv');if(!cv)return;const B=baseGet();const box=cv.parentElement.getBoundingClientRect();
+    const ts=Math.max(16,Math.floor(Math.min((box.width||340)/BW,(window.innerHeight*.48)/BH)));cv.width=BW*ts;cv.height=BH*ts;cv.style.width=BW*ts+'px';cv.style.height=BH*ts+'px';
+    const g=cv.getContext('2d');g.textAlign='center';g.textBaseline='middle';g.font=Math.floor(ts*.68)+'px sans-serif';
+    for(let y=0;y<BH;y++)for(let x=0;x<BW;x++){const c=bAt(B,x,y),X=x*ts,Y=y*ts;
+      g.fillStyle=(x+y)%2?'#1c1028':'#22142f';g.fillRect(X,Y,ts,ts);
+      if(c==='#'){g.fillStyle=bLocked(x,y)?'#140a1c':'#4a2a5c';g.fillRect(X,Y,ts,ts);g.fillStyle='#6a3f80';g.fillRect(X,Y,ts,Math.max(2,ts*.15));continue;}
+      if(c==='E'){g.fillStyle='#7dffb2';g.fillRect(X,Y,ts,ts);g.fillStyle='#000';g.fillText('⬇',X+ts/2,Y+ts/2);continue;}
+      if(c==='d'){g.fillStyle='#8a5a2a';g.fillRect(X+ts*.15,Y+ts*.1,ts*.7,ts*.8);continue;}
+      if(c==='B'){g.fillStyle='rgba(255,40,60,.35)';g.fillRect(X,Y,ts,ts);g.fillStyle='#ff2840';g.fillRect(X,Y+ts*.45,ts,Math.max(2,ts*.1));continue;}
+      if(BT[c]&&c!=='.')g.fillText(BT[c].ic,X+ts/2,Y+ts/2+1);}
+    g.strokeStyle='rgba(255,255,255,.05)';for(let i=0;i<=BW;i++){g.beginPath();g.moveTo(i*ts,0);g.lineTo(i*ts,BH*ts);g.stroke();}for(let i=0;i<=BH;i++){g.beginPath();g.moveTo(0,i*ts);g.lineTo(BW*ts,i*ts);g.stroke();}}
+  (function(){const ov=document.createElement('div');ov.id='baseov';ov.innerHTML='<div class="basep" id="basep"></div>';document.body.appendChild(ov);
+    ov.addEventListener('click',e=>{if(e.target.id==='baseov')closeBase();});
+    const st=document.createElement('style');st.textContent=`#baseov{position:fixed;inset:0;z-index:960;background:rgba(5,0,12,.9);display:none;align-items:center;justify-content:center;padding:8px}#baseov.on{display:flex}
+      .basep{width:min(98vw,480px);max-height:calc(100vh - 16px);overflow:auto;background:rgba(16,8,30,.98);border:2px solid #ff3d8b;border-radius:14px;padding:10px;color:#fff;font-family:'Oswald',sans-serif;box-shadow:0 0 0 2px #000,0 0 24px rgba(255,61,139,.4)}
+      .bsub{font-size:12px;color:#cbbbe6;margin-bottom:6px}.bwrap{display:flex;justify-content:center;touch-action:none}#bcv{border:2px solid #000;box-shadow:0 0 0 2px #2fe0ea;image-rendering:pixelated;touch-action:none;cursor:crosshair}
+      .bstat{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;margin-top:6px}.bstat .ok{color:#7dffb2}.bstat .bad{color:#ff6f6f}.bcnt{font-size:11px;color:#cbbbe6;margin-top:2px}.bmsg{font-size:12px;color:#ffe14d;margin-top:3px}
+      .btools{display:flex;gap:4px;overflow-x:auto;padding:6px 0 4px;margin-top:4px}.btools button{flex:none;width:66px;background:#1d1030;border:2px solid #4b3a6e;color:#fff;border-radius:8px;padding:3px 2px;cursor:pointer;font-family:'Oswald',sans-serif}
+      .btools button.on{border-color:#ffe14d;background:#3a2a10;box-shadow:0 0 8px rgba(255,225,77,.5)}.btools i{display:block;font-style:normal;font-size:20px}.btools b{display:block;font-size:10px;line-height:1.1}.btools small{display:block;font-size:9px;color:#7dffb2}
+      .bbtns{display:flex;gap:6px;margin-top:6px}.bbtns button{flex:1;font-family:'Bangers',cursive;font-size:18px;padding:9px 4px;border:3px solid #000;border-radius:8px;cursor:pointer}#btest{background:#2fe0ea}#bsave{background:#ff3d8b;color:#fff}`;
+    document.head.appendChild(st);})();
+  window.NH_BASE={open:openBase,get:()=>baseGet()};
   window.__continue=continueGame;window.__nhReady=true;roll();
   if(hasSave()){try{const d=JSON.parse(localStorage.getItem(SKEY));$('tap').innerHTML='TIPPEN ZUM WEITERSPIELEN<br><small style="font-size:.55em">Spielstand: Stufe '+d.lvl+'</small>';}catch(e){}}
   // ---------- Pixel-Einsatz (iframe) ----------
@@ -2334,11 +2420,12 @@
   window.addEventListener('message',e=>{
     const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
     const T=JSON.parse(f.dataset.t||'{}');
-    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
+    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
     if(d.type==='sfx'){if(window.NHA)NHA.sfx(d.n);return;}
     if(d.type==='mood'){if(window.NHA)NHA.mood(d.m);return;}
     if(d.type!=='heistEnd')return;
     if(window.NHA)NHA.mood('chill');
+    if(T.practice){const ok=d.res==='escape'&&[...(d.bag||[]),...(d.trunk||[])].includes('tresorgeld');wipeTo(()=>{f.remove();show('hide');fitAll();hud();setTimeout(()=>sayRaw('erz',`<div class="rbig ${ok?'':'bad'}">TESTLAUF ${ok?'GESCHAFFT':'GESCHEITERT'}</div>${ok?'Du bist mit dem Tresor rausgekommen. Da geht noch was – mehr Fallen? Hunde?':'Deine Base hat dich erwischt. Gut so!'}<div class="dsub">Testläufe kosten nichts und du verlierst keine Ausrüstung.</div>`,[{t:'Zurück zum Bauen',f:()=>{closeDlg();openBase();}},{t:'Fertig',f:closeDlg}]),300);});return;}
     const known=id=>ITEMS[id];
     let html; const typ=T.kind==='golden'?'golden':T.type;
     if(T.kind!=='golden'&&!T.story){const i=TARGETS.findIndex(x=>x.seed===T.seed);if(i>=0)TARGETS.splice(i,1);}
@@ -2359,7 +2446,8 @@
       let rp=0;if(T.fac&&T.fac===FACTION)rp=addRep(FACTION,12);else if(FACTION&&typ===FACT[FACTION].btype)rp=addRep(FACTION,5);
       if(Q===13&&FACTION&&T.fac===FACTION){Q=14;} if(T.story==='bank'&&Q===17){Q=18;if(FACTION)rp+=addRep(FACTION,20);}
       if(rp)pl+=`<b class="x">+${rp} Ruf ${FACT[FACTION].n}</b>`;
-      if(T.raid&&window.NH_ONLINE){NH_ONLINE.raidFinish(T.raid,true).then(l=>{if(l>0){addReward(l,0,0);setTimeout(()=>toastMsg('TRESOR GEKNACKT: +$'+fmt(l)),1500);}else if(l===0)setTimeout(()=>toastMsg('TRESOR WAR LEER'),1500);});}
+      if(T.raid&&window.NH_ONLINE&&T.kind==='base'&&![...(d.bag||[]),...(d.trunk||[])].includes('tresorgeld')){NH_ONLINE.raidFinish(T.raid,false,0);setTimeout(()=>toastMsg('TRESOR NICHT GEKNACKT – KEIN GELD'),1500);}
+      else if(T.raid&&window.NH_ONLINE){NH_ONLINE.raidFinish(T.raid,true).then(l=>{if(l>0){addReward(l,0,0);setTimeout(()=>toastMsg('TRESOR GEKNACKT: +$'+fmt(l)),1500);}else if(l===0)setTimeout(()=>toastMsg('TRESOR WAR LEER'),1500);});}
       if(FACTION&&window.NH_ONLINE)NH_ONLINE.factionPoints(Math.min(500,10+Math.round(val/100)+(typ==='bank'?150:0)));
       if(d.stolen&&VEHS[d.stolen]){track('stolen');if(GARAGE.includes(d.stolen)){const pv=Math.round(VEHS[d.stolen].v*.4);cash+=pv;pl+=`<b>🚗 ${VEHS[d.stolen].n} an Mags verkauft: +$${fmt(pv)}</b>`;}else{GARAGE.push(d.stolen);pl+=`<b class="x">🚗 Neu in der Garage: ${VEHS[d.stolen].n}</b>`;}}
       html=`<div class="rbig">ENTKOMMEN!</div>${T.name}: erledigt.<div class="reward"><b>Beute $${val}</b><b class="x">+ ${xpG} XP</b>${d.heat?`<b class="h">+${d.heat} Heat</b>`:''}${pl}</div>${ml?`<div class="dsub">Material ins Lager: ${ml}</div>`:''}${T.coup?'<div class="dsub">Coup des Tages: XP ×1,5 und $300 Bonus!</div>':''}${spindFull()?'<div class="dsub" style="color:#ff6f6f">⚠ Dein Spind ist übervoll – verkauf Beute oder bau ihn aus, bevor du wieder losziehst.</div>':''}<div class="dsub">Alles liegt im Spind. Beute verkaufst du bei Dee, Material verbaust du an der Werkbank.</div>`;
@@ -2367,7 +2455,7 @@
       const lost=Object.values(LOADOUT).filter(x=>x).length; const safe=LOADOUT.safe;
       Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null); if(safe)STASH.push(safe);
       const insd=INS_LIST&&INS_LIST.length?INS_LIST.filter(i=>i!==safe):null;if(insd){insd.forEach(i=>STASH.push(i));}INS_LIST=null;
-      if(T.raid&&window.NH_ONLINE)NH_ONLINE.raidFinish(T.raid,false);
+      if(T.raid&&window.NH_ONLINE){const bv=(d.bag||[]).filter(known).reduce((s,id)=>s+(ITEMS[id].t==='loot'?ITEMS[id].v:0),0);NH_ONLINE.raidFinish(T.raid,false,Math.round(150+bv*.5));}
       const bail=Math.min(cash,100); addReward(-bail,15,2); sfx('stamp');track('busted');track('ko',d.ko||0);track('searched',d.searched||0);if(T.coup)DAILYCOUP=T.coup;
       html=`<div class="rbig bad">ERWISCHT!</div>Eine Nacht in der Zelle, dann holt dich Sals Anwalt raus.<div class="reward"><b class="h">${lost} Ausrüstungsteile weg</b><b class="h">Kaution −$${bail}</b><b class="h">+2 Heat</b></div>${safe?`<div class="dsub">Gerettet im Geheimfach: ${ITEMS[safe].n}</div>`:''}${insd?`<div class="dsub" style="color:#7dffb2">🛡 Versicherung: Harvey hat ${insd.length} Ausrüstungsteile zurückgeholt.</div>`:''}<div class="dsub">Neues Werkzeug baust du an der Werkbank.</div>`;
     }
