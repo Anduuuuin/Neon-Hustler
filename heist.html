@@ -319,7 +319,7 @@ const hasCard=()=>BAG.some(p=>p.id==='karte');
 // ================= Figuren =================
 const P={x:0,y:0,face:-Math.PI/2,step:0,hp:100,moving:false};
 function mkG(path){return{x:path[0][0]*T,y:path[0][1]*T,dir:0,wp:0,path,sus:0,mode:'patrol',tx:0,ty:0,step:0,look:0,moving:false,down:false,stun:0,stuck:0};}
-let alarm=0,cop=null,busy=null,state='load',rings=[],smokes=[],heat=0,flashes=[];
+let NSEARCH=0,NKO=0,MAXAL=0,alarm=0,cop=null,busy=null,state='load',rings=[],smokes=[],heat=0,flashes=[];
 const jammed=()=>performance.now()<jamUntil;
 const lasersActive=()=>lasersOn&&!jammed();
 const camsActive=()=>camsOn&&!jammed();
@@ -479,6 +479,7 @@ function upd(dt){
   smokes.forEach(s=>{s.t-=dt;s.r=Math.min(46,s.r+dt*40);});smokes=smokes.filter(s=>s.t>0);
   flashes.forEach(f=>f.t-=dt);flashes=flashes.filter(f=>f.t>0);
   updButtons();
+  if(alarm>MAXAL)MAXAL=alarm;
   $('hp').textContent=Math.max(0,Math.round(P.hp));$('bv').textContent='$'+bagVal();$('al').style.width=Math.min(100,alarm)+'%';
   $('iJam').classList.toggle('on',jammed());
 }
@@ -527,7 +528,7 @@ function doAct(){
   const th=nearThing();if(!th)return;
   if(th.k==='cont'){const C=th.c;if(C.done){openLoot(C);return;}
     if(C.type==='X'){safeMenu(C);return;}
-    const D=CDEF[C.type];noise(D.nz*4);startBusy(C.type==='A'?'AUSSCHLACHTEN …':'DURCHSUCHEN …',D.t,()=>{C.done=true;SFX('loot');if(C.note&&!codeKnown){codeKnown=true;$('iCode').textContent='SAFE-CODE: '+CODE;$('iCode').classList.add('on');toast('ZETTEL: SAFE-CODE '+CODE);}openLoot(C);},C.type==='A'?1:0,60);return;}
+    const D=CDEF[C.type];noise(D.nz*4);startBusy(C.type==='A'?'AUSSCHLACHTEN …':'DURCHSUCHEN …',D.t,()=>{C.done=true;NSEARCH++;SFX('loot');if(C.note&&!codeKnown){codeKnown=true;$('iCode').textContent='SAFE-CODE: '+CODE;$('iCode').classList.add('on');toast('ZETTEL: SAFE-CODE '+CODE);}openLoot(C);},C.type==='A'?1:0,60);return;}
   if(th.k==='door'){doorMenu(th.d);return;}
   if(th.k==='fuse'){wireGame('STROMKASTEN','Gleiche Farben verbinden – dann sind die Laser aus.',()=>{lasersOn=false;$('iLaser').classList.add('on');toast('LASER AUS!');SFX('zip');});return;}
   if(th.k==='mon'){startBusy('KAMERAS HACKEN …',4,()=>{camsOn=false;$('iCam').classList.add('on');toast('KAMERAS AUS');SFX('zip');});return;}
@@ -573,7 +574,7 @@ function doAtk(){
   const w=WEAP[LO.weapon];let ch=w?w.p:45;if(!behind)ch-=35;if(g.stun>0)ch=100;
   const ok=Math.random()*100<ch;
   if(w&&w.loud){noise(260);raise(Math.max(alarm,70));}else noise(45);
-  if(ok){SFX('hit');g.down=true;g.mode='down';g.sus=0;toast(behind||g.stun>0?'AUSGESCHALTET!':'K.O.!');}
+  if(ok){SFX('hit');NKO++;g.down=true;g.mode='down';g.sus=0;toast(behind||g.stun>0?'AUSGESCHALTET!':'K.O.!');}
   else{SFX('hit');SFX('alert');g.mode='chase';g.sus=100;g.stun=0;raise(100);P.hp-=20;toast('ER WEHRT SICH!');if(P.hp<=0)busted('Der Wachmann ist stärker als gedacht.');}
 }
 
@@ -724,7 +725,7 @@ function leaveFS(){try{if(screen.orientation&&screen.orientation.unlock)screen.o
 function sendEnd(res){
   leaveFS();
   const lo=Object.assign({},LO);
-  const data={type:'heistEnd',res,kind:CFG.kind,btype:CFG.type,bag:BAG.map(p=>p.id).filter(id=>id!=='karte'),lo,heat,alarm:Math.round(alarm),val:bagVal()};
+  const data={type:'heistEnd',res,kind:CFG.kind,btype:CFG.type,bag:BAG.map(p=>p.id).filter(id=>id!=='karte'),lo,heat,alarm:Math.round(MAXAL),val:bagVal(),searched:NSEARCH,ko:NKO};
   if(EMBED)window.parent.postMessage(data,'*');else location.reload();
 }
 function extract(kind){

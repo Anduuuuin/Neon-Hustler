@@ -483,6 +483,41 @@
   #inv .crw b{display:block;font-size:13px}#inv .crw small{font-size:10px;color:#cbbbe6}
   #inv .crw.on{border-style:solid;border-color:#7dffb2;background:#123020}
   #inv .cell.cloth{border-color:#b98cff;background:#1d1236}
+
+  #trophy{position:fixed;left:calc(max(10px,env(safe-area-inset-left)) + 52px);bottom:max(12px,env(safe-area-inset-bottom));z-index:60;width:44px;height:44px;border-radius:50%;border:3px solid #000;background:#1d1030;font-size:20px;line-height:1;cursor:pointer;box-shadow:0 0 0 2px #ffd34d,0 0 14px rgba(255,211,77,.5);padding:0;opacity:.9}
+  #trophy[data-n]:not([data-n=""])::after{content:attr(data-n);position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:#ff3d3d;color:#fff;font-size:11px;font-weight:700;font-family:'Oswald',sans-serif;line-height:18px;border:2px solid #000}
+  #metaov{position:fixed;inset:0;z-index:950;background:rgba(5,0,12,.85);display:none;align-items:center;justify-content:center;padding:12px}
+  #metaov.on{display:flex}
+  .metap{width:min(96vw,460px);max-height:calc(100vh - 24px);display:flex;flex-direction:column}
+  .mtabs{display:flex;gap:4px;margin-bottom:8px}
+  .mtabs button{flex:1;background:#0b0616;border:2px solid #4b3a6e;color:#cbbbe6;font-family:'Bangers',cursive;font-size:15px;letter-spacing:.5px;padding:6px 2px;cursor:pointer;border-radius:6px}
+  .mtabs button.on{background:#ff3d8b;color:#fff;border-color:#000}
+  .mbody{overflow:auto;flex:1;padding-right:2px}
+  .mh{font-family:'Bangers',cursive;font-size:19px;letter-spacing:1px;color:#ffe14d;margin:8px 0 5px;display:flex;justify-content:space-between;align-items:baseline}
+  .mh small{font-family:'Oswald',sans-serif;font-size:11px;color:#7ff6ff;letter-spacing:0}
+  .mrow{display:flex;align-items:center;gap:8px;background:#1d1030;border:2px solid #4b3a6e;border-radius:8px;padding:6px 8px;margin-bottom:5px}
+  .mrow>div{flex:1;min-width:0}.mrow b{display:block;font-size:14px}.mrow small{font-size:11px;color:#cbbbe6}
+  .mrow.cl{opacity:.5}.mrow span{color:#7dffb2;font-size:18px}
+  .mrow button,.aset button{background:#7dffb2;border:2px solid #000;color:#000;font-family:'Bangers',cursive;font-size:15px;padding:5px 10px;cursor:pointer;border-radius:6px}
+  .mrow button:disabled,.aset button:disabled,.mbig:disabled{opacity:.3;background:#4b3a6e;color:#fff}
+  .pb{height:6px;background:#0b0616;border:1px solid #4b3a6e;margin:3px 0;border-radius:3px;overflow:hidden}.pb i{display:block;height:100%;background:linear-gradient(90deg,#2fe0ea,#7dffb2)}
+  .aset{background:#1d1030;border:2px solid #4b3a6e;border-radius:8px;padding:6px 8px;margin-bottom:6px}.aset.cl{border-color:#7dffb2}
+  .ah{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ah b{font-size:15px}.ah small{flex:1;font-size:11px;color:#cbbbe6}.ah span{color:#7dffb2;font-size:12px}
+  .ag{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}.ag img{width:34px;height:34px;object-fit:contain;background:#0b0616;border-radius:6px;padding:2px}.ag img.no{filter:grayscale(1) brightness(.25)}
+  .login{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+  .ld{background:#1d1030;border:2px solid #4b3a6e;border-radius:8px;padding:5px;text-align:center}.ld small{display:block;font-size:10px;color:#7ff6ff}.ld b{font-size:11px;font-weight:500}
+  .ld.got{opacity:.45;border-color:#7dffb2}.ld.now{border-color:#ffe14d;box-shadow:0 0 10px rgba(255,225,77,.6)}
+  .mbig{width:100%;margin:8px 0;background:#ff3d8b;color:#fff;border:3px solid #000;font-family:'Bangers',cursive;font-size:20px;letter-spacing:1px;padding:8px;cursor:pointer;box-shadow:3px 3px 0 #000}
+  .adrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.adrow button{background:#0b0616;border:2px solid #2fe0ea;color:#fff;font-family:'Oswald',sans-serif;font-size:13px;padding:10px 4px;border-radius:8px;cursor:pointer}
+  .st2{display:grid;grid-template-columns:1fr 1fr;gap:5px}.st2 div{background:#1d1030;border:1px solid #4b3a6e;border-radius:6px;padding:5px 8px}.st2 small{display:block;font-size:10px;color:#7ff6ff}.st2 b{font-size:14px}
+  .mp{font-size:13px;color:#e4dcf5;line-height:1.35}
+  #adov{position:fixed;inset:0;z-index:2000;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-family:'Oswald',sans-serif}
+  #adov b{font-family:'Bangers',cursive;font-size:34px;color:#ffe14d}#adov p{color:#aaa;max-width:260px}#adov i{font-style:normal;font-size:40px;font-family:'Bangers',cursive}
+  #inv .spcap{display:flex;align-items:center;gap:8px;margin-top:8px;background:#1b1030;border:2px solid #2fe0ea;border-radius:8px;padding:6px 8px;font-size:13px}
+  #inv .spcap>div{flex:1}#inv .spcap.full{border-color:#ff3d3d;background:#3a0f1a}
+  #inv .spcap button,#inv .spbtn button{background:#0b0616;border:2px solid #ffe14d;color:#ffe14d;font-family:'Oswald',sans-serif;font-size:12px;padding:6px 8px;border-radius:6px;cursor:pointer}
+  #inv .spbtn{display:flex;gap:6px;margin-top:6px}#inv .spbtn button{flex:1;border-color:#4b3a6e;color:#fff}#inv .spbtn .sptr.on{border-color:#ff3d3d;background:#3a0f1a}
+  #sheet .tgt.coup{border-color:#ff9f43;background:linear-gradient(135deg,#3a1400,#1d1030)}
 </style>
 </head>
 <body>
@@ -607,6 +642,8 @@
 </section>
 <div id="inv"></div>
 <button type="button" id="gear" aria-label="Einstellungen">⚙</button>
+<button type="button" id="trophy" aria-label="Zentrale">🏆</button>
+<div id="metaov"><div class="setp metap" id="metap"></div></div>
 <div id="setov"><div class="setp">
   <div class="seth"><b>EINSTELLUNGEN</b><button type="button" id="setx">✕</button></div>
   <button type="button" class="setb" id="sInstall"><span>📲</span><div><b>Auf dem Handy installieren</b><small id="sInstTxt">Als App auf den Startbildschirm – Vollbild, eigenes Symbol</small></div></button>
@@ -745,15 +782,17 @@
   let cash=40, nrg=10, jobTaken=false, job=0, xp=0, lvl=1, heat=0, buff=false;
   let Q=0, PEND=null, BAGLV=0, KNOWN=[]; const TARGETS=[], CALLS=[1,3,6,8,11,15,18], BAGS=[[5,4],[6,4],[6,5]];
   const OUTFIT_EQ={kopf:null,brille:'sonnenbrille',jacke:'sakko_pink',schuhe:'sneaker'}, REP={kartell:0,neon:0,syndikat:0}, CREW=[], CREW_ON=[];
-  let FACTION=null, UPG={bett:0,werkbank:0}, NMAX=10, lastRegen=Date.now();
+  let FACTION=null, UPG={bett:0,werkbank:0,spind:0}, NMAX=10, lastRegen=Date.now();
+  let STAT={}, DAILY=null, WEEKLY=null, LOGIN={last:'',streak:0,claimed:''}, ACH=[], ALBUM=[], ALBUMC=[], PRESTIGE=0, ADS={d:'',n:0}, DAILYCOUP='';
   const acts={
     close,
     takeJob(){jobTaken=true;job=1;$('h-phone').classList.remove('alert');close();toastMsg('JOB ANGENOMMEN!');
       setTimeout(()=>{$('h-door').classList.add('flash','alert');setTimeout(()=>$('h-door').classList.remove('flash'),2500);},900);},
     heist(){close();invOpen('heist');},
-    plan(a){const T=TARGETS[+a.dataset.i];if(!T)return;if(lvl<T.req){toastMsg('AB STUFE '+T.req);return;}if(nrg<T.e){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND=T;close();invOpen('heist');},
-    bank(){if(Q<17||lvl<7){toastMsg('AB STUFE 7');return;}if(nrg<5){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND={kind:'gen',type:'bank',name:'First Palm Bank',e:5,diff:3,seed:777+Math.floor(Math.random()*1e6),story:'bank'};close();invOpen('heist');},
-    golden(){if(Q<10||lvl<4){toastMsg(Q<10?'SAL HAT NOCH KEINEN PLAN':'AB STUFE 4');return;}if(nrg<4){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND={kind:'golden',type:'golden',name:'Golden Palm',e:4,diff:3};close();invOpen('heist');},
+    coup(){if(DAILYCOUP===dkey()){toastMsg('HEUTE SCHON ERLEDIGT');return;}const T=dailyCoup();if(nrg<T.e){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}if(spindBlock())return;PEND=T;close();invOpen('heist');},
+    plan(a){const T=TARGETS[+a.dataset.i];if(!T)return;if(spindBlock())return;if(lvl<T.req){toastMsg('AB STUFE '+T.req);return;}if(nrg<T.e){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND=T;close();invOpen('heist');},
+    bank(){if(Q<17||lvl<7){toastMsg('AB STUFE 7');return;}if(spindBlock())return;if(nrg<5){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND={kind:'gen',type:'bank',name:'First Palm Bank',e:5,diff:3,seed:777+Math.floor(Math.random()*1e6),story:'bank'};close();invOpen('heist');},
+    golden(){if(spindBlock())return;if(Q<10||lvl<4){toastMsg(Q<10?'SAL HAT NOCH KEINEN PLAN':'AB STUFE 4');return;}if(nrg<4){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND={kind:'golden',type:'golden',name:'Golden Palm',e:4,diff:3};close();invOpen('heist');},
     craft(a){craft(a.dataset.r);},
     bedup(){const nx=BEDS[UPG.bett+1];if(!nx)return;if(cash<nx[2]){toastMsg('ZU WENIG GELD');return;}addReward(-nx[2],0,0);UPG.bett++;NMAX=nx[1];nrg=Math.min(NMAX,nrg+4);sfx('cash');hud();open(bedHTML());},
     benchup(){if(UPG.werkbank>=1)return;if(cash<600){toastMsg('ZU WENIG GELD');return;}addReward(-600,0,0);UPG.werkbank=1;sfx('cash');hud();open(benchHTML());toastMsg('WERKBANK STUFE 2');},
@@ -791,7 +830,7 @@
 
   // ---------- Werte / HUD ----------
   function hud(){ questTick(); if(window.__nhReady)saveGame(); const nm=document.getElementById('nmax');if(nm)nm.textContent=NMAX; $('cash').textContent=cash; $('nrg').textContent=nrg; $('lvl').textContent=lvl;
-    $('heat').textContent='★'.repeat(heat)+'☆'.repeat(5-heat); $('buff').style.display=buff?'block':'none'; $('xpbar').style.width=Math.min(100,xp)+'%'; }
+    $('heat').textContent='★'.repeat(heat)+'☆'.repeat(5-heat); $('buff').style.display=buff?'block':'none'; $('xpbar').style.width=Math.min(100,xp/(100+(lvl-1)*20)*100)+'%'; if(window.__nhReady){albumScan();} }
   hud();
 
 
@@ -1089,7 +1128,7 @@
 
   // ================= ORTE, FIGUREN & JOBS =================
   const STATS={Muskeln:12,'Köpfchen':10,Charme:14,Ausdauer:11,'Glück':8};
-  function addReward(m,x,h){cash+=m;xp+=x;heat=Math.max(0,Math.min(5,heat+(h||0)));while(xp>=100){xp-=100;lvl++;setTimeout(()=>{sfx('cash');},300);}hud();}
+  function addReward(m,x,h){cash+=m;if(x>0&&window.__nhReady)x=Math.round(x*xpMul());xp+=x;heat=Math.max(0,Math.min(5,heat+(h||0)));while(xp>=100+(lvl-1)*20){xp-=100+(lvl-1)*20;lvl++;setTimeout(()=>{sfx('cash');toastMsg('STUFE '+lvl+'!');},300);}hud();}
   const PLACES={
     'm-hafen':{n:'CONTAINERHAFEN',img:'pl_hafen.webp',npc:'rico',greet:'Was willst du? Hier wird gearbeitet, nicht gequatscht.',
       jobs:[{n:'Kisten verladen',stat:'Ausdauer',p:75,t:6,m:25,x:12,e:1,ev:'Der Vorarbeiter meint, wenn du die Nachtschicht dranhängst, legt er was drauf.',safe:'Pünktlich Feierabend',risk:'Nachtschicht schieben'},
@@ -1157,7 +1196,7 @@
   function npcMenu(greet){
     const P=PLACES[curPlace];
     const ch=P.jobs.map(j=>({t:`${j.n}<small>$${j.m} · ${j.stat} · Energie ${j.e}${j.h?' · Heat-Risiko':''}</small>`,f:()=>startJob(j,P.npc,()=>npcMenu('Noch was?'))}));
-    if(P.npc==='dee')ch.unshift({t:'Beute verkaufen <small>60 % VOM WERT</small>',f:sellLoot});
+    if(P.npc==='dee')ch.unshift({t:'Beute verkaufen <small>${Math.round(deeRate()*100)} % VOM WERT</small>',f:sellLoot});
     if(SHOP[P.npc])ch.unshift({t:SHOPT[P.npc]||'Material kaufen <small>FÜR DIE WERKBANK</small>',f:()=>shopMenu(P.npc)});
     if(P.npc==='rico'&&Q>=12)ch.unshift({t:FACTION==='kartell'?'Los Cuchillos <small>FRAKTIONSAUFTRÄGE</small>':'Über Los Cuchillos reden <small>FRAKTION</small>',f:()=>factionTalk('rico')});
     ch.push({t:'Was gibt’s Neues?',f:()=>say(P.npc,P.rumor,[{t:'Interessant.',f:()=>npcMenu('Sonst noch was?')}])});
@@ -1196,7 +1235,7 @@
     const {j,who}=JOB; clearInterval(jobTimer); JOB=null; renderJob(); show(scene); jobEvent(j,who,()=>closeDlg());
   }
   function jobEvent(j,who,again){
-    const ch=Math.max(5,Math.min(95,j.p+(buff&&j.stat==='Charme'?15:0)+(statVal(j.stat)-10)*2));
+    const ch=Math.max(5,Math.min(95,j.p+(buff&&j.stat==='Charme'?15:0)+(statVal(j.stat)-10)*2+(hasSet('waffen')?5:0)));
     sayRaw(who,`<b>Zwischenfall!</b><br>${j.ev}`,[
       {t:`${j.safe}<small>SICHER · $${j.m}</small>`,f:()=>jobResult(j,who,again,'safe')},
       {t:`${j.risk}<small>${j.stat.toUpperCase()} · ${ch} % · $${j.m*2}${j.h?' · Heat':''}</small>`,f:()=>{if(j.stat==='Charme'&&buff){buff=false;hud();}diceRoll(who,ch,j.stat,win=>jobResult(j,who,again,win?'win':'lose'));}}]);
@@ -1210,7 +1249,7 @@
     let m=j.m,x=j.x,h=0,big='ERLEDIGT.',bad=false,txt='Sauber und ohne Ärger.';
     if(res==='win'){m=j.m*2;x=Math.round(j.x*1.5);h=j.h||0;big='GESCHAFFT!';txt='Riskant, aber es hat sich gelohnt.';}
     if(res==='lose'){m=Math.round(j.m*.3);x=Math.round(j.x*.5);h=j.h||0;big='MIST!';bad=true;txt='Das ging schief. Mit Glück kommst du mit ein paar Kröten davon.';}
-    addReward(m,x,h); sfx(bad?'stamp':'cash'); const rp=j.rep&&FACTION===j.rep?addRep(j.rep,res==='lose'?1:res==='win'?6:4):0;
+    addReward(m,x,h); sfx(bad?'stamp':'cash'); track('jobs');if(j.rep)track('factionjobs'); const rp=j.rep&&FACTION===j.rep?addRep(j.rep,res==='lose'?1:res==='win'?6:4):0;
     sayRaw(who,`<div class="rbig${bad?' bad':''}">${big}</div>${txt}<div class="reward"><b>+ $${m}</b><b class="x">+ ${x} XP</b>${h?'<b class="h">+1 Heat ★</b>':''}${rp?`<b class="x">+${rp} Ruf</b>`:''}</div>`,
       [{t:'Fertig',f:closeDlg}]);
   }
@@ -1292,7 +1331,8 @@
   function invOpen(mode){
     const o=$('inv'); o.dataset.mode=mode||'stash'; renderInv(); o.classList.add('on');
   }
-  function invClose(){$('inv').classList.remove('on');saveGame();}
+  let TRASH=false;
+  function invClose(){$('inv').classList.remove('on');TRASH=false;saveGame();}
   function renderInv(){
     const o=$('inv'), mode=o.dataset.mode;
     const sl=k=>{const id=LOADOUT[k];return `<button type="button" class="slot ${id?'full':''} ${k==='safe'?'safe':''}" data-slot="${k}"><small>${SLOTN[k]}</small>${id?`<img src="${ico(id)}" alt=""><b>${ITEMS[id].n}</b>`:'<i>leer</i>'}</button>`;};
@@ -1306,6 +1346,9 @@
       <div class="ih"><b>${mode==='heist'?'LOADOUT FÜR DEN HEIST':'SPIND · STASH'}</b><button type="button" class="ix">✕</button></div>
       <div class="isub">Was du mitnimmst, kannst du verlieren. Nur der <b>sichere Slot</b> bleibt dir immer.</div>
       <div class="doll">${lo}</div>${mode==='heist'&&CREW.length?`<div class="isub">Crew – antippen = mitnehmen (max. 2)</div><div class="crewrow">${CREW.map(c=>`<button type="button" class="crw ${CREW_ON.includes(c)?'on':''}" data-crew="${c}"><b>${CREWS[c].n}</b><small>${CREWS[c].role}</small></button>`).join('')}</div>`:''}<div class="bagrow"><img src="${ico('tasche')}" alt=""><b>RUCKSACK</b><span>${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]} Felder · ausbaubar an der Werkbank</span></div>
+      <div class="spcap ${spindFull()?'full':''}"><div><b>SPIND</b> ${spindUsed()}/${spindCap()} Felder<div class="pb"><i style="width:${Math.min(100,spindUsed()/spindCap()*100)}%"></i></div></div>
+        ${SPIND[(UPG.spind||0)+1]?`<button type="button" class="spup">Ausbau $${fmt(SPIND[(UPG.spind||0)+1][1])} → ${SPIND[(UPG.spind||0)+1][0]}</button>`:''}</div>
+      <div class="spbtn"><button type="button" class="sptr ${TRASH?'on':''}">🗑 ${TRASH?'Wegwerfen: AN – antippen löscht':'Wegwerfen'}</button><button type="button" class="spsell">📞 Beute an Dee (${Math.round((deeRate()-.1)*100)} %)</button></div>
       <div class="isub">Stash – antippen zum Ausrüsten</div>
       <div class="st">${st}</div>
       <div class="itip" id="itip">Tipp: Dietrich = leise Türen · Brecheisen = schnell, aber laut · Bohrer = Safes & Tresor · Granaten & Störsender in die Schnellslots</div>
@@ -1313,8 +1356,12 @@
     </div>`;
     o.querySelector('.ix').onclick=invClose;
     dollStart();
+    const su=o.querySelector('.spup');if(su)su.onclick=()=>{const nx=SPIND[(UPG.spind||0)+1];if(cash<nx[1]){$('itip').textContent='Zu wenig Geld für den Ausbau.';return;}addReward(-nx[1],0,0);UPG.spind=(UPG.spind||0)+1;sfx('cash');renderInv();};
+    o.querySelector('.sptr').onclick=()=>{TRASH=!TRASH;renderInv();};
+    o.querySelector('.spsell').onclick=()=>{const loot=STASH.filter(id=>ITEMS[id].t==='loot');if(!loot.length){$('itip').textContent='Keine Beute im Spind.';return;}const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*(deeRate()-.1));STASH=STASH.filter(id=>ITEMS[id].t!=='loot');addReward(v,5,0);track('sold',v);sfx('cash');renderInv();$('itip').textContent=`Dees Kurier hat alles abgeholt: +$${v}`;};
     o.querySelectorAll('.cell[data-i]').forEach(b=>b.onclick=()=>{
       const i=+b.dataset.i,id=STASH[i];
+      if(TRASH){STASH.splice(i,1);sfx('whoosh');renderInv();return;}
       if(ITEMS[id].t==='loot'){$('itip').textContent=`${ITEMS[id].n}: Wert $${ITEMS[id].v}. Bei Dee in der Pfandleihe verkaufen.`;return;}
       if(ITEMS[id].t==='mat'){$('itip').textContent=`${ITEMS[id].n}: Bastelmaterial für die Werkbank.`;return;}
       if(ITEMS[id].t==='cloth'){const s=ITEMS[id].slot;if(OUTFIT_EQ[s])STASH.push(OUTFIT_EQ[s]);OUTFIT_EQ[s]=id;STASH.splice(STASH.indexOf(id),1);$('itip').textContent=`${ITEMS[id].n}: ${ITEMS[id].d}`;renderInv();saveGame();return;}
@@ -1559,6 +1606,8 @@
     if(Q===13&&FACTION){const bt=FACT[FACTION].btype;let x=TARGETS.find(x=>x.type===bt&&x.fac);if(!x){x=mkTarget(bt);x.req=1;x.fac=FACTION;x.name=FACT[FACTION].n+': '+x.name;TARGETS[0]=x;}}
     TARGETS.forEach(x=>{if(!x.fac&&FACTION&&x.type===FACT[FACTION].btype&&Math.random()<.5)x.fac=FACTION;});
   }
+  function coupCard(){if(Q<2)return '';const T=dailyCoup(),done=DAILYCOUP===dkey();
+    return `<button type="button" class="tgt coup ${done?'lock':''}" data-a="coup"><b>🔥 ${T.name.replace('Coup des Tages: ','COUP DES TAGES: ')}</b><span>${TINFO[T.type].n} · ${'★'.repeat(T.diff)}${'☆'.repeat(3-T.diff)} · XP ×1,5 + $300 Bonus</span><small>${done?'Heute erledigt – morgen gibt’s einen neuen':'Nur heute · Energie '+T.e}</small></button>`;}
   function boardHTML(){
     refreshTargets();
     const gOpen=Q>=10&&lvl>=4;
@@ -1567,7 +1616,7 @@
     const list=TARGETS.map((x,i)=>{const lk=lvl<x.req;return `<button type="button" class="tgt ${lk?'lock':''}" data-a="plan" data-i="${i}"><b>${x.name}</b><span>${TINFO[x.type].n} · ${'★'.repeat(x.diff)}${'☆'.repeat(3-x.diff)} · ${TINFO[x.type].loot}</span><small>${lk?'ab Stufe '+x.req:'Energie '+x.e+' · zufälliger Grundriss'}${x.fac?` · <b style="color:${FACT[x.fac].col}">Auftrag ${FACT[x.fac].n} (+Ruf)</b>`:''}</small></button>`;}).join('');
     const bankOpen=Q>=17&&lvl>=7;
     const bank=Q>=17?`<button type="button" class="tgt gold ${bankOpen?'':'lock'}" data-a="bank"><b>★ FIRST PALM BANK</b><span>Akt-2-Finale · Tresor, Schließfächer, Goldwagen</span><small>${bankOpen?'Energie 5 · nimm deine Crew mit!':'ab Stufe 7'}</small></button>`:'';
-    return `<h2>Pinnwand</h2><p class="qline">Was du mitnimmst, kannst du verlieren. Jeder Einbruch hat einen neuen Grundriss.</p><div class="tlist">${bank}${gold}${list}</div>${btns()}`;
+    return `<h2>Pinnwand</h2><p class="qline">Was du mitnimmst, kannst du verlieren. Jeder Einbruch hat einen neuen Grundriss.</p><div class="tlist">${coupCard()}${bank}${gold}${list}</div>${btns()}`;
   }
   const RECIPES=[
     {id:'rauch',need:{chemie:1,klebeband:1}},{id:'medkit',need:{pillen:1,klebeband:1}},{id:'dietrich',need:{metall:1,klebeband:1}},
@@ -1594,7 +1643,8 @@
     if(!Object.entries(r.need).every(([k,v])=>cnt(k)>=v))return;
     Object.entries(r.need).forEach(([k,v])=>{for(let i=0;i<v;i++)STASH.splice(STASH.indexOf(k),1);});
     if(id==='_bag'){BAGLV=Math.min(BAGS.length-1,BAGLV+1);toastMsg('RUCKSACK GRÖSSER!');}else{STASH.push(id);toastMsg(rname(id).toUpperCase()+' GEBAUT');}
-    sfx('click');addReward(0,8,0);
+    sfx('click');addReward(0,8,0);track('crafted');
+    if(hasSet('werkzeug')&&id!=='_bag'&&Math.random()<.25){STASH.push(id);setTimeout(()=>toastMsg('GLÜCK: DOPPELT GEBAUT!'),900);}
     if(Q===4){Q=5;}
     if(Q===9&&id==='stoer'){Q=10;setTimeout(()=>{close();sayRaw('erz','<b>Störsender fertig.</b><br>Jetzt fehlt nur noch Stufe 4 – dann wartet der <b>Golden Palm</b> an der Pinnwand.',[{t:'Weiter',f:closeDlg}]);},500);}
     hud();open(benchHTML());
@@ -1657,7 +1707,7 @@
   const OSLOT={kopf:'KOPF',brille:'BRILLE',jacke:'JACKE',schuhe:'SCHUHE'};
   const BASE={Muskeln:10,'Köpfchen':10,Charme:12,Ausdauer:10,'Glück':8};
   function statVal(s){let v=(BASE[s]||10)+Math.floor((lvl-1)/2);Object.values(OUTFIT_EQ).forEach(id=>{if(id&&ITEMS[id]&&ITEMS[id].bonus&&ITEMS[id].bonus[s])v+=ITEMS[id].bonus[s];});
-    if(FACTION&&FACT[FACTION].stat[0]===s)v+=FACT[FACTION].stat[1];return v;}
+    if(FACTION&&FACT[FACTION].stat[0]===s)v+=FACT[FACTION].stat[1];if(hasSet('klamotten'))v+=1;return v;}
   function heistPerks(){const p={};const o=OUTFIT_EQ;
     if(o.kopf==='sturmhaube')p.heat=(p.heat||0)+1;if(o.brille==='nachtsicht')p.nv=1;if(o.jacke==='tarnweste')p.vest=1;if(o.schuhe==='schleicher')p.quiet=1;
     CREW_ON.forEach(c=>{const P=CREWS[c].p;Object.entries(P).forEach(([k,v])=>p[k]=(p[k]||0)+v);});
@@ -1726,21 +1776,158 @@
   // ---------- Speichern ----------
   const SKEY='nh_save_v1';let saveT=0;
   function saveGame(){clearTimeout(saveT);saveT=setTimeout(()=>{if(scene==='start'||scene==='intro')return;
-    try{localStorage.setItem(SKEY,JSON.stringify({v:1,t:Date.now(),cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,TARGETS,STASH,LOADOUT,OUTFIT_EQ,FACTION,REP,CREW,CREW_ON,UPG,NMAX,lastRegen,JOB}));}catch(e){}},400);}
+    try{localStorage.setItem(SKEY,JSON.stringify(snap()));}catch(e){}},400);}
+  function snap(){return {v:1,t:Date.now(),cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,TARGETS,STASH,LOADOUT,OUTFIT_EQ,FACTION,REP,CREW,CREW_ON,UPG,NMAX,lastRegen,JOB,STAT,DAILY,WEEKLY,LOGIN,ACH,ALBUM,ALBUMC,PRESTIGE,ADS,DAILYCOUP};}
   function hasSave(){try{return !!localStorage.getItem(SKEY);}catch(e){return false;}}
   function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SKEY));}catch(e){return false;}if(!d)return false;
-    ({cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,FACTION,UPG,NMAX,lastRegen}=Object.assign({cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,FACTION,UPG,NMAX,lastRegen},d));
+    ({cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,FACTION,UPG,NMAX,lastRegen,STAT,DAILY,WEEKLY,LOGIN,ACH,ALBUM,ALBUMC,PRESTIGE,ADS,DAILYCOUP}=Object.assign({cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,FACTION,UPG,NMAX,lastRegen,STAT,DAILY,WEEKLY,LOGIN,ACH,ALBUM,ALBUMC,PRESTIGE,ADS,DAILYCOUP},d));if(UPG.spind==null)UPG.spind=0;
     STASH=d.STASH||STASH;Object.assign(LOADOUT,d.LOADOUT||{});Object.assign(OUTFIT_EQ,d.OUTFIT_EQ||{});Object.assign(REP,d.REP||{});
     CREW.splice(0,CREW.length,...(d.CREW||[]));CREW_ON.splice(0,CREW_ON.length,...(d.CREW_ON||[]));TARGETS.splice(0,TARGETS.length,...(d.TARGETS||[]));
     if(d.JOB){JOB=d.JOB;clearInterval(jobTimer);jobTimer=setInterval(renderJob,250);}
     return true;}
-  window.addEventListener('pagehide',()=>{clearTimeout(saveT);if(scene!=='start'&&scene!=='intro')try{localStorage.setItem(SKEY,JSON.stringify({v:1,t:Date.now(),cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,TARGETS,STASH,LOADOUT,OUTFIT_EQ,FACTION,REP,CREW,CREW_ON,UPG,NMAX,lastRegen,JOB}));}catch(e){}});
+  window.addEventListener('pagehide',()=>{clearTimeout(saveT);if(scene!=='start'&&scene!=='intro')try{localStorage.setItem(SKEY,JSON.stringify(snap()));}catch(e){}});
   function continueGame(){loadGame();regen();wipeTo(()=>{show('hide');enterHideout();
       $('h-phone').classList.toggle('alert',job===0||CALLS.includes(Q));$('h-door').classList.toggle('alert',job===1||job===2);hud();renderJob();
-      setTimeout(()=>toastMsg('WILLKOMMEN ZURÜCK'),700);});}
+      setTimeout(()=>{roll();if(loginState().can)openMeta('bonus');else toastMsg('WILLKOMMEN ZURÜCK');},900);});}
   window.NH_GAME={hasSave,wipe:()=>{try{localStorage.removeItem(SKEY);}catch(e){}},cheat:(k)=>{if(k==='cash')addReward(500,0,0);if(k==='lvl'){addReward(0,100,0);}if(k==='nrg'){nrg=NMAX;hud();}if(k==='mat'){['metall','metall','kabel','kabel','klebeband','klebeband','chemie','platine','pillen'].forEach(i=>STASH.push(i));toastMsg('MATERIAL IM SPIND');}saveGame();},
     info:()=>({lvl,Q,cash})};
-  window.__continue=continueGame;window.__nhReady=true;
+  // ================= LANGZEIT: AUFGABEN, LOGIN, ERFOLGE, ALBUM, PRESTIGE, WERBUNG, SPIND =================
+  const xpNeed=l=>100+(l-1)*20;
+  const fmt=n=>n>=1000?(Math.round(n/100)/10+'k').replace('.0k','k'):String(n);
+  function dkey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function wkey(d=new Date()){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return t.getUTCFullYear()+'-W'+Math.ceil(((t-y)/864e5+1)/7);}
+  function srand(s){let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return()=>{h+=0x6D2B79F5;let t=h;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+  function track(k,n=1){if(!n)return;STAT[k]=(STAT[k]||0)+n;metaBadge();}
+  // ---------- Spind ----------
+  const SPIND=[[40,0],[60,500],[90,1500],[130,4000],[180,10000],[250,25000]];
+  const spindCap=()=>SPIND[UPG.spind||0][0];
+  const spindUsed=()=>STASH.reduce((s,id)=>s+(ITEMS[id]?ITEMS[id].w*ITEMS[id].h:1),0);
+  const spindFull=()=>spindUsed()>spindCap();
+  function spindBlock(){if(!spindFull())return false;toastMsg('SPIND VOLL – ERST PLATZ SCHAFFEN');invOpen('stash');return true;}
+  // ---------- Bonus durch Album & Prestige ----------
+  const ALBUM_SETS={
+    schmuck:{n:'Schmuck',ids:['ring','uhr','collier','goldkette','gold'],bonus:'Dee zahlt 70 % statt 60 %'},
+    luxus:{n:'Luxus',ids:['gemaelde','aktenkoffer','chips','zigarren','elektronik'],bonus:'+10 % XP aus Einsätzen'},
+    werkzeug:{n:'Werkzeug & Gadgets',ids:['dietrich','dietrich2','brecheisen','bohrer','stoer','blend','rauch','medkit'],bonus:'Werkbank: 25 % Chance auf doppelt'},
+    waffen:{n:'Waffen',ids:['schlaeger','messer','schlagring','revolver'],bonus:'Jobs: +5 % Erfolgschance'},
+    klamotten:{n:'Kleiderschrank',ids:Object.keys(CLOTH),bonus:'+1 auf alle Werte'}};
+  const hasSet=k=>ALBUMC.includes(k);
+  const deeRate=()=>(hasSet('schmuck')?.7:.6)+PRESTIGE*.05;
+  const xpMul=()=>1+PRESTIGE*.15;
+  function albumScan(){let ch=false;[...STASH,...Object.values(LOADOUT),...Object.values(OUTFIT_EQ)].forEach(id=>{if(id&&ITEMS[id]&&!ALBUM.includes(id)){ALBUM.push(id);ch=true;}});if(ch)metaBadge();}
+  // ---------- Belohnungen ----------
+  const MATS=['metall','kabel','klebeband','chemie','platine','pillen'];
+  function give(r){const out=[];
+    if(r.cash){cash+=r.cash;out.push('$'+r.cash);}
+    if(r.xp){addReward(0,r.xp,0);out.push(r.xp+' XP');}
+    if(r.nrg){nrg=Math.min(NMAX+10,nrg+r.nrg);out.push('+'+r.nrg+' Energie');}
+    if(r.mat){for(let i=0;i<r.mat;i++)STASH.push(MATS[Math.floor(Math.random()*MATS.length)]);out.push(r.mat+'× Material');}
+    if(r.item){STASH.push(r.item);out.push(ITEMS[r.item].n);}
+    if(r.rep&&FACTION){addRep(FACTION,r.rep);out.push('+'+r.rep+' Ruf');}
+    if(r.cloth){const own=new Set([...STASH,...Object.values(OUTFIT_EQ)]);const pool=Object.keys(CLOTH).filter(c=>!own.has(c));const c=(pool.length?pool:Object.keys(CLOTH))[Math.floor(Math.random()*(pool.length||Object.keys(CLOTH).length))];STASH.push(c);out.push('Kleidung: '+ITEMS[c].n);}
+    hud();sfx('cash');return out.join(' · ');}
+  const rtxt=r=>[r.cash&&'$'+r.cash,r.xp&&r.xp+' XP',r.nrg&&'+'+r.nrg+' ⚡',r.mat&&r.mat+'× Material',r.item&&ITEMS[r.item].n,r.rep&&'+'+r.rep+' Ruf',r.cloth&&'Kleidung'].filter(Boolean).join(' · ');
+  // ---------- Tägliche & wöchentliche Aufgaben ----------
+  const DPOOL=[
+    {k:'jobs',g:3,t:'Erledige 3 Jobs in der Stadt',r:{cash:150,xp:30}},{k:'heists',g:1,t:'Schließe einen Einsatz erfolgreich ab',r:{cash:200,xp:40}},
+    {k:'searched',g:12,t:'Durchsuche 12 Behälter',r:{mat:3,xp:30}},{k:'ko',g:2,t:'Schalte 2 Wachen aus',r:{cash:150,xp:30}},
+    {k:'clean',g:1,t:'Ein Einsatz, ohne Alarm auszulösen',r:{item:'rauch',xp:40}},{k:'crafted',g:2,t:'Baue 2 Gegenstände an der Werkbank',r:{cash:120,xp:25}},
+    {k:'sold',g:1500,t:'Verkaufe Beute für $1.500',r:{xp:50,nrg:3}},{k:'bought',g:1,t:'Kauf etwas in einem Laden',r:{cash:80,xp:15}},
+    {k:'loot',g:2000,t:'Erbeute Ware im Wert von $2.000',r:{cash:250,xp:50}},{k:'factionjobs',g:2,t:'Erledige 2 Fraktionsjobs',r:{rep:5,xp:40},need:()=>!!FACTION}];
+  const WPOOL=[
+    {k:'heists',g:8,t:'8 erfolgreiche Einsätze',r:{cash:1500,xp:200,cloth:1}},{k:'jobs',g:20,t:'20 Jobs in der Stadt',r:{cash:1000,xp:150,mat:6}},
+    {k:'loot',g:20000,t:'Beute im Wert von $20.000',r:{cash:2000,xp:250}},{k:'ko',g:15,t:'15 Wachen ausschalten',r:{item:'blend',cash:800,xp:150}},
+    {k:'clean',g:5,t:'5 Einsätze ohne Alarm',r:{item:'stoer',cash:1000,xp:200}},{k:'crafted',g:12,t:'12 Gegenstände bauen',r:{mat:10,xp:150}},
+    {k:'daily',g:12,t:'12 Tagesaufgaben erledigen',r:{cloth:1,cash:1500,xp:200}}];
+  function roll(){
+    const d=dkey(),w=wkey();
+    if(!DAILY||DAILY.d!==d){const R=srand('d'+d);const pool=DPOOL.filter(m=>!m.need||m.need()).slice();const ids=[];while(ids.length<3&&pool.length){ids.push(pool.splice(Math.floor(R()*pool.length),1)[0].k);}
+      DAILY={d,ids,base:Object.fromEntries(ids.map(k=>[k,STAT[k]||0])),cl:[]};}
+    if(!WEEKLY||WEEKLY.w!==w){const R=srand('w'+w);const pool=WPOOL.slice();const ids=[];while(ids.length<3){ids.push(pool.splice(Math.floor(R()*pool.length),1)[0].k);}
+      WEEKLY={w,ids,base:Object.fromEntries(ids.map(k=>[k,STAT[k]||0])),cl:[]};}
+  }
+  const prog=(M,box,k)=>Math.min(M.g,(STAT[k]||0)-(box.base[k]||0));
+  // ---------- Login-Bonus ----------
+  const LOGIN_R=[{cash:100},{nrg:5},{mat:4},{cash:300,xp:30},{item:'blend'},{cash:500,nrg:5},{cloth:1}];
+  function loginState(){const d=dkey();if(LOGIN.claimed===d)return{can:false,day:LOGIN.streak};
+    const y=dkey(new Date(Date.now()-864e5));const next=LOGIN.last===y?(LOGIN.streak%7)+1:1;return{can:true,day:next};}
+  function claimLogin(){const s=loginState();if(!s.can)return;LOGIN.streak=s.day;LOGIN.last=dkey();LOGIN.claimed=dkey();const t=give(LOGIN_R[s.day-1]);track('logins');renderMeta();toastMsg('TAG '+s.day+': '+t);}
+  // ---------- Erfolge ----------
+  const AC=(id,t,c,r)=>({id,t,c,r});const SV=k=>STAT[k]||0;
+  const ACHS=[
+    AC('j10','10 Jobs erledigt',()=>SV('jobs')>=10,{cash:200}),AC('j50','50 Jobs erledigt',()=>SV('jobs')>=50,{cash:800,xp:100}),AC('j200','200 Jobs – Arbeitstier',()=>SV('jobs')>=200,{cash:3000,cloth:1}),
+    AC('h1','Erster erfolgreicher Einsatz',()=>SV('heists')>=1,{cash:150}),AC('h10','10 Einsätze',()=>SV('heists')>=10,{cash:600,mat:5}),AC('h50','50 Einsätze – Profi',()=>SV('heists')>=50,{cash:3000,item:'stoer'}),AC('h150','150 Einsätze – Legende',()=>SV('heists')>=150,{cash:10000,cloth:1}),
+    AC('s50','50 Behälter durchsucht',()=>SV('searched')>=50,{mat:5}),AC('s300','300 Behälter durchsucht',()=>SV('searched')>=300,{mat:15,cash:1000}),AC('s1k','1.000 Behälter – Wühlmaus',()=>SV('searched')>=1000,{cash:5000}),
+    AC('k10','10 Wachen ausgeschaltet',()=>SV('ko')>=10,{item:'blend'}),AC('k75','75 Wachen ausgeschaltet',()=>SV('ko')>=75,{cash:2000,item:'revolver'}),
+    AC('c5','5 saubere Einsätze',()=>SV('clean')>=5,{item:'stoer'}),AC('c30','30 saubere Einsätze – Phantom',()=>SV('clean')>=30,{cash:4000,cloth:1}),
+    AC('cr10','10 Dinge gebaut',()=>SV('crafted')>=10,{mat:6}),AC('cr60','60 Dinge gebaut – Bastler',()=>SV('crafted')>=60,{cash:2500}),
+    AC('l25','Beute für $25.000',()=>SV('loot')>=25000,{cash:1500}),AC('l250','Beute für $250.000',()=>SV('loot')>=250000,{cash:15000}),
+    AC('lv10','Stufe 10',()=>lvl>=10||PRESTIGE>0,{cash:1000}),AC('lv20','Stufe 20',()=>lvl>=20||PRESTIGE>1,{cash:3000,cloth:1}),AC('lv30','Stufe 30',()=>lvl>=30,{cash:8000}),
+    AC('gp','Golden Palm geknackt',()=>Q>=11,{cash:1000}),AC('bk','First Palm Bank geknackt',()=>Q>=19,{cash:5000,cloth:1}),
+    AC('r100','Rechte Hand deiner Fraktion',()=>FACTION&&REP[FACTION]>=100,{cash:5000}),AC('crew5','Komplette Crew (5)',()=>CREW.length>=5,{cash:2000}),
+    AC('bed','Wasserbett',()=>UPG.bett>=2,{nrg:10}),AC('sp','Spind voll ausgebaut',()=>(UPG.spind||0)>=SPIND.length-1,{cash:5000}),
+    AC('al1','Erstes Album-Set',()=>ALBUMC.length>=1,{cash:500}),AC('al5','Alle Album-Sets',()=>ALBUMC.length>=5,{cash:10000}),
+    AC('d10','10 Tagesaufgaben',()=>SV('daily')>=10,{cash:1000}),AC('lg7','7 Tage in Folge eingeloggt',()=>LOGIN.streak>=7,{cloth:1}),
+    AC('p1','Erstes Prestige',()=>PRESTIGE>=1,{cash:2000}),AC('busted','Erwischt … passiert jedem',()=>SV('busted')>=1,{cash:100})];
+  // ---------- Prestige ----------
+  const canPrestige=()=>lvl>=15&&Q>=19;
+  function doPrestige(){if(!canPrestige())return;PRESTIGE++;lvl=1;xp=0;cash=500;
+    STASH=STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='cloth');Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null);
+    ['dietrich','brecheisen','schlaeger','medkit','rauch'].forEach(i=>STASH.push(i));REP.kartell=REP.neon=REP.syndikat=Math.min(REP[FACTION]||0,20);if(FACTION)REP[FACTION]=20;
+    TARGETS.splice(0,TARGETS.length);sfx('stamp');hud();closeMeta();
+    sayRaw('erz',`<div class="rbig">COMEBACK ★${PRESTIGE}</div>Du fängst neu an – aber die Stadt kennt deinen Namen.<div class="reward"><b class="x">+${PRESTIGE*15} % XP dauerhaft</b><b>Dee zahlt +${PRESTIGE*5} %</b></div><div class="dsub">Kleidung, Baupläne, Crew, Ausbau und Album bleiben.</div>`,[{t:'Los geht’s',f:closeDlg}]);}
+  // ---------- Werbung (Platzhalter für später: AdMob) ----------
+  const AD_MAX=8;
+  function adsLeft(){const d=dkey();if(ADS.d!==d){ADS.d=d;ADS.n=0;}return AD_MAX-ADS.n;}
+  function watchAd(r){if(adsLeft()<=0){toastMsg('HEUTE KEINE WERBUNG MEHR');return;}
+    const o=document.createElement('div');o.id='adov';o.innerHTML='<div><b>WERBUNG</b><p>Platzhalter – in der Play-Store-Version läuft hier ein kurzes Video.</p><i id="adc">3</i></div>';document.body.appendChild(o);
+    let n=3;const it=setInterval(()=>{n--;const c=document.getElementById('adc');if(c)c.textContent=n;if(n<=0){clearInterval(it);o.remove();ADS.n++;const t=give(r);track('ads');renderMeta();toastMsg('BELOHNUNG: '+t);}},1000);}
+  // ---------- Coup des Tages ----------
+  function dailyCoup(){const d=dkey();const R=srand('coup'+d);const av=Object.keys(TINFO).filter(x=>lvl>=TINFO[x].req&&x!=='bank');const ty=av[Math.floor(R()*av.length)]||'werkstatt';
+    const nm=TNAMES[ty][Math.floor(R()*TNAMES[ty].length)];return{kind:'gen',type:ty,name:'Coup des Tages: '+nm,diff:Math.min(3,1+Math.floor(lvl/6)),req:1,e:TINFO[ty].e,seed:Math.floor(R()*1e9),coup:d};}
+  // ---------- Zentrale (Oberfläche) ----------
+  let metaTab='daily';
+  function claimable(){roll();let n=0;if(loginState().can)n++;
+    [[DAILY,DPOOL],[WEEKLY,WPOOL]].forEach(([box,P])=>box.ids.forEach(k=>{const M=P.find(m=>m.k===k);if(M&&!box.cl.includes(k)&&prog(M,box,k)>=M.g)n++;}));
+    ACHS.forEach(a=>{if(!ACH.includes(a.id)&&a.c())n++;});Object.entries(ALBUM_SETS).forEach(([k,s])=>{if(!ALBUMC.includes(k)&&s.ids.every(i=>ALBUM.includes(i)))n++;});return n;}
+  function metaBadge(){const b=document.getElementById('trophy');if(!b)return;const n=claimable();b.dataset.n=n?n:'';}
+  function openMeta(t){if(t)metaTab=t;$('metaov').classList.add('on');renderMeta();}
+  function closeMeta(){$('metaov').classList.remove('on');saveGame();}
+  function renderMeta(){roll();const P=$('metap');if(!P)return;
+    const tabs=[['daily','Aufgaben'],['ach','Erfolge'],['album','Album'],['bonus','Bonus'],['stats','Profil']];
+    let body='';
+    if(metaTab==='daily'){const sec=(title,box,pool,sub,stat)=>`<div class="mh">${title}<small>${sub}</small></div>`+box.ids.map(k=>{const M=pool.find(m=>m.k===k);const p=prog(M,box,k),done=p>=M.g,cl=box.cl.includes(k);
+        return `<div class="mrow ${cl?'cl':''}"><div><b>${M.t}</b><div class="pb"><i style="width:${p/M.g*100}%"></i></div><small>${fmt(p)}/${fmt(M.g)} · ${rtxt(M.r)}</small></div>${cl?'<span>✔</span>':`<button type="button" ${done?'':'disabled'} data-mc="${stat}:${k}">HOLEN</button>`}</div>`;}).join('');
+      const ms=()=>{const n=new Date();const e=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1);const h=Math.floor((e-n)/36e5),m=Math.floor((e-n)/6e4)%60;return `neu in ${h} h ${m} min`;};
+      body=sec('TÄGLICH',DAILY,DPOOL,ms(),'d')+sec('WÖCHENTLICH',WEEKLY,WPOOL,'jeden Montag neu','w');}
+    if(metaTab==='ach'){const done=ACHS.filter(a=>ACH.includes(a.id)).length;body=`<div class="mh">ERFOLGE<small>${done}/${ACHS.length}</small></div>`+ACHS.map(a=>{const cl=ACH.includes(a.id),ok=a.c();
+        return `<div class="mrow ${cl?'cl':''}"><div><b>${cl?'🏆 ':''}${a.t}</b><small>${rtxt(a.r)}</small></div>${cl?'<span>✔</span>':`<button type="button" ${ok?'':'disabled'} data-ma="${a.id}">HOLEN</button>`}</div>`;}).join('');}
+    if(metaTab==='album'){body=`<div class="mh">SAMMELALBUM<small>Jedes Teil einmal besitzen</small></div>`+Object.entries(ALBUM_SETS).map(([k,s])=>{const have=s.ids.filter(i=>ALBUM.includes(i)).length,full=have===s.ids.length,cl=ALBUMC.includes(k);
+        return `<div class="aset ${cl?'cl':''}"><div class="ah"><b>${s.n}</b><small>${have}/${s.ids.length} · Bonus: ${s.bonus}</small>${cl?'<span>✔ aktiv</span>':`<button type="button" ${full?'':'disabled'} data-al="${k}">AKTIVIEREN</button>`}</div><div class="ag">${s.ids.map(i=>`<img src="${ico(i)}" class="${ALBUM.includes(i)?'':'no'}" alt="" title="${ITEMS[i].n}">`).join('')}</div></div>`;}).join('');}
+    if(metaTab==='bonus'){const ls=loginState();
+      body=`<div class="mh">TÄGLICHER LOGIN<small>${ls.can?'Heute abholen!':'Morgen wiederkommen'}</small></div><div class="login">${LOGIN_R.map((r,i)=>{const d=i+1,got=(!ls.can&&d<=LOGIN.streak)||(ls.can&&d<ls.day);const now=ls.can&&d===ls.day;return `<div class="ld ${got?'got':''} ${now?'now':''}"><small>TAG ${d}</small><b>${rtxt(r)}</b></div>`;}).join('')}</div>
+        ${ls.can?'<button type="button" class="mbig" data-login="1">TAG '+ls.day+' ABHOLEN</button>':''}
+        <div class="mh">WERBUNG ANSEHEN<small>noch ${adsLeft()}/${AD_MAX} heute</small></div>
+        <div class="adrow"><button type="button" data-ad="nrg">⚡ +4 Energie</button><button type="button" data-ad="cash">💵 +$${150+lvl*20}</button><button type="button" data-ad="mat">🔩 3× Material</button></div>`;}
+    if(metaTab==='stats'){const rows=[['Stufe',lvl+(PRESTIGE?' · Prestige ★'+PRESTIGE:'')],['Jobs',SV('jobs')],['Einsätze',SV('heists')],['Erwischt',SV('busted')],['Behälter durchsucht',SV('searched')],['Wachen ausgeschaltet',SV('ko')],['Saubere Einsätze',SV('clean')],['Beute gesamt','$'+fmt(SV('loot'))],['Verkauft','$'+fmt(SV('sold'))],['Gebaut',SV('crafted')],['Fraktion',FACTION?FACT[FACTION].n+' · '+rankOf(REP[FACTION]):'–']];
+      body=`<div class="mh">DEIN PROFIL</div><div class="st2">${rows.map(r=>`<div><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}</div>
+        <div class="mh">COMEBACK (PRESTIGE)<small>ab Stufe 15 nach Akt 2</small></div><p class="mp">Fang mit Stufe 1 neu an. Du behältst Kleidung, Baupläne, Crew, Ausbau und Album – und bekommst dauerhaft <b>+15 % XP</b> und <b>+5 % beim Hehler</b> pro Stern.</p>
+        <button type="button" class="mbig" data-prest="1" ${canPrestige()?'':'disabled'}>${canPrestige()?'COMEBACK STARTEN ★'+(PRESTIGE+1):'Noch nicht freigeschaltet'}</button>`;}
+    P.innerHTML=`<div class="seth"><b>ZENTRALE</b><button type="button" id="metax">✕</button></div><div class="mtabs">${tabs.map(([k,n])=>`<button type="button" class="${k===metaTab?'on':''}" data-tab="${k}">${n}</button>`).join('')}</div><div class="mbody">${body}</div>`;
+    $('metax').onclick=closeMeta;
+    P.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{metaTab=b.dataset.tab;renderMeta();});
+    P.querySelectorAll('[data-mc]').forEach(b=>b.onclick=()=>{const[s,k]=b.dataset.mc.split(':');const box=s==='d'?DAILY:WEEKLY,M=(s==='d'?DPOOL:WPOOL).find(m=>m.k===k);if(box.cl.includes(k))return;box.cl.push(k);if(s==='d')track('daily');toastMsg(give(M.r));renderMeta();});
+    P.querySelectorAll('[data-ma]').forEach(b=>b.onclick=()=>{const a=ACHS.find(x=>x.id===b.dataset.ma);if(ACH.includes(a.id))return;ACH.push(a.id);toastMsg('🏆 '+give(a.r));renderMeta();});
+    P.querySelectorAll('[data-al]').forEach(b=>b.onclick=()=>{ALBUMC.push(b.dataset.al);sfx('stamp');toastMsg('SET-BONUS AKTIV');renderMeta();hud();});
+    P.querySelectorAll('[data-login]').forEach(b=>b.onclick=claimLogin);
+    P.querySelectorAll('[data-ad]').forEach(b=>b.onclick=()=>watchAd({nrg:{nrg:4},cash:{cash:150+lvl*20},mat:{mat:3}}[b.dataset.ad]));
+    P.querySelectorAll('[data-prest]').forEach(b=>b.onclick=()=>{if(b.dataset.ok){doPrestige();return;}b.dataset.ok=1;b.textContent='Wirklich? Nochmal tippen';});
+    metaBadge();
+  }
+  document.getElementById('trophy').onclick=e=>{e.stopPropagation();openMeta();};
+  document.getElementById('metaov').addEventListener('click',e=>{if(e.target.id==='metaov')closeMeta();});
+  setInterval(metaBadge,5000);
+  window.__continue=continueGame;window.__nhReady=true;roll();
   if(hasSave()){try{const d=JSON.parse(localStorage.getItem(SKEY));$('tap').innerHTML='TIPPEN ZUM WEITERSPIELEN<br><small style="font-size:.55em">Spielstand: Stufe '+d.lvl+'</small>';}catch(e){}}
   // ---------- Pixel-Einsatz (iframe) ----------
   function startPixHeist(T){
@@ -1769,7 +1956,9 @@
       items.forEach(id=>STASH.push(id));
       Object.values(d.lo||{}).forEach(id=>{if(id&&known(id))STASH.push(id);});
       Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null);
-      const xpG=(XPB[typ]||40)+Math.min(80,Math.round(val/60)); addReward(0,xpG,d.heat||0); sfx('cash');
+      track('heists');track('searched',d.searched||0);track('ko',d.ko||0);if((d.alarm||0)<60)track('clean');track('loot',val);
+      let xpG=(XPB[typ]||40)+Math.min(80,Math.round(val/60));if(hasSet('luxus'))xpG=Math.round(xpG*1.1);if(T.coup){xpG=Math.round(xpG*1.5);cash+=300;DAILYCOUP=T.coup;}
+      addReward(0,xpG,d.heat||0); sfx('cash');
       const up=unlockPlans(plans);let pl=up.map(n=>n?`<b class="x">Neuer Bauplan: ${n}</b>`:'<b>Bauplan schon bekannt · +20 XP</b>').join('');
       if(up.some(n=>!n))addReward(0,20*up.filter(n=>!n).length,0);
       const mats={};items.filter(id=>ITEMS[id].t==='mat').forEach(id=>mats[id]=(mats[id]||0)+1);
@@ -1778,11 +1967,11 @@
       let rp=0;if(T.fac&&T.fac===FACTION)rp=addRep(FACTION,12);else if(FACTION&&typ===FACT[FACTION].btype)rp=addRep(FACTION,5);
       if(Q===13&&FACTION&&T.fac===FACTION){Q=14;} if(T.story==='bank'&&Q===17){Q=18;if(FACTION)rp+=addRep(FACTION,20);}
       if(rp)pl+=`<b class="x">+${rp} Ruf ${FACT[FACTION].n}</b>`;
-      html=`<div class="rbig">ENTKOMMEN!</div>${T.name}: erledigt.<div class="reward"><b>Beute $${val}</b><b class="x">+ ${xpG} XP</b>${d.heat?`<b class="h">+${d.heat} Heat</b>`:''}${pl}</div>${ml?`<div class="dsub">Material: ${ml}</div>`:''}<div class="dsub">Alles liegt im Spind. Beute verkaufst du bei Dee, Material verbaust du an der Werkbank.</div>`;
+      html=`<div class="rbig">ENTKOMMEN!</div>${T.name}: erledigt.<div class="reward"><b>Beute $${val}</b><b class="x">+ ${xpG} XP</b>${d.heat?`<b class="h">+${d.heat} Heat</b>`:''}${pl}</div>${ml?`<div class="dsub">Material: ${ml}</div>`:''}${T.coup?'<div class="dsub">Coup des Tages: XP ×1,5 und $300 Bonus!</div>':''}${spindFull()?'<div class="dsub" style="color:#ff6f6f">⚠ Dein Spind ist übervoll – verkauf Beute oder bau ihn aus, bevor du wieder losziehst.</div>':''}<div class="dsub">Alles liegt im Spind. Beute verkaufst du bei Dee, Material verbaust du an der Werkbank.</div>`;
     } else {
       const lost=Object.values(LOADOUT).filter(x=>x).length; const safe=LOADOUT.safe;
       Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null); if(safe)STASH.push(safe);
-      const bail=Math.min(cash,100); addReward(-bail,15,2); sfx('stamp');
+      const bail=Math.min(cash,100); addReward(-bail,15,2); sfx('stamp');track('busted');track('ko',d.ko||0);track('searched',d.searched||0);if(T.coup)DAILYCOUP=T.coup;
       html=`<div class="rbig bad">ERWISCHT!</div>Eine Nacht in der Zelle, dann holt dich Sals Anwalt raus.<div class="reward"><b class="h">${lost} Ausrüstungsteile weg</b><b class="h">Kaution −$${bail}</b><b class="h">+2 Heat</b></div>${safe?`<div class="dsub">Gerettet im Geheimfach: ${ITEMS[safe].n}</div>`:''}<div class="dsub">Neues Werkzeug baust du an der Werkbank.</div>`;
     }
     refreshTargets();saveGame();
@@ -1794,16 +1983,16 @@
   const price=(npc,p)=>Math.round(p*(npc==='joe'&&FACTION==='kartell'?.75:1));
   function shopMenu(npc,msg){
     const ch=SHOP[npc].map(([id,p0])=>{const p=price(npc,p0);return {t:`${ITEMS[id].n} <small>$${p} · ${ITEMS[id].t==='cloth'?ITEMS[id].d:'im Spind: '+STASH.filter(x=>x===id).length}</small>`,f:()=>{
-      if(cash<p){shopMenu(npc,'Ohne Kohle keine Ware.');return;}addReward(-p,0,0);STASH.push(id);sfx('cash');shopMenu(npc,`${ITEMS[id].n} – liegt in deinem Spind. Noch was?`);}};});
+      if(cash<p){shopMenu(npc,'Ohne Kohle keine Ware.');return;}addReward(-p,0,0);STASH.push(id);track('bought');sfx('cash');shopMenu(npc,`${ITEMS[id].n} – liegt in deinem Spind. Noch was?`);}};});
     ch.push({t:'Fertig',f:()=>npcMenu('Sonst noch was?')});
     say(npc,msg||({joe:'Schrott hab ich genug. Kostet aber.',tito:'Ich kenn da jemanden, der kennt jemanden. Was brauchst du?',sunny:'Bro, mit dem Look kommst du überall rein!',duke:'Qualität hat ihren Preis, Junge.'}[npc]),ch);
   }
   // Dee kauft Beute
   function sellLoot(){
     const loot=STASH.filter(id=>ITEMS[id].t==='loot'); if(!loot.length){say('dee','Du hast nichts, was mich interessiert, Schätzchen.',[{t:'OK',f:()=>npcMenu('Sonst noch was?')}]);return;}
-    const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*.6);
+    const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*deeRate());
     say('dee',`${loot.length} Teile … heiße Ware. Ich geb dir ${v} Dollar. Keine Fragen, kein Feilschen.`,[
-      {t:`Deal <small>+$${v}</small>`,f:()=>{STASH=STASH.filter(id=>ITEMS[id].t!=='loot');addReward(v,10,0);sfx('cash');say('dee','Angenehm, mit dir Geschäfte zu machen.',[{t:'Bis bald',f:closeDlg}]);}},
+      {t:`Deal <small>+$${v}</small>`,f:()=>{STASH=STASH.filter(id=>ITEMS[id].t!=='loot');addReward(v,10,0);track('sold',v);sfx('cash');say('dee','Angenehm, mit dir Geschäfte zu machen.',[{t:'Bis bald',f:closeDlg}]);}},
       {t:'Lieber behalten',f:()=>npcMenu('Wie du meinst.')}]);
   }
 
@@ -1845,7 +2034,7 @@
   let rs=0;$('sReset').onclick=()=>{if(rs){if(window.NH_GAME)NH_GAME.wipe();window.__nhReady=false;location.reload();return;}rs=1;$('sReset').querySelector('b').textContent='Nochmal tippen = alles löschen';setTimeout(()=>{rs=0;$('sReset').querySelector('b').textContent='Neues Spiel';},3000);};
   document.querySelectorAll(".tsth button").forEach(b=>b.onclick=()=>{if(window.NH_GAME)NH_GAME.cheat(b.dataset.c);b.style.background='#7dffb2';setTimeout(()=>b.style.background='',300);});
   setInterval(()=>{const m=$('map'),s=$('start'),i=$('intro');const vis=id=>{const x=document.getElementById(id);return x&&x.classList.contains('on');};const sh=document.getElementById('sheet');
-    const hide=vis('map')||!!document.getElementById('pixh')||vis('dlg')||vis('inv')||(sh&&sh.classList.contains('open'))||vis('paper')||vis('menu2');$('gear').style.display=hide?'none':'';},400);
+    const hide=vis('map')||!!document.getElementById('pixh')||vis('dlg')||vis('inv')||(sh&&sh.classList.contains('open'))||vis('paper')||vis('menu2');$('gear').style.display=hide?'none':'';const tr=$('trophy');if(tr)tr.style.display=(hide||vis('start')||vis('intro'))?'none':'';},400);
 })();
 </script>
 </body>
