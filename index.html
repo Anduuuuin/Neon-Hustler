@@ -565,6 +565,26 @@
   .srow{display:flex;align-items:center;gap:8px;background:#1d1030;border:2px solid #4b3a6e;border-radius:8px;padding:6px 8px;margin-bottom:5px;opacity:.6}.srow.on{opacity:1;border-color:#7dffb2}
   .srow img{width:38px;height:38px;object-fit:contain;cursor:pointer}.srow>div:nth-child(2){flex:1;min-width:0}.srow b{display:block;font-size:14px}.srow small{font-size:11px;color:#cbbbe6}
   .sq{display:flex;align-items:center;gap:6px}.sq button{width:32px;height:32px;border-radius:50%;border:2px solid #000;background:#2fe0ea;font-size:18px;font-weight:700;cursor:pointer}.sq i{font-style:normal;min-width:20px;text-align:center;font-weight:700}
+
+  #pbiz{position:absolute;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 64px);transform:translateX(-50%);z-index:12;background:#7dffb2;color:#000;border:3px solid #000;box-shadow:3px 3px 0 #ff3d8b;font-family:'Bangers',cursive;font-size:17px;letter-spacing:1px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+  #pbiz em{font-style:normal;margin-left:8px;background:#000;color:#7dffb2;padding:0 6px}
+  .scr2.talk #pbiz{opacity:0;pointer-events:none}
+  #bizscr{position:fixed;inset:0;z-index:945;display:none;background:#05020b}#bizscr.on{display:block}
+  #bizimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .bzshade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,0,12,.75),rgba(5,0,12,0) 22%,rgba(5,0,12,0) 40%,rgba(5,0,12,.9) 70%)}
+  #bizp{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:max(10px,env(safe-area-inset-top)) 10px max(12px,env(safe-area-inset-bottom));color:#fff;font-family:'Oswald',sans-serif}
+  .bztop{display:flex;gap:10px;align-items:center}.bztop button{background:#fff;border:3px solid #000;box-shadow:3px 3px 0 #2fe0ea;font-family:'Bangers',cursive;font-size:18px;padding:3px 10px;cursor:pointer}
+  .bztop b{display:block;font-family:'Bangers',cursive;font-size:24px;letter-spacing:1px;color:#ffe14d;-webkit-text-stroke:1px #000;paint-order:stroke fill;text-shadow:2px 2px 0 #ff3d8b}.bztop small{font-size:12px;color:#e4dcf5}
+  .bzbot{max-height:62vh;overflow:auto}
+  .bzbox{background:rgba(16,8,30,.95);border:2px solid #2fe0ea;border-radius:12px;padding:10px;box-shadow:0 0 0 2px #000}
+  .bzbox.ev{border-color:#ff9f43}.bzbox .evt{font-family:'Bangers',cursive;font-size:24px;color:#ff9f43}.bzbox p{margin:6px 0;font-size:14px;line-height:1.35}
+  .bzopt{display:block;width:100%;margin-top:6px;background:#1d1030;border:2px solid #2fe0ea;color:#fff;font-family:'Bangers',cursive;font-size:18px;padding:8px;border-radius:8px;cursor:pointer;text-align:left}
+  .bzkasse{display:flex;align-items:center;gap:10px;margin-bottom:6px}.bzkasse>div{flex:1}.bzkasse small{display:block;font-size:11px;color:#7ff6ff}.bzkasse b{font-family:'Bangers',cursive;font-size:28px;color:#7dffb2}
+  .bzkasse button{background:#7dffb2;border:3px solid #000;font-family:'Bangers',cursive;font-size:18px;padding:10px 12px;border-radius:8px;cursor:pointer}.bzkasse button:disabled{opacity:.35}
+  .bzmsg{font-size:12px;color:#ffe14d;margin:4px 0 6px}
+  .bztr{display:flex;align-items:center;gap:8px;background:#1d1030;border:1px solid #4b3a6e;border-radius:8px;padding:6px 8px;margin-bottom:5px}.bztr>div{flex:1;min-width:0}.bztr b{display:block;font-size:14px}.bztr b{color:#fff}.bztr small{font-size:11px;color:#cbbbe6}
+  em.stars{font-style:normal;color:#ffe14d}em.stars s{text-decoration:none;color:#4b3a6e}
+  .bztr button{background:#ffe14d;border:2px solid #000;font-family:'Bangers',cursive;font-size:16px;padding:4px 10px;border-radius:6px;cursor:pointer;line-height:1}.bztr button small{font-family:'Oswald',sans-serif;font-size:11px;color:#000;font-weight:700}.bztr button.poor{opacity:.45}.bztr span{color:#7dffb2;font-size:12px}
 </style>
 </head>
 <body>
@@ -673,6 +693,7 @@
   </div>
   <div id="ptop"><button type="button" id="pback">◂ KARTE</button><div id="pname"></div></div>
   <button type="button" id="ptalk"><img alt=""><span></span></button>
+  <button type="button" id="pbiz"></button>
 </section>
 
 
@@ -694,6 +715,7 @@
 <button type="button" id="phoneb" aria-label="Handy">📱</button>
 <div id="phone"><div class="phwrap"><div class="phframe"><div class="phnotch"></div><div class="phscr" id="phscr"></div></div></div></div>
 <div id="empov"><div class="setp metap" id="empp"></div></div>
+<div id="bizscr"><img id="bizimg" alt=""><div class="bzshade"></div><div id="bizp"></div></div>
 <div id="sellov"><div class="setp metap" id="sellp"></div></div>
 <div id="metaov"><div class="setp metap" id="metap"></div></div>
 <div id="setov"><div class="setp">
@@ -1227,6 +1249,8 @@
     const t=$('ptalk');
     if(P.npc){t.style.display='';t.querySelector('img').src=people[P.npc].p;t.querySelector('img').style.display='';t.querySelector('span').textContent='MIT '+people[P.npc].n.split(' ')[0]+' REDEN';}
     else {t.style.display='';t.querySelector('img').style.display='none';t.querySelector('span').textContent='UMSEHEN';}
+    const bk=Object.keys(BIZX).find(k=>BIZX[k].place===id&&lvl>=BIZ[k].req);const pb=$('pbiz');
+    if(bk){const own=EMP.biz[bk]&&EMP.biz[bk].lv;pb.style.display='';pb.innerHTML=own?`🏢 DEIN LADEN: ${BIZ[bk].n.toUpperCase()}${bizPending(bk)?'<em>$'+fmt(bizPending(bk))+'</em>':''}`:`🏷 ZU VERKAUFEN: ${BIZ[bk].n.toUpperCase()}`;pb.onclick=e=>{e.stopPropagation();closeDlg();openBiz(bk);};}else pb.style.display='none';
     setTimeout(()=>{if(Math.random()<.25&&!(id==='m-hafen'&&job===2))travelEvent();else placeTalk();},650);
   }
   $('ptalk').addEventListener('click',e=>{e.stopPropagation();placeTalk();});
@@ -2015,7 +2039,7 @@
     yacht:{n:'Yachtcharter',where:'Yachthafen',req:10,cost:40000,inc:2000},casino:{n:'Hinterzimmer-Casino',where:'Casino',req:12,cost:90000,inc:4500}};
   const bizInc=(k,l)=>Math.round(BIZ[k].inc*(1+.6*(l-1)));const bizCap=l=>6+2*l;const bizUp=(k,l)=>Math.round(BIZ[k].cost*l*1.3);
   function empPending(){const now=Date.now();let cash_=0;const items={};
-    Object.entries(EMP.biz).forEach(([k,s])=>{if(!s.lv)return;const h=Math.min(bizCap(s.lv),(now-s.t)/36e5);cash_+=Math.floor(h*bizInc(k,s.lv));});
+    Object.entries(EMP.biz).forEach(([k,s])=>{if(!s.lv)return;cash_+=bizPending(k);});
     Object.entries(EMP.mods).forEach(([k,s])=>{if(!s.lv)return;const L=MODS[k].lv[s.lv-1];
       if(L.cash){cash_+=Math.floor(Math.min(MODS[k].capH,(now-s.t)/36e5)*L.cash);}
       else{const n=Math.min(MODS[k].cap,Math.floor((now-s.t)/(L.min*6e4)));if(n)items[L.item]=(items[L.item]||0)+n;}});
@@ -2030,12 +2054,12 @@
   function openEmp(){$('empov').classList.add('on');renderEmp();}
   function closeEmp(){$('empov').classList.remove('on');saveGame();}
   function renderEmp(){const P=$('empp');const p=empPending();const pend=p.cash||Object.keys(p.items).length;
-    const total=Object.entries(EMP.biz).reduce((s,[k,v])=>s+(v.lv?bizInc(k,v.lv):0),0)+Object.entries(EMP.mods).reduce((s,[k,v])=>s+(v.lv&&MODS[k].lv[v.lv-1].cash?MODS[k].lv[v.lv-1].cash:0),0);
+    const total=Object.entries(EMP.biz).reduce((s,[k,v])=>s+(v.lv?bizIncS(k,v):0),0)+Object.entries(EMP.mods).reduce((s,[k,v])=>s+(v.lv&&MODS[k].lv[v.lv-1].cash?MODS[k].lv[v.lv-1].cash:0),0);
     let body='';
     if(empTab==='biz'){body=`<div class="mh">TARNFIRMEN<small>Einnahmen auch offline · Kasse voll nach ein paar Stunden</small></div>`+Object.entries(BIZ).map(([k,b])=>{const s=EMP.biz[k]||{lv:0},lk=lvl<b.req;
-        const h=s.lv?Math.min(bizCap(s.lv),(Date.now()-s.t)/36e5):0;
-        return `<div class="mrow ${lk?'cl':''}"><div><b>${b.n}${s.lv?' · Stufe '+s.lv:''}</b><small>${b.where} · ${s.lv?'$'+bizInc(k,s.lv)+'/h · Kasse '+Math.floor(h/bizCap(s.lv)*100)+' %':'$'+bizInc(k,1)+'/h'}</small>${s.lv?`<div class="pb"><i style="width:${h/bizCap(s.lv)*100}%"></i></div>`:''}</div>
-          ${lk?`<span style="font-size:11px;color:#cbbbe6">ab Stufe ${b.req}</span>`:s.lv>=5?'<span>MAX</span>':`<button type="button" data-biz="${k}">${s.lv?'AUSBAU':'KAUFEN'}<br><small>$${fmt(s.lv?bizUp(k,s.lv):b.cost)}</small></button>`}</div>`;}).join('');}
+        const s2=s.lv?bst(k):null;const cp=s.lv?bizCapS(s2):6;const h=s.lv?Math.min(cp,(Date.now()-s.t)/36e5):0;const ups=s2?TRK.reduce((a,t)=>a+s2.up[t],0):0;
+        return `<div class="mrow ${lk?'cl':''}"><div><b>${b.n}${s.lv?' · Ausbau '+ups+'/25':''}</b><small>${b.where} · ${s.lv?'$'+fmt(bizIncS(k,s2))+'/h · Kasse '+Math.floor(h/cp*100)+' %':'$'+fmt(b.inc)+'/h'}</small>${s.lv?`<div class="pb"><i style="width:${h/cp*100}%"></i></div>`:''}</div>
+          ${lk?`<span style="font-size:11px;color:#cbbbe6">ab Stufe ${b.req}</span>`:`<button type="button" data-visit="${k}">${s.lv?'BESUCHEN':'ANSEHEN'}<br><small>${s.lv?'ausbauen':'$'+fmt(b.cost)}</small></button>`}</div>`;}).join('');}
     if(empTab==='mods'){body=`<div class="mh">VERSTECK-MODULE<small>Produktion läuft rund um die Uhr</small></div>`+Object.entries(MODS).map(([k,m])=>{const s=EMP.mods[k]||{lv:0},lk=lvl<m.req,L=s.lv?m.lv[s.lv-1]:null,nx=m.lv[s.lv];
         const desc=L?(L.cash?`$${L.cash}/h`:`1× ${L.item==='_mat'?'Material':ITEMS[L.item].n} alle ${L.min} min (max ${m.cap})`):m.txt;
         return `<div class="mrow ${lk?'cl':''}"><img src="${ico(m.ic)}" alt="" style="width:34px;height:34px;object-fit:contain"><div><b>${m.n}${s.lv?' · Stufe '+s.lv:''}</b><small>${desc}</small></div>
@@ -2050,6 +2074,7 @@
     $('empc').onclick=()=>{const t=empCollect();if(t)toastMsg('KASSIERT: '+t);renderEmp();};
     const ad=$('empad');if(ad)ad.onclick=()=>{const v=EMP.last;EMP.last=0;watchAd({cash:v});setTimeout(renderEmp,3300);};
     P.querySelectorAll('[data-et]').forEach(b=>b.onclick=()=>{empTab=b.dataset.et;renderEmp();});
+    P.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>{closeEmp();openBiz(b.dataset.visit);});
     P.querySelectorAll('[data-biz]').forEach(b=>b.onclick=()=>{const k=b.dataset.biz,s=EMP.biz[k]||{lv:0,t:Date.now()};const c=s.lv?bizUp(k,s.lv):BIZ[k].cost;if(cash<c){toastMsg('ZU WENIG GELD');return;}
       if(s.lv)empCollect();cash-=c;s.lv++;if(s.lv===1)s.t=Date.now();EMP.biz[k]=s;track('biz');sfx('stamp');hud();renderEmp();});
     P.querySelectorAll('[data-mod]').forEach(b=>b.onclick=()=>{const k=b.dataset.mod,s=EMP.mods[k]||{lv:0,t:Date.now()};const nx=MODS[k].lv[s.lv];if(cash<nx.c){toastMsg('ZU WENIG GELD');return;}
@@ -2120,6 +2145,66 @@
   document.getElementById('phone').addEventListener('click',e=>{if(e.target.id==='phone')phoneClose();});
   setInterval(()=>{const b=document.getElementById('phoneb');if(!b)return;rollOffers();const n=OFFERS.list.filter(o=>!o.taken).length+(CALLS.includes(Q)?1:0);b.dataset.n=n||'';},4000);
   TINFO.viertel={n:'Viertel (6 Gebäude)',req:3,e:5,loot:'Alles – plus Autos zum Klauen'};TNAMES.viertel=['Little Havana','Ocean Drive Block','Hafenviertel','Sunset Strip'];
+  // ================= LÄDEN BESUCHEN & AUSBAUEN (Tycoon) =================
+  const BIZX={
+    wasch:{img:'biz_wasch.webp',fb:'pl_slum.webp',place:'m-slum',staff:['Rosa','Hector','Mrs. Kim','Lupe','Big Earl'],
+      tr:{a:['Waschmaschinen','Mehr Maschinen = mehr Kundschaft'],p:['Personal','Bügeln, Falten, Lieferservice'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Flyer in der ganzen Siedlung'],s:['Sicherheit','Kamera & Türsteher gegen Ärger']}},
+    autowasch:{img:'biz_autowasch.webp',fb:'pl_shop.webp',place:'m-shop',staff:['Tony','Chico','Jules','Marv','Dante'],
+      tr:{a:['Waschstraßen','Mehr Bürsten, mehr Autos pro Stunde'],p:['Personal','Polierer & Innenreinigung'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Neonschild am Boulevard'],s:['Sicherheit','Wachmann für die Nacht']}},
+    video:{img:'biz_video.webp',fb:'pl_towers.webp',place:'m-towers',staff:['Nerd-Kevin','Sandy','Phil','Trixie','Ray'],
+      tr:{a:['VHS-Regale','Mehr Filme, mehr Ausleihen'],p:['Personal','Nachtschicht & Beratung'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Kinoplakate & Radiospots'],s:['Sicherheit','Diebstahlsicherung']}},
+    club:{img:'biz_club.webp',fb:'pl_club.webp',place:'m-club',staff:['DJ Flash','Bunny','Rocco','Starla','Big Mo'],
+      tr:{a:['Licht & Bar','Lasershow, Champagner-Bar'],p:['Personal','Barkeeper, Tänzer, DJs'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','VIP-Gästeliste & Promis'],s:['Sicherheit','Türsteher-Team']}},
+    yacht:{img:'biz_yacht.webp',fb:'pl_yacht.webp',place:'m-yacht',staff:['Kapitän Ray','Marina','Skip','Coco','Admiral Burke'],
+      tr:{a:['Yachten','Größere Flotte'],p:['Personal','Crew & Kapitäne'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Prospekte in Luxushotels'],s:['Sicherheit','Hafenwache']}},
+    casino:{img:'biz_casino.webp',fb:'pl_casino.webp',place:'m-casino',staff:['Croupier Vic','Lady Luck','Sal Jr.','Mona','The Count'],
+      tr:{a:['Spieltische','Poker, Roulette, Black Jack'],p:['Personal','Croupiers & Kellner'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Flüsterpropaganda bei Reichen'],s:['Sicherheit','Bewaffnete Aufpasser']}}};
+  const TRK=['a','p','t','w','s'];const TMAX=5;
+  function bst(k){const s=EMP.biz[k];if(!s)return null;if(!s.up){s.up={a:Math.max(0,(s.lv||1)-1),p:0,t:0,w:0,s:0};}return s;}
+  function bizIncS(k,s){if(!s||!s.lv)return Math.round(BIZ[k].inc*1.5);const u=bst(k).up;return Math.round(BIZ[k].inc*1.5*(1+.3*u.a)*(1+.18*u.p)*(1+.15*u.w));}
+  function bizCapS(s){if(!s||!s.lv)return 6;const u=s.up||{p:0,t:0};return 6+3*u.t+u.p;}
+  function trCost(k,tr,l){const f={a:1,p:.8,t:.6,w:.7,s:.6}[tr];return Math.round(BIZ[k].cost*f*.35*Math.pow(l+1,1.45));}
+  function bizPending(k){const s=bst(k);if(!s||!s.lv)return 0;return Math.floor(Math.min(bizCapS(s),(Date.now()-s.t)/36e5)*bizIncS(k,s));}
+  function bizCollect(k){const v=bizPending(k);const s=bst(k);if(!v)return 0;s.t=Date.now();cash+=v;track('income',v);EMP.last=v;sfx('cash');hud();return v;}
+  let BZ=null,bzMsg='',bzEvent=null;
+  function openBiz(k){BZ=k;bzMsg='';const s=bst(k);bzEvent=null;
+    if(s&&s.lv&&(!s.ev||Date.now()-s.ev>36e5)&&Math.random()<.35){s.ev=Date.now();bzEvent=pickEvent(k);}
+    $('bizscr').classList.add('on');renderBiz();}
+  function closeBiz(){$('bizscr').classList.remove('on');BZ=null;saveGame();}
+  function pickEvent(k){const s=bst(k),sec=s.up.s;const reg=bizPending(k);const staff=BIZX[k].staff;
+    const E=[
+      {t:'🔧 Kaputt!',d:`Eine ${k==='wasch'?'Waschmaschine':'Anlage'} ist ausgefallen. Reparatur sofort oder die Kundschaft bleibt weg.`,o:[
+        {t:`Reparieren · $${Math.round(BIZ[k].inc*1.5)}`,f:()=>{const c=Math.round(BIZ[k].inc*1.5);if(cash<c)return 'Zu wenig Geld.';cash-=c;hud();return 'Läuft wieder wie geschmiert.';}},
+        {t:'Ignorieren · Kasse −40 %',f:()=>{s.t+=Math.min(Date.now()-s.t,bizCapS(s)*36e5)*.4;return 'Die Kundschaft ist sauer und geht woanders hin.';}}]},
+      {t:'💸 Griff in die Kasse',d:`${staff[Math.min(s.up.p,staff.length-1)]} hat Geld aus der Kasse genommen. ${sec>=2?'Deine Kamera hat alles aufgezeichnet.':''}`,o:[
+        {t:'Rauswerfen',f:()=>{if(s.up.p>0&&sec<2){s.up.p--;return 'Weg ist er – und mit ihm ein Stück Personal (Personal −1).';}return 'Rausgeworfen. Dank Kamera holst du das Geld zurück.';}},
+        {t:'Ernstes Gespräch · Charme',f:()=>{const ch=40+(statVal('Charme')-10)*3+sec*10;if(Math.random()*100<ch){addReward(0,15,0);return 'Er gibt alles zurück und arbeitet jetzt doppelt so hart. (+15 XP)';}s.t+=Math.min(Date.now()-s.t,bizCapS(s)*36e5)*.3;return 'Er lacht dich aus. Ein Teil der Kasse ist weg.';}}]},
+      {t:'🕶 Schutzgeld',d:'Zwei Typen von einer Gang stehen im Laden: „Schöner Laden. Wäre schade, wenn ihm was passiert.“',o:[
+        {t:`Zahlen · $${Math.round(BIZ[k].inc*2)}`,f:()=>{const c=Math.round(BIZ[k].inc*2);if(cash<c)return 'Du hast nicht genug – sie nehmen sich die Kasse.';cash-=c;hud();return 'Sie ziehen ab. Für heute.';}},
+        {t:'Rauswerfen · Muskeln',f:()=>{const ch=35+(statVal('Muskeln')-10)*3+sec*12;if(Math.random()*100<ch){addReward(0,25,0);return 'Die kommen so schnell nicht wieder. (+25 XP)';}s.t=Date.now();heat=Math.min(5,heat+1);hud();return 'Prügelei! Die Kasse ist leer und die Polizei war da (+1 Heat).';}}]},
+      {t:'⭐ Stammkunde',d:'Ein reicher Stammkunde ist begeistert und will investieren.',o:[
+        {t:'Annehmen',f:()=>{const v=Math.round(BIZ[k].inc*(2+s.up.w));cash+=v;hud();sfx('cash');return `Er legt $${fmt(v)} auf den Tisch.`;}}]}];
+    if(reg<BIZ[k].inc*.5)E.splice(1,1);
+    return E[Math.floor(Math.random()*E.length)];}
+  function renderBiz(){const k=BZ,B=BIZ[k],X=BIZX[k],s=bst(k),own=!!(s&&s.lv),P=$('bizp');
+    $('bizimg').src=X.img;$('bizimg').onerror=function(){this.onerror=null;this.src=X.fb;};
+    const pend=bizPending(k),inc=bizIncS(k,s),cap=bizCapS(s),h=own?Math.min(cap,(Date.now()-s.t)/36e5):0;
+    let body='';
+    if(!own){body=`<div class="bzbox"><p>${B.where} · Startet mit <b>$${fmt(Math.round(B.inc*1.5))}/h</b>. Danach ausbauen: Ausstattung, Personal, Tresor, Werbung, Sicherheit.</p>${lvl<B.req?`<p>Ab Stufe ${B.req}.</p>`:`<button type="button" class="mbig" id="bzbuy">KAUFEN · $${fmt(B.cost)}</button>`}</div>`;}
+    else if(bzEvent){body=`<div class="bzbox ev"><b class="evt">${bzEvent.t}</b><p>${bzEvent.d}</p>${bzEvent.o.map((o,i)=>`<button type="button" class="bzopt" data-eo="${i}">${o.t}</button>`).join('')}</div>`;}
+    else{body=`<div class="bzbox"><div class="bzkasse"><div><small>KASSE</small><b>$${fmt(pend)}</b><div class="pb"><i style="width:${h/cap*100}%"></i></div><small>$${fmt(inc)}/h · voll nach ${cap} h</small></div><button type="button" id="bzcol" ${pend?'':'disabled'}>KASSIEREN</button></div>
+      ${bzMsg?`<div class="bzmsg">${bzMsg}</div>`:''}
+      ${TRK.map(tr=>{const l=s.up[tr],c=trCost(k,tr,l),[n,d]=X.tr[tr];const extra=tr==='p'?(l?' · '+X.staff.slice(0,l).join(', '):''):tr==='a'?` · ${k==='wasch'?(4+l*3)+' Maschinen':k==='yacht'?(1+l)+' Yachten':k==='casino'?(2+l*2)+' Tische':'Stufe '+l}`:'';
+        return `<div class="bztr"><div><b>${n} <em class="stars">${'★'.repeat(l)}<s>${'★'.repeat(TMAX-l)}</s></em></b><small>${d}${extra}</small></div>${l>=TMAX?'<span>MAX</span>':`<button type="button" data-tr="${tr}" ${cash<c?'class="poor"':''}>+1<br><small>$${fmt(c)}</small></button>`}</div>`;}).join('')}</div>`;}
+    P.innerHTML=`<div class="bztop"><button type="button" id="bzback">◂ ZURÜCK</button><div><b>${B.n}</b><small>${own?'Dein Laden · '+(s.up.a+s.up.p+s.up.t+s.up.w+s.up.s)+'/25 Ausbau':'Zu verkaufen'}</small></div></div><div class="bzbot">${body}</div>`;
+    $('bzback').onclick=closeBiz;
+    const by=$('bzbuy');if(by)by.onclick=()=>{if(cash<B.cost){toastMsg('ZU WENIG GELD');return;}cash-=B.cost;EMP.biz[k]={lv:1,t:Date.now(),up:{a:0,p:0,t:0,w:0,s:0}};track('biz');sfx('stamp');hud();bzMsg='Glückwunsch – der Laden gehört dir!';renderBiz();};
+    const co=$('bzcol');if(co)co.onclick=()=>{const v=bizCollect(k);bzMsg=v?`+$${fmt(v)} kassiert.`:'';renderBiz();};
+    P.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{const tr=b.dataset.tr,l=s.up[tr],c=trCost(k,tr,l);if(cash<c){bzMsg='Zu wenig Geld für diesen Ausbau.';renderBiz();return;}
+      bizCollect(k);cash-=c;s.up[tr]++;sfx('stamp');hud();track('bizup');bzMsg=`${X.tr[tr][0]} ausgebaut! Jetzt $${fmt(bizIncS(k,s))}/h.`;renderBiz();});
+    P.querySelectorAll('[data-eo]').forEach(b=>b.onclick=()=>{const r=bzEvent.o[+b.dataset.eo].f();bzEvent=null;bzMsg=r;renderBiz();});
+  }
+  ACHS.push(AC('bizmax','Ein Laden komplett ausgebaut',()=>Object.keys(BIZ).some(k=>{const s=EMP.biz[k];return s&&s.up&&TRK.every(t=>s.up[t]>=TMAX);}),{cash:15000,cloth:1}));
   window.__continue=continueGame;window.__nhReady=true;roll();
   if(hasSave()){try{const d=JSON.parse(localStorage.getItem(SKEY));$('tap').innerHTML='TIPPEN ZUM WEITERSPIELEN<br><small style="font-size:.55em">Spielstand: Stufe '+d.lvl+'</small>';}catch(e){}}
   // ---------- Pixel-Einsatz (iframe) ----------
