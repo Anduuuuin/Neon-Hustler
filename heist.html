@@ -179,9 +179,9 @@ let CODE='0000',codeKnown=false,lasersOn=false,hasLasers=false,camsOn=true,jamUn
 function grid(w,h,v){return Array.from({length:h},()=>Array(w).fill(v));}
 const at=(x,y)=>(G[y]&&G[y][x])||'#';
 function fillR(x0,y0,x1,y1,c,fl){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){G[y][x]=c;if(fl)FL[y][x]=fl;}}
-const CDEF={B:{n:'WACHMANN',t:1.2,nz:2},V:{n:'VITRINE',t:1.5,nz:24},S:{n:'REGAL',t:2,nz:6},C:{n:'KISTE',t:1.8,nz:8},D:{n:'SCHREIBTISCH',t:1.8,nz:6},X:{n:'SAFE',t:2,nz:6},Z:{n:'SPIND',t:1.6,nz:8},
+const CDEF={B:{n:'WACHMANN',t:1.2,nz:2},P:{n:'HANDSCHUHFACH',t:1.6,nz:8},TR:{n:'KOFFERRAUM',t:0,nz:0},V:{n:'VITRINE',t:1.5,nz:24},S:{n:'REGAL',t:2,nz:6},C:{n:'KISTE',t:1.8,nz:8},D:{n:'SCHREIBTISCH',t:1.8,nz:6},X:{n:'SAFE',t:2,nz:6},Z:{n:'SPIND',t:1.6,nz:8},
   G:{n:'GOLDWAGEN',t:1.5,nz:4},Y:{n:'SCHLIESSFACH',t:2.5,nz:12},Q:{n:'KOMMODE',t:1.6,nz:6},R:{n:'WERKZEUGSCHRANK',t:1.8,nz:10},A:{n:'AUTO AUSSCHLACHTEN',t:3,nz:14},K:{n:'KÜHLSCHRANK',t:1.2,nz:4}};
-const KSIZE={V:[2,1],S:[2,1],C:[1,1],D:[2,1],X:[1,1],Z:[1,1],G:[1,1],Y:[1,1],Q:[2,1],R:[1,1],A:[3,2],K:[1,1],bed:[2,2],sofa:[2,1],table:[2,1],counter:[3,1],plant:[1,1],trash:[1,1],bush:[1,1],fuse:[1,1],mon:[1,1],panel:[1,1],lift:[2,2]};
+const KSIZE={V:[2,1],S:[2,1],C:[1,1],D:[2,1],X:[1,1],Z:[1,1],G:[1,1],Y:[1,1],Q:[2,1],R:[1,1],A:[3,2],K:[1,1],bed:[2,2],sofa:[2,1],table:[2,1],counter:[3,1],plant:[1,1],trash:[1,1],bush:[1,1],fuse:[1,1],mon:[1,1],panel:[1,1],lift:[2,2],getaway:[3,2],parked:[3,2]};
 function place(kind,x,y){
   const[w,h]=KSIZE[kind];const o={kind,x,y,w,h};OBJ.push(o);
   const ch=kind==='fuse'?'F':kind==='mon'?'M':kind==='panel'?'P':'%';
@@ -220,6 +220,7 @@ function buildGolden(){
   LIGHTS=[[4,3],[10,3],[16,3],[24,3],[5,9],[14,9],[24,9],[4,16],[14,16],[24,15],[24,21],[6,26],[20,26],[14,27]];
   LABELS=[['GOLDEN PALM',3,1,'#ff3d8b'],['TRESOR',23,1,'#7ff6ff'],['LAGER',2,13,'#7ff6ff'],['BÜRO',23,13,'#7ff6ff'],['SECURITY',21,19,'#7ff6ff']];
   noteIn(OBJ.find(o=>o.kind==='S'));
+  placeGetaway(18,25);
   fillLoot('golden');
 }
 // ---------- Generator ----------
@@ -279,6 +280,7 @@ function buildGen(cfg){
   else{place('trash',1,yardTop+1);if(G[yardTop+1][W-2]==='.')place('trash',W-2,yardTop+1);}
   LIGHTS.push([4,yardTop+2],[W-5,yardTop+2],[ex,H-3]);
   EXITS=['E'];P.x=(ex+.5)*T;P.y=(H-3)*T;
+  GETAWAY_AT=[ex+3,H-4];
   // Möbel
   rooms.forEach(r=>{const res=(x,y)=>(x>=r.x0+3&&x<=r.x0+5)||y===r.y0+3;
     const fits=(x,y,w,h)=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){if(xx<r.x0||xx>r.x0+7||yy<r.y0||yy>r.y0+5||G[yy][xx]!=='.'||res(xx,yy))return false;}return true;};
@@ -303,11 +305,89 @@ function buildGen(cfg){
   {const cand=rooms.filter(r=>r!==entry);const r=cand[Math.floor(rnd()*cand.length)];for(const[x,y]of[[r.x0+1,r.y0+2],[r.x0+6,r.y0+2],[r.x0+1,r.y0+4],[r.x0+6,r.y0+4]]){if(G[y][x]==='.'){G[y][x]='U';break;}}}
   // Safe-Code-Zettel
   const conts=OBJ.filter(o=>o.cont&&o.kind!=='X');if(OBJ.some(o=>o.kind==='X')&&conts.length)noteIn(pick(conts));
+  if(GETAWAY_AT){placeGetaway(GETAWAY_AT[0],GETAWAY_AT[1]);GETAWAY_AT=null;}
   fillLoot(cfg.type);
 }
+// ---------- Fahrzeuge ----------
+const VEH={rostlaube:{n:'Rostlaube',tw:3,th:2,col:'#8a6a4a'},kombi:{n:'Kombi „Family“',tw:4,th:3,col:'#4a7ad0'},muscle:{n:'Muscle Car',tw:4,th:2,col:'#d23a3a'},
+  van:{n:'Lieferwagen',tw:6,th:4,col:'#e8e8e8'},sport:{n:'Sportwagen „Testarossa“',tw:3,th:2,col:'#ff3d8b'},limo:{n:'Stretch-Limo',tw:6,th:5,col:'#1a1a22'}};
+const STEAL=[['kombi',.4],['muscle',.25],['van',.2],['sport',.1],['limo',.05]];
+let TRUNK=null,stolenCar=null,GETAWAY_AT=null;
+function stealPick(){let r=rnd();for(const[k,p]of STEAL){if(r<p)return k;r-=p;}return 'kombi';}
+function findFree(cx,cy,w,h,rad=8){for(let r=0;r<=rad;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=cx+dx,y=cy+dy;let ok=true;
+    for(let yy=y-1;yy<=y+h&&ok;yy++)for(let xx=x-1;xx<=x+w&&ok;xx++){const c=G[yy]&&G[yy][xx];const inner=yy>=y&&yy<y+h&&xx>=x&&xx<x+w;if(inner?c!=='.':(c!=='.'&&c!=='#'&&c!=='E'&&c!=='%'))ok=false;if(inner&&CT[yy][xx])ok=false;}
+    if(ok)return[x,y];}return null;}
+function placeGetaway(cx,cy){const v=VEH[CFG.car&&VEH[CFG.car.id]?CFG.car.id:'rostlaube'];const tw=(CFG.car&&CFG.car.tw)||v.tw,th=(CFG.car&&CFG.car.th)||v.th;
+  const p=findFree(cx,cy,3,2,10);if(!p)return;const o=place('getaway',p[0],p[1]);o.col=v.col;o.car=v.n;o.cont={type:'TR',items:[],done:true,cw:tw,ch:th};TRUNK=o.cont;}
+// ---------- Viertel (mehrere Gebäude) ----------
+const DTYPES=[['werkstatt',0],['apotheke',0],['villa',1],['lagerhalle',1],['juwelier',2],['nachtclub',2]];
+function makeHouse(type,ox,oy,d){
+  const B=BTYPES[type],C=2,R=2,HW=19,HH=15;const n0=OBJ.length;
+  for(let y=oy;y<oy+HH;y++)for(let x=ox;x<ox+HW;x++){G[y][x]='#';FL[y][x]='wood';}
+  const rooms=[];for(let j=0;j<R;j++)for(let i=0;i<C;i++)rooms.push({i,j,x0:ox+1+i*9,y0:oy+1+j*7,nb:[]});
+  const ro=(i,j)=>(i>=0&&i<C&&j>=0&&j<R)?rooms[j*C+i]:null;
+  const seen=new Set();const st=[rooms[0]];seen.add(rooms[0]);const edges=[];
+  while(st.length){const r=st[st.length-1];const n=[[1,0],[-1,0],[0,1],[0,-1]].map(([a,b])=>ro(r.i+a,r.j+b)).filter(x=>x&&!seen.has(x));if(!n.length){st.pop();continue;}const q=pick(n);seen.add(q);edges.push([r,q]);st.push(q);}
+  const entry=ro(ri(0,1),1);const types=shuf(B.rooms.filter(t=>t!==B.entry));rooms.filter(r=>r!==entry).forEach((r,k)=>r.t=types[k%types.length]);entry.t=B.entry;
+  rooms.forEach(r=>{const R0=ROOMS[r.t];fillR(r.x0,r.y0,r.x0+7,r.y0+5,'.',R0.fl);LIGHTS.push([r.x0+4,r.y0+3]);});
+  LABELS.push([B.n.toUpperCase(),ox+1,oy,B.acc]);
+  edges.forEach(([a,b])=>{let x,y;if(a.j===b.j){x=Math.max(a.x0,b.x0)-1;y=a.y0+3;}else{x=a.x0+4;y=Math.max(a.y0,b.y0)-1;}const locked=rnd()<B.lockP*.7;G[y][x]=locked?'L':'d';FL[y][x]=ROOMS[a.t].fl;a.nb.push({r:b,x,y,open:!locked});b.nb.push({r:a,x,y,open:!locked});});
+  const fy=oy+HH-1;G[fy][entry.x0+4]='L';FL[fy][entry.x0+4]=ROOMS[entry.t].fl;
+  const wr=rooms.find(r=>r.j===1&&r!==entry);G[fy][wr.x0+2]='W';
+  if(rnd()<.5){const sr=rooms[ri(0,1)];G[oy][sr.x0+5]='W';}
+  // Vorgarten
+  for(let y=oy+HH;y<oy+HH+3;y++)for(let x=ox;x<ox+HW;x++){if(G[y]&&G[y][x]==='.')FL[y][x]=type==='villa'?'grass':'conc';}
+  rooms.forEach(r=>{const res=(x,y)=>(x>=r.x0+3&&x<=r.x0+5)||y===r.y0+3;
+    const fits=(x,y,w,h)=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){if(xx<r.x0||xx>r.x0+7||yy<r.y0||yy>r.y0+5||G[yy][xx]!=='.'||res(xx,yy))return false;}return true;};
+    ROOMS[r.t].f.forEach(k=>{const[w,h]=KSIZE[k];const cand=[];for(let y=r.y0;y<=r.y0+5;y++)for(let x=r.x0;x<=r.x0+7;x++)if(fits(x,y,w,h)){const edge=(y===r.y0?0:y+h-1===r.y0+5?1:(x===r.x0||x+w-1===r.x0+7)?2:3);cand.push({x,y,e:edge+rnd()*.9});}
+      cand.sort((a,b)=>a.e-b.e);if(cand.length&&cand[0].e<3)place(k,cand[0].x,cand[0].y);});});
+  for(let i=n0;i<OBJ.length;i++)OBJ[i].tab=type;
+  // Wachen im Haus
+  const ng=type==='villa'||type==='nachtclub'?2:1;const gr=shuf(rooms.filter(r=>r!==entry));
+  for(let k=0;k<ng;k++){const r0=gr[k%gr.length];const ctr=r=>[r.x0+4.5,r.y0+3.5];const path=[ctr(r0)];let cur=r0,prev=null;
+    for(let s=0;s<2;s++){const n=cur.nb.filter(e=>e.open&&e.r!==prev);if(!n.length)break;const e=pick(n);path.push([e.x+.5,e.y+.5]);path.push(ctr(e.r));prev=cur;cur=e.r;}
+    if(path.length===1){const[cx,cy]=path[0];path.push([cx,cy-2],[cx,cy],[cx-3,cy],[cx+2,cy]);}else{path.push(...path.slice(1,-1).reverse());}
+    const g=mkG(path);g.arm=(ARMED[type]||[0,0,0])[d];guards.push(g);}
+  if(['villa','juwelier','nachtclub'].includes(type)){const r=pick(rooms.filter(r=>r!==entry));const left=rnd()<.5;cams.push({x:(left?r.x0+.4:r.x0+7.6)*T,y:(r.y0+.2)*T,base:left?Math.PI*.3:Math.PI*.7,sw:rnd()*3,sus:0});}
+  // Safe-Code im selben Haus
+  const hc=OBJ.slice(n0).filter(o=>o.cont&&o.kind!=='X');if(OBJ.slice(n0).some(o=>o.kind==='X')&&hc.length)noteIn(pick(hc));
+  return {rooms,entry,ox,oy};
+}
+function buildDistrict(cfg){
+  const d=Math.max(0,Math.min(2,(cfg.diff||1)-1));ACC='#ff9f43';
+  const BX=3,BY=2,HW=19,HH=15,gap=6,mar=4;
+  W=mar*2+BX*HW+(BX-1)*gap;H=mar+BY*(HH+3+gap)+1;
+  G=grid(W,H,'#');FL=grid(W,H,'street');CT=grid(W,H,null);OBJ=[];LABELS=[];LIGHTS=[];guards=[];cams=[];
+  fillR(1,1,W-2,H-2,'.','street');yardTop=H;
+  const pool=DTYPES.filter(t=>t[1]<=d+1).map(t=>t[0]);const houses=[];
+  for(let bj=0;bj<BY;bj++)for(let bi=0;bi<BX;bi++){const ox=mar+bi*(HW+gap),oy=mar+bj*(HH+3+gap);houses.push(makeHouse(pick(pool),ox,oy,d));}
+  // Straßen: Lampen, parkende Autos, Mülltonnen
+  for(let x=4;x<W-4;x+=9){LIGHTS.push([x,2]);}
+  houses.forEach(h=>{LIGHTS.push([h.ox-3,h.oy+8],[h.ox+HW/2,h.oy+HH+4]);
+    const door=h.entry.x0+4;
+    for(let k=0;k<2;k++){const x=h.ox+ri(0,HW-3),y=h.oy+HH+3;if(Math.abs(x+1-door)<4)continue;let ok=true;for(let yy=y;yy<y+2;yy++)for(let xx=x;xx<x+3;xx++)if(G[yy][xx]!=='.'||CT[yy][xx])ok=false;
+      if(ok){const o=place('parked',x,y);o.car=stealPick();o.col=VEH[o.car].col;o.cont={type:'P',items:[],done:false,cw:4,ch:3};o.tab='street';}}
+    if(G[h.oy+HH][h.ox]==='.')place('trash',h.ox,h.oy+HH);
+    const cx=h.ox+HW-1,cy=h.oy+HH+1;if(G[cy][cx]==='.'&&!CT[cy][cx]){const o=place('C',cx,cy);o.tab='street';}});
+  // Kanaldeckel in einem Haus
+  {const h=pick(houses);const r=pick(h.rooms.filter(r=>r!==h.entry));for(const[x,y]of[[r.x0+1,r.y0+2],[r.x0+6,r.y0+2],[r.x0+1,r.y0+4]]){if(G[y][x]==='.'){G[y][x]='U';break;}}}
+  // Ausgänge an den Rändern
+  const midY=mar+HH+3+2;for(let y=midY-1;y<=midY+1;y++){G[y][1]='E';G[y][W-2]='E';}
+  const midX=Math.floor(W/2);for(let x=midX-2;x<=midX+2;x++)G[H-2][x]='E';
+  EXITS=['E'];
+  // Straßengang
+  const gangN=[2,3,4][d];for(let k=0;k<gangN;k++){const h=houses[k%houses.length];const x0=h.ox-3,x1=h.ox+HW+2,y0=Math.max(2,h.oy-2),y1=h.oy+HH+5;
+    const path=[[x0+.5,y0+.5],[x1+.5,y0+.5],[x1+.5,y1+.5],[x0+.5,y1+.5]];if(k%2)path.reverse();const g=mkG(path);g.arm=.75;g.gang=1;guards.push(g);}
+  // Start an einem Ausgang
+  const starts=[[midX,H-3],[2,midY],[W-3,midY]];const s=starts[ri(0,2)];P.x=(s[0]+.5)*T;P.y=(s[1]+.5)*T;
+  placeGetaway(s[0]+(s[0]<5?2:s[0]>W-6?-5:3),s[1]-3);
+  LOOT.street={P:['platine','kabel','geld','elektronik','munition','zigarren','uhr'],C:['metall','kabel','klebeband','geld','munition','verband']};
+  fillLoot('lagerhalle');
+}
+
 function noteIn(o){if(o){o.cont.note=true;}}
 function fillLoot(tab){
-  OBJ.forEach(o=>{if(!o.cont)return;const L=LOOT[tab][o.kind]||['geld'];const C=o.cont;
+  OBJ.forEach(o=>{if(!o.cont||o.kind==='getaway')return;const L=(LOOT[o.tab||tab]||LOOT[tab])[o.kind]||['geld'];const C=o.cont;
     const n=o.kind==='X'?3:o.kind==='G'?2:o.kind==='A'?3:ri(1,3);
     for(let k=0;k<n;k++){const id=pick(L);const p=fit(C.items,4,3,id);if(p)C.items.push(p);}
     if(o.kind==='D'&&tab==='golden'){const p=fit(C.items,4,3,'karte');if(p)C.items.unshift(p);}});
@@ -328,7 +408,7 @@ const hasCard=()=>BAG.some(p=>p.id==='karte');
 // ================= Figuren =================
 const P={x:0,y:0,face:-Math.PI/2,step:0,hp:100,moving:false};
 function mkG(path){return{x:path[0][0]*T,y:path[0][1]*T,dir:0,wp:0,path,sus:0,mode:'patrol',tx:0,ty:0,step:0,look:0,moving:false,down:false,stun:0,stuck:0,hp:100,armed:false,shootCd:1};}
-let NSEARCH=0,NKO=0,MAXAL=0,alarm=0,cop=null,busy=null,state='load',rings=[],smokes=[],heat=0,flashes=[];
+let ENDKIND='',NSEARCH=0,NKO=0,MAXAL=0,alarm=0,cop=null,busy=null,state='load',rings=[],smokes=[],heat=0,flashes=[];
 const jammed=()=>performance.now()<jamUntil;
 const lasersActive=()=>lasersOn&&!jammed();
 const camsActive=()=>camsOn&&!jammed();
@@ -381,6 +461,9 @@ function drawObj(o){const X=o.x*T,Y=o.y*T,w=o.w*T,h=o.h*T;
   case'R':box(X+1,Y,14,15,'#c62828','#e04848');for(let i=0;i<3;i++)px(tx,X+3,Y+4+i*4,10,1,'#7a1010');px(tx,X+7,Y+5,2,1,'#ddd');break;
   case'K':box(X+1,Y,14,15,'#dde4ea','#fff');px(tx,X+2,Y+6,12,1,'#9aa8b4');px(tx,X+12,Y+2,1,3,'#666');px(tx,X+12,Y+8,1,4,'#666');break;
   case'A':{box(X+2,Y+3,w-4,h-6,o.x%2?'#d23a6a':'#2a7ad0');px(tx,X+10,Y+6,10,h-12,'#1a2a3a');px(tx,X+11,Y+7,8,3,'#6ad');px(tx,X+3,Y+2,6,3,'#111');px(tx,X+w-9,Y+2,6,3,'#111');px(tx,X+3,Y+h-5,6,3,'#111');px(tx,X+w-9,Y+h-5,6,3,'#111');px(tx,X+w-5,Y+8,2,4,'#ffe14d');px(tx,X+w-5,Y+h-12,2,4,'#ffe14d');break;}
+  case'getaway':case'parked':{const c=o.col||'#888';const neon=o.kind==='getaway';if(neon){tx.fillStyle='rgba(255,61,139,.35)';tx.fillRect(X-2,Y+h-6,w+4,6);}
+    box(X+1,Y+3,w-2,h-6,c);px(tx,X+12,Y+5,14,h-10,'rgba(20,30,50,.85)');px(tx,X+13,Y+6,12,3,'#9cd');px(tx,X+2,Y+2,7,3,'#111');px(tx,X+w-9,Y+2,7,3,'#111');px(tx,X+2,Y+h-5,7,3,'#111');px(tx,X+w-9,Y+h-5,7,3,'#111');
+    px(tx,X+w-4,Y+7,2,4,'#ffe14d');px(tx,X+w-4,Y+h-11,2,4,'#ffe14d');px(tx,X+2,Y+7,2,3,'#f33');px(tx,X+2,Y+h-10,2,3,'#f33');if(neon){px(tx,X+4,Y+h-8,6,2,'#ffe14d');}break;}
   case'bed':box(X+1,Y+1,w-2,h-2,'#e8e0f0');px(tx,X+3,Y+3,w-6,7,'#fff');px(tx,X+2,Y+12,w-4,h-14,'#a33c6a');px(tx,X+2,Y+12,w-4,2,'#c85088');break;
   case'sofa':box(X,Y+2,w,12,'#3a6ad0','#5a8af0');px(tx,X+2,Y+6,w-4,6,'#4a7ae0');px(tx,X+w/2,Y+6,1,6,'#2a4aa0');break;
   case'table':box(X+1,Y+4,w-2,9,'#6a3a20','#8a5a30');px(tx,X+6,Y+6,4,3,'#eee');px(tx,X+18,Y+6,3,3,'#3c8');break;
@@ -503,7 +586,7 @@ function updButtons(){
   const a=$('act'),k=$('atk');let label='—',on=false;
   if(state==='play'&&!busy){const ex=onExit(),th=nearThing();
     if(ex){label='ABHAUEN';on=true;}
-    else if(th){on=true;label=th.k==='cont'?(th.c.done?'ÖFFNEN':'DURCH-<br>SUCHEN'):th.k==='door'?(th.d.type==='W'?'FENSTER':'TÜR'):th.k==='fuse'?'STROM-<br>KASTEN':th.k==='mon'?'MONITOR':th.k==='hole'?'KANAL-<br>DECKEL':'ALARM-<br>ANLAGE';}}
+    else if(th){on=true;label=th.k==='cont'?(th.c.type==='TR'?'KOFFER-<br>RAUM':th.c.type==='P'?'AUTO':th.c.done?'ÖFFNEN':'DURCH-<br>SUCHEN'):th.k==='door'?(th.d.type==='W'?'FENSTER':'TÜR'):th.k==='fuse'?'STROM-<br>KASTEN':th.k==='mon'?'MONITOR':th.k==='hole'?'KANAL-<br>DECKEL':'ALARM-<br>ANLAGE';}}
   const ng=state==='play'&&!busy&&nearGuard();
   const key_=label+on+!!ng+qKey()+LO.weapon+MAG+'/'+ammoLeft()+(reloadT>0)+bleed;
   if(key_===lastBtn)return;lastBtn=key_;
@@ -545,7 +628,10 @@ function doAct(){
   if(state!=='play'||busy)return;
   const ex=onExit();if(ex){extract(ex);return;}
   const th=nearThing();if(!th)return;
-  if(th.k==='cont'){const C=th.c;if(C.done){openLoot(C);return;}
+  if(th.k==='cont'){const C=th.c;
+    if(C.type==='TR'){SFX('door');openLoot(C);return;}
+    if(C.type==='P'){parkedMenu(th.o);return;}
+    if(C.done){openLoot(C);return;}
     if(C.type==='X'){safeMenu(C);return;}
     const D=CDEF[C.type];noise(D.nz*4);startBusy(C.type==='A'?'AUSSCHLACHTEN …':'DURCHSUCHEN …',D.t,()=>{C.done=true;NSEARCH++;SFX('loot');if(C.note&&!codeKnown){codeKnown=true;$('iCode').textContent='SAFE-CODE: '+CODE;$('iCode').classList.add('on');toast('ZETTEL: SAFE-CODE '+CODE);}openLoot(C);},C.type==='A'?1:0,60);return;}
   if(th.k==='door'){doorMenu(th.d);return;}
@@ -639,6 +725,13 @@ function updBullets(dt){
   bullets=bullets.filter(b=>b.life>0);sparks.forEach(s=>s.t-=dt);sparks=sparks.filter(s=>s.t>0);
   if(bleed&&state!=='end'){P.hp-=1.3*dt;if(P.hp<=0)busted('Du bist verblutet, bevor du rauskamst.');}
 }
+function parkedMenu(o){const C=o.cont,V=VEH[o.car];
+  const b=[];if(!C.done)b.push({t:'Handschuhfach & Sitze durchsuchen<small>2 s · etwas laut</small>',f:()=>{noise(40);startBusy('DURCHSUCHEN …',2,()=>{C.done=true;NSEARCH++;SFX('loot');openLoot(C);});}});
+  else b.push({t:'Handschuhfach öffnen',f:()=>openLoot(C)});
+  b.push({t:`Kurzschließen & abhauen<small>${V.n} gehört dir · dein Fluchtwagen und sein Kofferraum bleiben hier · Alarmanlage möglich</small>`,f:()=>{
+    if(rnd()<.4){noise(240);raise(Math.max(alarm+30,60));toast('AUTOALARM!');SFX('siren');}
+    wireGame('ZÜNDUNG','Kabel richtig verbinden – dann springt der Motor an.',()=>{stolenCar=o.car;SFX('unlock');extract('S');});}});
+  menu(V.n.toUpperCase(),`Ein geparkter ${V.n}. Kofferraum: ${V.tw}×${V.th}.`,b.concat([{t:'Zurück'}]));}
 // ================= Minispiele =================
 function lockGame(onOk,pro){
   state='mini';const pins=pro?3:4;let done=0,miss=0,pos=0,dirm=1,speed=pro?.6:.75,zone,raf,cool=0;
@@ -705,10 +798,11 @@ function renderLoot(){
   const C=curC,cs=cellSize(C.ch);
   $('ov').className='ov on';
   $('ov').innerHTML=`<div class="lp wide"><h3>${CDEF[C.type].n}</h3><div class="sub">Ziehen = umpacken · kurz antippen = drehen · lila = Bastelmaterial · blau = Bauplan · die Zeit läuft weiter!</div>
-    <div class="cols"><div><div class="gl"><span>INHALT</span><span>${C.items.length?'':'leer'}</span></div>${gridHTML('gc',C.items,C.cw,C.ch,'',cs)}</div>
+    <div class="cols"><div><div class="gl"><span>${C.type==='TR'?'KOFFERRAUM '+C.cw+'×'+C.ch+' – kommt nur über die grünen Ausgänge mit raus':'INHALT'}</span><span>${C.items.length?'':'leer'}</span></div>${gridHTML('gc',C.items,C.cw,C.ch,'',cs)}</div>
     <div><div class="gl"><span>${bagLabel()}</span><b>$${bagVal()}</b></div>${gridHTML('gb',BAG,BW,BH,'bag',cs)}</div></div>
-    <div class="bt row"><button type="button" class="y" id="lall">ALLES NEHMEN</button><button type="button" class="p" id="lok">FERTIG</button></div></div>`;
+    <div class="bt row"><button type="button" class="y" id="lall">${C.type==='TR'?'ALLES EINLADEN':'ALLES NEHMEN'}</button><button type="button" class="p" id="lok">FERTIG</button></div></div>`;
   $('lok').onclick=closeOv;
+  if(C.type==='TR'){$('lall').onclick=()=>{BAG.slice().filter(p=>p.id!=='karte'&&!IT[p.id].use).sort((a,b)=>IT[b.id].v-IT[a.id].v).forEach(p=>{const q=fit(C.items,C.cw,C.ch,p.id);if(q){C.items.push(q);BAG.splice(BAG.indexOf(p),1);}});renderLoot();};bindDrag(cellSize(C.ch),renderLoot);return;}
   $('lall').onclick=()=>{C.items.slice().sort((a,b)=>(IT[b.id].plan?999:IT[b.id].v)-(IT[a.id].plan?999:IT[a.id].v)).forEach(p=>{const q=fit(BAG,BW,BH,p.id);if(q){BAG.push(q);C.items.splice(C.items.indexOf(p),1);}});renderLoot();if(C.items.length)toast('RUCKSACK VOLL');};
   bindDrag(cs,renderLoot);
 }
@@ -789,16 +883,17 @@ function resultPanel(html){$('ov').className='ov mid on';$('ov').innerHTML=`<div
 function leaveFS(){try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();if(document.fullscreenElement)document.exitFullscreen();}catch(e){}}
 function sendEnd(res){
   leaveFS();
+  const trunkIds=(res==='escape'&&ENDKIND==='E'&&TRUNK)?TRUNK.items.map(p=>p.id).filter(id=>id!=='karte'):[];
   if(res==='escape'&&MAG+PART>=10){const p=fit(BAG,BW,BH,'munition');if(p)BAG.push(p);}
   const lo=Object.assign({},LO);
-  const data={type:'heistEnd',res,kind:CFG.kind,btype:CFG.type,bag:BAG.map(p=>p.id).filter(id=>id!=='karte'),lo,heat,alarm:Math.round(MAXAL),val:bagVal(),searched:NSEARCH,ko:NKO};
+  const data={type:'heistEnd',res,kind:CFG.kind,btype:CFG.type,bag:BAG.map(p=>p.id).filter(id=>id!=='karte').concat(trunkIds),lo,heat,stolen:res==='escape'?stolenCar:null,alarm:Math.round(MAXAL),val:bagVal(),searched:NSEARCH,ko:NKO};
   if(EMBED)window.parent.postMessage(data,'*');else location.reload();
 }
 function extract(kind){
-  state='end';heat=Math.max(0,(alarm>=60?1:0)+(kind==='O'?2:0)+(cop?1:0)+(killed?1:0)-(PK.heat||0)-(kind==='U'?1:0));const v=bagVal();lastBtn='';updButtons();
-  const items=BAG.filter(p=>p.id!=='karte');const mats=items.filter(p=>IT[p.id].mat).length,plans=items.filter(p=>IT[p.id].plan).length;
-  wipe(()=>resultPanel(`<div class="big">ENTKOMMEN!</div><p>${kind==='O'?'Du stürmst durch die Vordertür auf die Hauptstraße und tauchst in der Menge unter.':kind==='U'?'Du verschwindest in der Kanalisation. Zwei Blocks weiter kletterst du aus einem Gully – keiner hat dich gesehen.':'Du springst in den Wagen. Reifen quietschen, die Neonlichter verschwimmen.'}</p>
-    <div class="rw"><span>${items.length} Teile · $${v}</span>${mats?`<span>${mats}× Material</span>`:''}${plans?`<span>${plans}× Bauplan</span>`:''}${heat?`<span class="h">+${heat} Heat</span>`:''}</div>
+  ENDKIND=kind;state='end';heat=Math.max(0,(alarm>=60?1:0)+(kind==='O'?2:0)+(cop?1:0)+(killed?1:0)-(PK.heat||0)-(kind==='U'?1:0));const v=bagVal();lastBtn='';updButtons();
+  const trunkN=(kind==='E'&&TRUNK)?TRUNK.items.length:0;const items=BAG.filter(p=>p.id!=='karte').concat(kind==='E'&&TRUNK?TRUNK.items:[]);const mats=items.filter(p=>IT[p.id].mat).length,plans=items.filter(p=>IT[p.id].plan).length;
+  wipe(()=>resultPanel(`<div class="big">ENTKOMMEN!</div><p>${kind==='O'?'Du stürmst durch die Vordertür auf die Hauptstraße und tauchst in der Menge unter.':kind==='S'?`Der Motor heult auf – du rast im geklauten ${VEH[stolenCar].n} davon!`:kind==='U'?'Du verschwindest in der Kanalisation. Zwei Blocks weiter kletterst du aus einem Gully – keiner hat dich gesehen.':'Du springst in den Wagen. Reifen quietschen, die Neonlichter verschwimmen.'}</p>
+    <div class="rw"><span>${items.length} Teile · $${v+(trunkN?TRUNK.items.reduce((s,p)=>s+(IT[p.id].mat?0:IT[p.id].v),0):0)}</span>${trunkN?`<span>${trunkN} aus dem Kofferraum</span>`:''}${kind==='S'?`<span>🚗 ${VEH[stolenCar].n}</span>`:''}${TRUNK&&TRUNK.items.length&&kind!=='E'?'<span class="h">Kofferraum zurückgelassen</span>':''}${mats?`<span>${mats}× Material</span>`:''}${plans?`<span>${plans}× Bauplan</span>`:''}${heat?`<span class="h">+${heat} Heat</span>`:''}</div>
     <div class="bt"><button type="button" class="p" id="fin">${EMBED?'ZURÜCK INS VERSTECK':'NOCHMAL'}</button></div>`));
   setTimeout(()=>{const b=$('fin');if(b)b.onclick=()=>sendEnd('escape');},600);
 }
@@ -816,11 +911,12 @@ const INTRO={
   juwelier:['JUWELIER','Klein, aber fein: Vitrinen voller <b>Ringe, Ketten, Uhren</b> – und ein Tresorraum mit Gold. Laserschranke, Kameras, Alarmanlage.','Erst Stromkasten, dann Vitrinen. Vitrinen klirren laut!'],
   nachtclub:['NACHTCLUB','Nach Feierabend: <b>Casino-Chips, Bargeld, Zigarren</b> in Bar, VIP-Lounge und Büro. Die Türsteher machen Kontrollgänge.','Der Büro-Safe hat oft die Tageseinnahmen.'],
   bank:['BANK','Der große Fisch: <b>Schließfächer, Goldwagen, Aktenkoffer</b>. Vier Wachen, viele Kameras, Laser und Alarmanlage.','Ohne Störsender und Crew wird es eng. Plane deine Flucht!'],
+  viertel:['DAS VIERTEL','Ein ganzer Block: <b>sechs Gebäude</b> – Werkstätten, Apotheken, Villen, Clubs. Auf den Straßen patrouilliert eine <b>bewaffnete Gang</b>. Dein Fluchtwagen steht am Rand – <b>Kofferraum</b> zum Zwischenlagern!','Drei Ausgänge an den Rändern, ein Kanaldeckel in einem der Häuser. Geparkte Autos kannst du ausräumen oder kurzschließen und klauen.'],
   villa:['VILLA','Reiche Leute, teure Sachen: <b>Schmuck, Gold, Platinen</b> aus der Haustechnik. Aber: Security, Kameras, eine <b>Laserschranke</b> und eine Alarmanlage.','Stromkasten suchen = Laser aus. Security-Monitor = Kameras aus. Fenster sind ein leiser Weg rein – mit Dietrich.']
 };
 function intro(){
   state='intro';checkRot();
-  const I=INTRO[CFG.kind==='golden'?'golden':CFG.type];
+  const I=INTRO[CFG.kind==='golden'?'golden':CFG.type]||INTRO.werkstatt;
   const tl=[LO.tool1,LO.tool2].filter(Boolean).map(i=>IT[i].n).join(', ')||'kein Werkzeug';
   resultPanel(`<div class="big" style="font-size:34px">${CFG.name||I[0]}</div><p>${I[1]}</p>
   <p style="font-size:13px;color:#cbbbe6">🕹️ Linke Hand: ziehen = laufen (wenig = schleichen). Rechte Hand: 🟡 Aktion · 🔴 Schlag von hinten – oder Feuer mit Schusswaffe (halten = Dauerfeuer, Taste R lädt) · Schnellslots · 🎒 Tasche.<br>Tipp: ${I[2]}</p>
@@ -834,12 +930,14 @@ function begin(cfg){
   BW=CFG.bagW||5;BH=CFG.bagH||4;
   ['q1','q2'].forEach(q=>lastQ[q]=LO[q]);
   CODE=String(1000+Math.floor(rnd()*9000));
-  if(CFG.kind==='golden')buildGolden();else buildGen(CFG);
+  TRUNK=null;stolenCar=null;
+  alarmPanel=armed=disarmed=false;alarmT=0;hasLasers=lasersOn=false;camsOn=true;jamUntil=0;codeKnown=false;uOpen=false;killed=0;bullets=[];sparks=[];bleed=false;MAXAL=0;NSEARCH=0;NKO=0;alarm=0;cop=null;BAG=[];P.hp=100;smokes=[];rings=[];GETAWAY_AT=null;
+  if(CFG.kind==='golden')buildGolden();else if(CFG.type==='viertel')buildDistrict(CFG);else buildGen(CFG);
   setupDoors();drawTiles();
   $('title').textContent=(CFG.name||'EINSATZ').toUpperCase();
   if(PK.code){codeKnown=true;$('iCode').textContent='SAFE-CODE: '+CODE;$('iCode').classList.add('on');}
-  const ar=CFG.kind==='golden'?1:(ARMED[CFG.type]||[0,0,0])[Math.max(0,Math.min(2,(CFG.diff||1)-1))];guards.forEach(g=>{g.armed=rnd()<ar;g.shootCd=1+rnd();});
-  RAID=CFG.kind==='golden'?600:CFG.type==='bank'?720:CFG.type==='villa'?600:480;raidOver=false;
+  const ar=CFG.kind==='golden'?1:(ARMED[CFG.type]||[0,0,0])[Math.max(0,Math.min(2,(CFG.diff||1)-1))];guards.forEach(g=>{g.armed=rnd()<(g.arm!=null?g.arm:ar);g.shootCd=1+rnd();});
+  RAID=CFG.kind==='golden'?600:CFG.type==='bank'?720:CFG.type==='viertel'?660:CFG.type==='villa'?600:480;raidOver=false;
   MAG=0;PART=0;if(gun()){MAG=takeRounds(gun().mag);}
   if(PK.ko&&guards.length){const g=guards[Math.floor(rnd()*guards.length)];g.down=true;g.mode='down';}
   lastBtn='';updButtons();intro();
