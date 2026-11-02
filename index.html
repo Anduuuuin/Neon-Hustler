@@ -2231,7 +2231,7 @@
     clearInterval(bzFx);bzFx=setInterval(()=>{if(!BZ||bzTab!=='kasse')return;const s=bst(BZ);if(!s||!s.lv)return;const rows=[...document.querySelectorAll('.bzst[data-j]')];if(!rows.length)return;
       const r=rows[Math.floor(Math.random()*rows.length)];const j=+r.dataset.j;if(s.brk===j)return;const f=document.createElement('i');f.className='bzpop';f.textContent='+$'+fmt(Math.max(1,Math.round(stInc(BZ,j,s)/120)));r.appendChild(f);setTimeout(()=>f.remove(),1100);},700);}
   function closeBiz(){$('bizscr').classList.remove('on');BZ=null;clearInterval(bzTick);clearInterval(bzFx);const c=$('bzcrowd');if(c)c.innerHTML='';saveGame();}
-  function crowd(){let c=$('bzcrowd');if(!c){c=document.createElement('div');c.id='bzcrowd';$('bizscr').insertBefore(c,$('bizp'));}
+  function crowd(){return;let c=$('bzcrowd');if(!c){c=document.createElement('div');c.id='bzcrowd';$('bizscr').insertBefore(c,$('bizp'));}
     const s=bst(BZ);const n=s&&s.lv?Math.min(9,1+bizRank(BZ)+(s.up.w||0)):0;const X=BIZX[BZ];
     c.innerHTML=Array.from({length:n},(_,i)=>`<span style="top:${30+Math.random()*16}%;animation-duration:${7+Math.random()*7}s,.5s;animation-delay:-${Math.random()*12}s,0s;${Math.random()<.5?'animation-direction:reverse,alternate;':''}">${X.cust[i%X.cust.length]}</span>`).join('');}
   function tipTarget(k){let ty=BIZX[k].tip;if(!TINFO[ty]||lvl<TINFO[ty].req)ty='werkstatt';const T=mkTarget(ty);T.name='Tipp: '+T.name;T.diff=Math.max(1,T.diff-1);TARGETS.unshift(T);return T;}
