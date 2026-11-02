@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b0418">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon192.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neon Hustler – Prototyp Startbildschirm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Oswald:wght@500;700&family=Permanent+Marker&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;height:100%;background:#12061f;color-scheme:light;color:#000;overflow:hidden;font-family:'Oswald',sans-serif;-webkit-user-select:none;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+  .screen{position:fixed;inset:0;overflow:hidden;display:none}
+  .screen.on{display:block}
+  .stage{position:absolute;left:50%;top:50%;aspect-ratio:944/1680;transform:translate(-50%,-50%)}
+  .layer{position:absolute;inset:0;will-change:transform}
+  .layer>img{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+
+  /* ===== START ===== */
+  #bg{inset:-4%}
+  #bg>img{animation:zoom 30s ease-in-out infinite alternate}
+  @keyframes zoom{from{transform:scale(1)}to{transform:scale(1.06)}}
+  #sunglow{position:absolute;left:65%;top:20%;width:70%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+    background:radial-gradient(circle,rgba(255,210,90,.55) 0%,rgba(255,120,80,.25) 35%,rgba(255,60,140,0) 70%);mix-blend-mode:screen;animation:pulse 5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+  #shimmer{position:absolute;left:0;top:32%;width:100%;height:12%;mix-blend-mode:screen;opacity:.75;
+    background:repeating-linear-gradient(100deg,rgba(255,220,150,0) 0 18px,rgba(255,230,170,.55) 20px,rgba(255,220,150,0) 24px 46px);
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 40%,#000 70%,transparent);mask-image:linear-gradient(180deg,transparent,#000 40%,#000 70%,transparent);animation:shim 3.5s linear infinite}
+  @keyframes shim{from{background-position:0 0}to{background-position:92px 0}}
+  #neon{position:absolute;left:91%;top:20.5%;width:6%;height:9.5%;transform:translate(-50%,0);border-radius:30%;
+    background:radial-gradient(ellipse,rgba(255,80,200,.9),rgba(255,80,200,0) 70%);mix-blend-mode:screen;animation:flicker 4s steps(1) infinite}
+  #neon2{position:absolute;left:96%;top:22%;width:7%;height:12%;border-radius:30%;
+    background:radial-gradient(ellipse,rgba(60,240,255,.6),rgba(60,240,255,0) 70%);mix-blend-mode:screen;animation:flicker 6.3s steps(1) infinite reverse}
+  @keyframes flicker{0%{opacity:1}7%{opacity:.2}9%{opacity:1}11%{opacity:.4}13%{opacity:1}61%{opacity:1}63%{opacity:.15}66%{opacity:.9}100%{opacity:1}}
+  #wet{position:absolute;left:0;top:52%;width:100%;height:30%;mix-blend-mode:screen;opacity:.5;
+    background:linear-gradient(115deg,transparent 30%,rgba(255,90,200,.45) 45%,transparent 60%);background-size:300% 100%;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 30%,#000 60%,transparent);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 60%,transparent);animation:wet 9s ease-in-out infinite}
+  @keyframes wet{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+  #carwrap{position:absolute;inset:0;pointer-events:none}
+  #car{position:absolute;width:78%;left:-90%;top:58%;transform-origin:50% 100%;filter:drop-shadow(0 18px 10px rgba(20,0,40,.55))}
+  #car img{position:static;width:100%;height:auto;display:block}
+  #car .lights{position:absolute;right:-22%;top:52%;width:40%;height:22%;background:radial-gradient(ellipse at left,rgba(255,250,210,.85),rgba(255,250,210,0) 70%);mix-blend-mode:screen}
+  #car .streak{position:absolute;left:-60%;top:30%;width:60%;height:50%;
+    background:repeating-linear-gradient(180deg,rgba(255,255,255,0) 0 10px,rgba(255,200,240,.35) 11px,rgba(255,255,255,0) 13px 22px);
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000);mask-image:linear-gradient(90deg,transparent,#000)}
+  #car.drive{animation:drive 4.6s cubic-bezier(.3,.1,.6,.95) forwards}
+  @keyframes drive{0%{left:-90%;top:54%;transform:rotate(13deg) scale(.85)}100%{left:115%;top:70%;transform:rotate(13deg) scale(1.05)}}
+  #car .body{animation:bounce .18s ease-in-out infinite alternate}
+  @keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-1.2%)}}
+  #figin{position:absolute;left:-6%;top:19%;width:90%;height:90%}
+  #figin img{position:absolute;inset:0;width:100%;height:100%;transform-origin:35% 100%;animation:breathe 4.2s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1,1) rotate(0)}50%{transform:scale(1.006,1.014) rotate(-.4deg)}}
+  #smoke,#dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(18,4,32,.75) 100%)}
+  #startui{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+  #logo{margin-top:max(6vh,24px);transform:rotate(-5deg);text-align:center;animation:logoin 1.1s cubic-bezier(.2,1.6,.4,1) both}
+  @keyframes logoin{from{transform:rotate(-5deg) scale(2.2);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+  #logo .t{font-family:'Bangers',cursive;font-size:clamp(48px,15vw,88px);line-height:.9;letter-spacing:3px;color:#ffe14d;
+    -webkit-text-stroke:3px #000;paint-order:stroke fill;text-shadow:5px 5px 0 #ff3d8b,0 0 18px rgba(255,61,139,.9),0 0 40px rgba(255,61,139,.6);animation:logoflick 7s steps(1) infinite}
+  #logo .t2{color:#2fe0ea;text-shadow:5px 5px 0 #8a2a8f,0 0 18px rgba(47,224,234,.9),0 0 40px rgba(47,224,234,.6);animation-delay:2.3s}
+  @keyframes logoflick{0%{opacity:1}40%{opacity:1}41%{opacity:.35}42%{opacity:1}43%{opacity:.5}44%{opacity:1}100%{opacity:1}}
+  #tap{position:absolute;bottom:max(9vh,40px);font-family:'Bangers',cursive;font-size:clamp(22px,6.5vw,34px);letter-spacing:2px;color:#fff;
+    -webkit-text-stroke:1.5px #000;paint-order:stroke fill;text-shadow:3px 3px 0 #000;animation:blink 1.4s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.96)}}
+
+  /* ===== ÜBERGANG ===== */
+  #wipe{position:fixed;inset:-20%;z-index:50;pointer-events:none;transform:translateX(-140%) skewX(-18deg);
+    background:repeating-linear-gradient(90deg,#000 0 46px,#ffe14d 46px 70px,#000 70px 116px,#ff3d8b 116px 132px)}
+  #wipe.go{animation:wipe 1.1s cubic-bezier(.7,0,.3,1) forwards}
+  @keyframes wipe{0%{transform:translateX(-140%) skewX(-18deg)}45%,55%{transform:translateX(0) skewX(-18deg)}100%{transform:translateX(140%) skewX(-18deg)}}
+
+  /* ===== INTRO-COMIC ===== */
+  #intro{background:#14081f;background-image:radial-gradient(rgba(255,255,255,.06) 1.2px,transparent 1.4px);background-size:9px 9px}
+  #panelbox{position:absolute;left:50%;top:50%;width:min(94vw,640px);transform:translate(-50%,-50%)}
+  .cap{position:relative;z-index:3;display:inline-block;background:#ffe14d;border:3px solid #000;padding:8px 12px;font-size:clamp(15px,4.3vw,20px);font-weight:500;line-height:1.3;
+    box-shadow:4px 4px 0 #000;margin:0 0 -14px 10px;max-width:86%;transform:rotate(-1.5deg)}
+  .frame{position:relative;border:5px solid #000;box-shadow:8px 8px 0 #ff3d8b;overflow:hidden;aspect-ratio:1456/1088;background:#000}
+  .frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:kb 9s ease-out forwards}
+  @keyframes kb{from{transform:scale(1.12)}to{transform:scale(1)}}
+  .panel-in{animation:pin .55s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes pin{from{opacity:0;transform:translateY(40px) rotate(3deg) scale(.9)}to{opacity:1;transform:none}}
+  .bubble{position:absolute;z-index:4;background:#fff;border:3px solid #000;border-radius:22px;padding:8px 14px;font-family:'Permanent Marker',cursive;
+    font-size:clamp(14px,4vw,19px);line-height:1.25;max-width:58%;box-shadow:3px 3px 0 #000;animation:pop .4s cubic-bezier(.2,1.8,.4,1) both}
+  .bubble.phone{font-size:clamp(12px,3.4vw,16px);max-width:52%;border-radius:6px;background:#2fe0ea;font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  @keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+  .sfx{position:absolute;z-index:4;font-family:'Bangers',cursive;font-size:clamp(46px,14vw,84px);color:#ffe14d;-webkit-text-stroke:3px #000;paint-order:stroke fill;
+    text-shadow:5px 5px 0 #ff3d8b;transform:rotate(-12deg);animation:sfx .25s ease-in-out infinite alternate}
+  @keyframes sfx{from{transform:rotate(-12deg) scale(1)}to{transform:rotate(-8deg) scale(1.08)}}
+  .shake .frame{animation:shake .12s linear infinite}
+  @keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,-3px)}100%{transform:translate(0,0)}}
+  #next{position:absolute;right:16px;bottom:max(22px,env(safe-area-inset-bottom));font-family:'Bangers',cursive;font-size:24px;letter-spacing:1px;color:#fff;
+    -webkit-text-stroke:1px #000;paint-order:stroke fill;text-shadow:2px 2px 0 #000;animation:blink 1.4s ease-in-out infinite;pointer-events:none}
+  #skip{position:absolute;left:14px;top:max(14px,env(safe-area-inset-top));background:rgba(0,0,0,.45);color:#fff;border:2px solid rgba(255,255,255,.4);
+    font-family:'Oswald',sans-serif;font-size:14px;padding:6px 12px;cursor:pointer}
+  #dots{position:absolute;left:0;right:0;bottom:max(30px,env(safe-area-inset-bottom));display:flex;justify-content:center;gap:8px;pointer-events:none}
+  #dots span{width:10px;height:10px;border:2px solid #000;background:#555;transform:rotate(45deg)}
+  #dots span.on{background:#ffe14d}
+
+  /* ===== VERSTECK ===== */
+  #hide{background:#0d0618}
+  #hide .bulb{position:absolute;left:55%;top:8.5%;width:46%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+    background:radial-gradient(circle,rgba(255,200,110,.55),rgba(255,160,60,.15) 40%,rgba(255,160,60,0) 70%);mix-blend-mode:screen;animation:bulb 6s steps(1) infinite}
+  @keyframes bulb{0%{opacity:1}52%{opacity:1}53%{opacity:.4}54%{opacity:1}56%{opacity:.6}57%{opacity:1}100%{opacity:1}}
+  #hide .win{position:absolute;left:4%;top:7%;width:20%;height:17%;background:radial-gradient(ellipse,rgba(255,60,200,.45),rgba(255,60,200,0) 70%);mix-blend-mode:screen;animation:pulse2 4s ease-in-out infinite}
+  @keyframes pulse2{0%,100%{opacity:.5}50%{opacity:1}}
+  #hide .tv{position:absolute;left:13.6%;top:38%;width:13%;height:8%;border-radius:12%;
+    background:repeating-linear-gradient(180deg,rgba(255,255,255,.12) 0 2px,rgba(0,0,0,0) 2px 4px);mix-blend-mode:screen;animation:tv .15s steps(2) infinite}
+  @keyframes tv{0%{opacity:.5;background-position:0 0}100%{opacity:.9;background-position:0 3px}}
+  #hide .tvglow{position:absolute;left:5%;top:32%;width:32%;height:22%;background:radial-gradient(ellipse,rgba(80,220,255,.3),rgba(80,220,255,0) 70%);mix-blend-mode:screen;animation:tvg 2.3s ease-in-out infinite}
+  @keyframes tvg{0%,100%{opacity:.5}30%{opacity:.9}60%{opacity:.6}}
+  .hs{position:absolute;background:transparent;border:0;padding:0;cursor:pointer;border-radius:10px;outline:none}
+  .hs::after{content:'';position:absolute;inset:0;border-radius:10px;border:3px solid #ffe14d;box-shadow:0 0 18px #ffe14d,inset 0 0 18px rgba(255,225,77,.5);opacity:0;transition:opacity .2s}
+  .hs:hover::after,.hs:focus-visible::after,.hs.flash::after{opacity:1}
+  .hs .mk{position:absolute;left:var(--mx,50%);top:var(--my,50%);width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#ffe14d;border:2px solid #000;
+    box-shadow:0 0 0 0 rgba(255,225,77,.7);animation:ping 2s ease-out infinite}
+  @keyframes ping{0%{box-shadow:0 0 0 0 rgba(255,225,77,.8)}100%{box-shadow:0 0 0 18px rgba(255,225,77,0)}}
+  .hs .lb{position:absolute;left:var(--mx,50%);top:calc(var(--my,50%) + 14px);transform:translateX(-50%) rotate(-3deg);white-space:nowrap;background:#ffe14d;border:2px solid #000;
+    font-family:'Bangers',cursive;font-size:15px;letter-spacing:1px;padding:1px 7px;color:#000;box-shadow:2px 2px 0 #000;opacity:0;transition:opacity .4s}
+  #hide.labels .hs .lb{opacity:1}
+  #h-phone .lb{left:0;transform:rotate(-3deg)}
+  #h-bench .lb,#h-locker .lb{left:auto;right:0;transform:rotate(-3deg)}
+  #h-radio .lb{left:auto;right:4px;transform:rotate(-3deg)}
+  .hs.alert .mk{background:#ff3d8b;animation:ping .9s ease-out infinite}
+
+  #hud{position:absolute;left:0;right:0;top:0;padding:max(10px,env(safe-area-inset-top)) 12px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;
+    background:linear-gradient(180deg,rgba(10,2,20,.85),rgba(10,2,20,0));pointer-events:none}
+  #hud .who{color:#000;background:#fff;border:3px solid #000;box-shadow:3px 3px 0 #ff3d8b;padding:2px 10px;transform:rotate(-1.5deg);min-width:120px}
+  #hud .who b{font-family:'Bangers',cursive;font-size:22px;letter-spacing:1px;display:block;line-height:1.1}
+  #hud .who small{font-size:12px}
+  #hud .stats{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+  #hud .pill{background:#000;color:#fff;border:2px solid #2fe0ea;padding:2px 9px;font-size:14px;font-weight:700}
+  #hud .pill.cash{border-color:#7dffb2;color:#7dffb2}
+  #hud .pill.heat{border-color:#ff3d8b;color:#ffb3d1}
+
+  #sheet,.sheetx{position:absolute;left:10px;right:10px;bottom:max(12px,env(safe-area-inset-bottom));z-index:20;background:#fff;border:4px solid #000;box-shadow:7px 7px 0 #ff3d8b;
+    padding:14px 16px 16px;transform:translateY(140%) rotate(1deg);transition:transform .45s cubic-bezier(.2,1.3,.4,1)}
+  #sheet.open,.sheetx.open{transform:translateY(0) rotate(0)}
+  .sheetx h2,#sheet h2{margin:0 0 6px;font-family:'Bangers',cursive;font-weight:400;font-size:30px;letter-spacing:1px;line-height:1}
+  .sheetx p,#sheet p{margin:0 0 10px;font-size:16px;line-height:1.35}
+  .sheetx .tag,#sheet .tag{display:inline-block;background:#ffe14d;border:2px solid #000;font-size:12px;font-weight:700;padding:1px 6px;margin-bottom:8px}
+  .sheetx .row,#sheet .row{display:flex;gap:10px;margin-top:6px}
+  .sheetx button,#sheet button{flex:1;height:48px;border:3px solid #000;font-family:'Bangers',cursive;font-size:22px;letter-spacing:1px;cursor:pointer;box-shadow:4px 4px 0 #000}
+  .sheetx .ok,#sheet .ok{background:#ff3d8b;color:#fff;-webkit-text-stroke:.8px #000}
+  .sheetx .no,#sheet .no{background:#eee}
+  .sheetx button:active,#sheet button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #000}
+  .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:4px 0 10px}
+  .grid div{aspect-ratio:1;border:2px solid #000;background:#f1ede4;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;font-weight:700;line-height:1.1;padding:2px}
+  .grid div.full{background:#2fe0ea}
+  #toast,.tst{position:absolute;left:50%;top:22%;z-index:30;transform:translate(-50%,-20px) rotate(-3deg);opacity:0;transition:all .35s;background:#ffe14d;border:3px solid #000;
+    box-shadow:4px 4px 0 #000;font-family:'Bangers',cursive;font-size:22px;letter-spacing:1px;padding:4px 14px;white-space:nowrap;pointer-events:none}
+  #toast.on,.tst.on{opacity:1;transform:translate(-50%,0) rotate(-3deg)}
+  #fade{position:absolute;inset:0;background:#000;pointer-events:none;opacity:1;transition:opacity 1.2s}
+
+  /* ===== STADTKARTE ===== */
+  #map{background:#0d0618}
+  #map .glow{position:absolute;border-radius:50%;mix-blend-mode:screen;pointer-events:none}
+  #map .g-club{left:36%;top:27%;width:34%;height:16%;background:radial-gradient(ellipse,rgba(255,60,200,.45),rgba(255,60,200,0) 70%);animation:flicker 5s steps(1) infinite}
+  #map .g-diner{left:66%;top:40%;width:36%;height:18%;background:radial-gradient(ellipse,rgba(255,90,170,.4),rgba(255,90,170,0) 70%);animation:pulse2 3s ease-in-out infinite}
+  #map .g-pawn{left:62%;top:70%;width:38%;height:16%;background:radial-gradient(ellipse,rgba(255,170,40,.4),rgba(255,170,40,0) 70%);animation:flicker 7s steps(1) infinite reverse}
+  #map .g-sea{left:0;top:2%;width:100%;height:20%;background:repeating-linear-gradient(100deg,rgba(255,150,220,0) 0 22px,rgba(255,150,220,.25) 24px,rgba(255,150,220,0) 28px 54px);border-radius:0;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 70%,transparent);animation:shim 5s linear infinite}
+  #map .hs .lb{opacity:1}
+  #map .spot .lb{font-size:13px;padding:0 5px}
+
+  .hs.target .mk{background:#ff3d8b;width:20px;height:20px;margin:-10px 0 0 -10px;animation:ping .9s ease-out infinite}
+  .hs.target .lb{background:#ff3d8b;color:#fff}
+  .hs.target .lb::before{content:'ZIEL: '}
+  #maptop{position:absolute;left:0;right:0;bottom:0;padding:26px 12px max(14px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:6;
+    background:linear-gradient(0deg,rgba(10,2,20,.92),rgba(10,2,20,0))}
+  #map #hud .qst{display:none}
+  #map #hud .who{min-width:0}
+  #maptop button{background:#fff;border:3px solid #000;box-shadow:3px 3px 0 #2fe0ea;font-family:'Bangers',cursive;font-size:20px;letter-spacing:1px;padding:3px 12px;cursor:pointer}
+  #mission{background:#000;color:#ffe14d;border:2px solid #ffe14d;font-size:13px;font-weight:700;padding:4px 8px;max-width:60%;text-align:right}
+
+  /* ===== SZENE ===== */
+  #scene{background:#14081f;background-image:radial-gradient(rgba(255,255,255,.06) 1.2px,transparent 1.4px);background-size:9px 9px}
+  #scbox{position:absolute;left:50%;top:46%;width:min(94vw,640px);transform:translate(-50%,-50%)}
+  #scbtns{position:absolute;left:12px;right:12px;bottom:max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+  #scbtns button{min-height:54px;border:4px solid #000;background:#fff;font-family:'Bangers',cursive;font-size:22px;letter-spacing:1px;cursor:pointer;box-shadow:5px 5px 0 #2fe0ea;
+    display:flex;justify-content:space-between;align-items:center;padding:0 14px;color:#000}
+  #scbtns button small{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;background:#000;color:#ffe14d;padding:2px 6px}
+  #scbtns button.hot{background:#ff3d8b;color:#fff;-webkit-text-stroke:.8px #000;box-shadow:5px 5px 0 #ffe14d}
+  #scbtns button:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
+  #scbtns button:disabled{opacity:.45}
+  .timer{margin-top:14px;border:3px solid #000;background:#fff;height:26px;position:relative;box-shadow:4px 4px 0 #000}
+  .timer i{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(135deg,#ffe14d 0 12px,#ffcc00 12px 24px);width:0}
+  .timer span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .dice{position:absolute;inset:0;margin:auto;z-index:6;font-family:'Bangers',cursive;font-size:72px;color:#fff;-webkit-text-stroke:3px #000;paint-order:stroke fill;
+    text-shadow:5px 5px 0 #ff3d8b;background:#000;border:4px solid #ffe14d;width:110px;height:110px;display:flex;align-items:center;justify-content:center;animation:pop .3s cubic-bezier(.2,1.8,.4,1) both}
+  .result{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:6;font-family:'Bangers',cursive;font-size:clamp(40px,12vw,72px);white-space:nowrap;
+    color:#ffe14d;-webkit-text-stroke:3px #000;paint-order:stroke fill;text-shadow:6px 6px 0 #ff3d8b;animation:pop .35s cubic-bezier(.2,1.8,.4,1) both}
+  .result.bad{color:#fff;text-shadow:6px 6px 0 #555}
+  .reward{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .reward b{background:#000;color:#7dffb2;border:2px solid #7dffb2;padding:3px 9px;font-size:15px}
+  .reward b.h{color:#ffb3d1;border-color:#ff3d8b}
+  .reward b.x{color:#2fe0ea;border-color:#2fe0ea}
+  #hud .xp{width:100%;height:6px;background:#ddd;border:1px solid #000;margin-top:3px}
+  #hud .xp i{display:block;height:100%;background:#2fe0ea;width:0;transition:width .8s}
+
+  /* ===== Neues Menü-Design (statt weißer Kästen) ===== */
+  #sheet,.sheetx{background:rgba(16,8,30,.94) !important;color:#f3eefe;border:2px solid #2fe0ea !important;border-radius:14px;
+    box-shadow:0 0 0 2px #000,0 0 24px rgba(47,224,234,.45),inset 0 0 30px rgba(255,61,139,.12) !important;backdrop-filter:blur(6px)}
+  #sheet h2,.sheetx h2{color:#ff6fb5;text-shadow:0 0 12px rgba(255,61,139,.8),2px 2px 0 #000}
+  #sheet p,.sheetx p{color:#e4dcf5}
+  #sheet .tag,.sheetx .tag{background:#ff3d8b;color:#fff;border-color:#000}
+  #sheet .no,.sheetx .no{background:#2a1d40 !important;color:#fff;border-color:#000}
+  #sheet .grid div{background:#231536;color:#cfc3e6;border-color:#4b3a6e}
+  #sheet .grid div.full{background:#2fe0ea;color:#000}
+
+  /* ===== DINER ===== */
+  #diner{background:#0d0618}
+  #dl .char{position:absolute;pointer-events:none}
+  #dl .char img{width:100%;display:block}
+  #sal{left:12%;top:47.7%;width:38%}
+  #sal img{transform-origin:50% 100%;animation:breathe 3.8s ease-in-out infinite}
+  #candy{left:28%;top:23.8%;width:33%}
+  #candy img{transform-origin:50% 100%;animation:sway 5s ease-in-out infinite}
+  @keyframes sway{0%,100%{transform:rotate(0) translateY(0)}50%{transform:rotate(1.2deg) translateY(-.6%)}}
+  #gum{position:absolute;left:51.5%;top:20.5%;width:9%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffd6ec,#ff8cc6 60%,#e55aa0);
+    border:1.5px solid #6a1b45;transform:translate(-50%,-50%) scale(.3);animation:gum 6s ease-in infinite}
+  @keyframes gum{0%{transform:translate(-50%,-50%) scale(.6)}70%{transform:translate(-50%,-50%) scale(1.5)}72%{transform:translate(-50%,-50%) scale(1.7);opacity:1}74%{transform:translate(-50%,-50%) scale(.2);opacity:0}100%{transform:translate(-50%,-50%) scale(.2);opacity:0}}
+  #counterfg{position:absolute;left:22.46%;top:37.38%;width:60.38%;height:14.4%;pointer-events:none}
+  #counterfg img{width:100%;height:100%;display:block}
+  #clock{position:absolute;left:54%;top:20.2%;width:15%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none}
+  #clock i{position:absolute;left:50%;bottom:50%;width:3px;margin-left:-1.5px;background:#ff6fd0;box-shadow:0 0 6px #ff3dc8;transform-origin:50% 100%;border-radius:2px}
+  #clock .hh{height:28%;animation:spin 120s linear infinite}
+  #clock .mh{height:40%;background:#7ff6ff;box-shadow:0 0 6px #2fe0ea;animation:spin 10s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #winlight{position:absolute;left:0;top:6%;width:19%;height:36%;overflow:hidden;pointer-events:none}
+  #winlight i{position:absolute;top:70%;left:-60%;width:50%;height:6%;border-radius:50%;background:radial-gradient(ellipse,rgba(255,250,210,.9),rgba(255,120,200,0) 70%);mix-blend-mode:screen;animation:passby 6s linear infinite}
+  #winlight i:nth-child(2){top:76%;animation-delay:3.2s;background:radial-gradient(ellipse,rgba(255,60,60,.8),rgba(255,60,60,0) 70%);animation-direction:reverse}
+  @keyframes passby{0%{left:-60%}35%{left:120%}100%{left:120%}}
+  #juke{position:absolute;left:86%;top:30%;width:14%;height:34%;border-radius:40% 40% 6% 6%;background:radial-gradient(ellipse,rgba(255,80,200,.45),rgba(255,80,200,0) 70%);mix-blend-mode:screen;animation:pulse2 1.2s ease-in-out infinite;pointer-events:none}
+  #tubes{position:absolute;left:0;top:0;width:100%;height:16%;background:linear-gradient(180deg,rgba(80,240,255,.25),rgba(80,240,255,0));mix-blend-mode:screen;animation:flicker 8s steps(1) infinite;pointer-events:none}
+  #dtop{position:absolute;left:12px;bottom:auto;top:max(10px,env(safe-area-inset-top))}
+  #dtop button,#dexit{background:#000;color:#fff;border:2px solid #2fe0ea;box-shadow:0 0 10px rgba(47,224,234,.6);font-family:'Bangers',cursive;font-size:19px;letter-spacing:1px;padding:4px 12px;cursor:pointer}
+
+  /* Dialog */
+  #dlg{position:absolute;left:8px;right:8px;bottom:max(10px,env(safe-area-inset-bottom));z-index:25;display:none}
+  #dlg.on{display:block;animation:pin .35s cubic-bezier(.2,1.4,.4,1) both}
+  #dlg .box{position:relative;background:rgba(14,6,26,.95);border:2px solid #ff3d8b;border-radius:14px;box-shadow:0 0 0 2px #000,0 0 22px rgba(255,61,139,.5);padding:14px 14px 12px 104px;min-height:96px}
+  #dlg .por{position:absolute;left:10px;top:-22px;width:84px;height:84px;border:3px solid #000;box-shadow:0 0 0 2px #ffe14d,4px 4px 0 #000;background-size:cover;transform:rotate(-3deg)}
+  #dlg .nm{position:absolute;left:12px;top:66px;width:80px;text-align:center;font-family:'Bangers',cursive;font-size:17px;letter-spacing:1px;color:#ffe14d;text-shadow:2px 2px 0 #000}
+  #dlg .tx{font-size:17px;line-height:1.4;color:#fff;min-height:48px}
+  #dlg .tx::after{content:'▌';color:#ff3d8b;animation:blink .8s steps(1) infinite;margin-left:2px}
+  #dlg .ch{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  #dlg .ch button{text-align:left;background:#1d1030;color:#fff;border:2px solid #2fe0ea;border-radius:8px;padding:10px 12px;font-family:'Oswald',sans-serif;font-size:16px;cursor:pointer;
+    box-shadow:0 0 8px rgba(47,224,234,.35);animation:pin .3s both}
+  #dlg .ch button::before{content:'▸ ';color:#2fe0ea}
+  #dlg .ch button:active{background:#2fe0ea;color:#000}
+
+  /* Auftragszettel */
+  #paper{position:absolute;left:50%;top:47%;z-index:28;width:min(86vw,380px);transform:translate(-50%,-50%) rotate(-2deg) scale(0);background:#f1e8d0;
+    background-image:repeating-linear-gradient(180deg,transparent 0 27px,rgba(80,120,200,.18) 27px 28px);color:#222;font-family:'Special Elite',monospace;
+    padding:26px 18px 18px;box-shadow:0 18px 40px rgba(0,0,0,.6),0 0 0 1px #c9bb95;transition:transform .45s cubic-bezier(.2,1.5,.4,1)}
+  #paper.on{transform:translate(-50%,-50%) rotate(-2deg) scale(1)}
+  #paper .tape{position:absolute;left:50%;top:-12px;width:110px;height:26px;transform:translateX(-50%) rotate(2deg);background:rgba(255,240,180,.75);border:1px solid rgba(0,0,0,.08)}
+  #paper .pol{position:absolute;right:14px;top:18px;width:96px;background:#fff;padding:6px 6px 18px;box-shadow:2px 3px 8px rgba(0,0,0,.35);transform:rotate(5deg)}
+  #paper .pol img{width:100%;display:block}
+  #paper .pol span{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-family:'Permanent Marker',cursive;font-size:11px}
+  #paper h3{margin:0 0 4px;font-family:'Special Elite',monospace;font-size:13px;letter-spacing:2px;color:#8a1c1c}
+  #paper .tt{font-family:'Permanent Marker',cursive;font-size:24px;line-height:1.1;margin:0 110px 12px 0}
+  #paper dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0 0 10px;font-size:14px}
+  #paper dt{color:#6b5d3e}
+  #paper dd{margin:0;font-weight:bold}
+  #paper .note{font-family:'Permanent Marker',cursive;font-size:14px;color:#1d3fa0;transform:rotate(-1deg);margin:4px 0 14px}
+  #paper .acts{display:flex;gap:10px}
+  #paper .acts button{flex:1;height:46px;font-family:'Bangers',cursive;font-size:21px;letter-spacing:1px;border:3px solid #000;cursor:pointer;box-shadow:3px 3px 0 #000}
+  #paper .acts .yes{background:#c62828;color:#fff}
+  #paper .acts .nope{background:#e0d6bb}
+  #paper .stamp{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) rotate(-14deg) scale(3);opacity:0;font-family:'Bangers',cursive;font-size:46px;letter-spacing:3px;
+    color:rgba(198,40,40,.85);border:5px solid rgba(198,40,40,.85);padding:2px 14px;border-radius:8px;pointer-events:none}
+  #paper .stamp.hit{animation:stamp .35s cubic-bezier(.5,0,.7,1.6) forwards}
+  @keyframes stamp{to{transform:translate(-50%,-50%) rotate(-14deg) scale(1);opacity:1}}
+  #veil{position:absolute;inset:0;z-index:24;background:rgba(5,0,12,.55);display:none}
+  #veil.on{display:block}
+
+  /* Speisekarte */
+  #menu2{position:absolute;left:50%;top:48%;z-index:28;width:min(90vw,390px);transform:translate(-50%,-50%) scale(0);background:#fff7fb;border:4px solid #000;border-radius:16px;overflow:hidden;
+    box-shadow:0 0 0 3px #ff3d8b,0 18px 40px rgba(0,0,0,.6);transition:transform .4s cubic-bezier(.2,1.5,.4,1)}
+  #menu2.on{transform:translate(-50%,-50%) scale(1)}
+  #menu2 .hd{background:repeating-linear-gradient(90deg,#ff3d8b 0 18px,#ff6fb5 18px 36px);padding:10px 14px;text-align:center;border-bottom:4px solid #000}
+  #menu2 .hd b{font-family:'Bangers',cursive;font-size:30px;letter-spacing:2px;color:#fff;-webkit-text-stroke:1.5px #000;paint-order:stroke fill;text-shadow:3px 3px 0 #000}
+  #menu2 .it{display:flex;align-items:center;gap:12px;padding:9px 12px;border-bottom:2px dashed #f0b6d2}
+  #menu2 .it img{width:52px;height:52px;object-fit:contain;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.25))}
+  #menu2 .it .nm{flex:1;font-family:'Bangers',cursive;font-size:21px;letter-spacing:1px;line-height:1}
+  #menu2 .it .nm small{display:block;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0;color:#7a2a55;margin-top:3px}
+  #menu2 .it button{min-width:64px;height:40px;background:#2fe0ea;border:3px solid #000;font-family:'Bangers',cursive;font-size:20px;cursor:pointer;box-shadow:3px 3px 0 #000}
+  #menu2 .it button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+  #menu2 .ft{display:flex;justify-content:space-between;align-items:center;padding:10px 12px}
+  #menu2 .ft span{font-weight:700}
+  #menu2 .ft button{background:#000;color:#fff;border:0;font-family:'Bangers',cursive;font-size:19px;padding:6px 14px;cursor:pointer}
+  .fly{position:fixed;z-index:60;width:54px;pointer-events:none;transition:all .8s cubic-bezier(.5,-.3,.6,1)}
+  #hud .pill.buff{border-color:#ff6fb5;color:#ff9fd0;display:none}
+
+  /* Porträt-Gespräche */
+  .scr2 .layer{transition:filter .4s}
+  .scr2.talk .layer{filter:brightness(.45) blur(2px) saturate(1.2)}
+  .scr2.talk .hs,.scr2.talk #ptalk{opacity:0;pointer-events:none}
+  #bust{position:absolute;z-index:22;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 150px);height:min(62vh,560px);opacity:0;pointer-events:none;
+    transition:transform .5s cubic-bezier(.2,1.2,.4,1),opacity .3s}
+  #bust img{height:100%;display:block;transform-origin:50% 100%;animation:breathe 3.8s ease-in-out infinite;
+    filter:drop-shadow(0 0 0 #000) drop-shadow(3px 0 0 #000) drop-shadow(-3px 0 0 #000) drop-shadow(0 -3px 0 #000) drop-shadow(0 0 18px var(--rim,#ff3d8b))}
+  #bust.l{left:-4%;transform:translateX(-110%)}
+  #bust.r{right:-6%;transform:translateX(110%)}
+  #bust.on{opacity:1;transform:translateX(0)}
+  #dlg .box{transition:none}
+  .talk #dlg .por{display:none}
+  .talk #dlg .box{padding-left:14px;padding-top:26px}
+  .talk #dlg .nm{left:12px;top:-14px;width:auto;background:#000;border:2px solid #ffe14d;padding:0 10px;font-size:19px}
+
+  /* Verschiebbare Karte */
+  #stageC{left:0 !important;top:0 !important;aspect-ratio:auto !important;transform:none;touch-action:none;cursor:grab}
+  #map.drag #stageC{cursor:grabbing}
+  #maphint{position:absolute;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(0,0,0,.7);color:#fff;border:2px solid #2fe0ea;
+    white-space:nowrap;font-family:'Bangers',cursive;font-size:20px;letter-spacing:1px;padding:4px 14px;pointer-events:none;animation:hintsw 1.6s ease-in-out infinite;transition:opacity .5s}
+  @keyframes hintsw{0%,100%{transform:translateX(-56%)}50%{transform:translateX(-44%)}}
+
+  /* ===== ORTE ===== */
+  #place{background:#0d0618}
+  #ptop{position:absolute;left:12px;top:calc(max(10px,env(safe-area-inset-top)) + 166px);z-index:15;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+  #ptop button{background:#000;color:#fff;border:2px solid #2fe0ea;box-shadow:0 0 10px rgba(47,224,234,.6);font-family:'Bangers',cursive;font-size:19px;letter-spacing:1px;padding:4px 12px;cursor:pointer}
+  #pname{font-family:'Bangers',cursive;font-size:30px;letter-spacing:2px;color:#ffe14d;-webkit-text-stroke:1.5px #000;paint-order:stroke fill;text-shadow:3px 3px 0 #ff3d8b;transform:rotate(-3deg)}
+  #ptalk{position:absolute;left:50%;bottom:max(26px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:12;display:flex;align-items:center;gap:10px;
+    background:rgba(14,6,26,.92);border:2px solid #ff3d8b;border-radius:40px;box-shadow:0 0 0 2px #000,0 0 18px rgba(255,61,139,.6);padding:6px 18px 6px 6px;cursor:pointer;color:#fff;
+    font-family:'Bangers',cursive;font-size:22px;letter-spacing:1px;white-space:nowrap;animation:pulse3 2s ease-in-out infinite}
+  #ptalk img{width:46px;height:46px;border-radius:50%;border:2px solid #ffe14d;object-fit:cover}
+  @keyframes pulse3{0%,100%{box-shadow:0 0 0 2px #000,0 0 12px rgba(255,61,139,.5)}50%{box-shadow:0 0 0 2px #000,0 0 26px rgba(255,61,139,.9)}}
+  #pfx{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen}
+  .dice2{font-family:'Bangers',cursive;font-size:64px;line-height:1;color:#fff;-webkit-text-stroke:2px #000;paint-order:stroke fill;text-shadow:4px 4px 0 #ff3d8b;text-align:center}
+  .dsub{text-align:center;font-size:14px;color:#cbbbe6}
+  .rbig{font-family:'Bangers',cursive;font-size:40px;letter-spacing:2px;color:#ffe14d;-webkit-text-stroke:1.5px #000;paint-order:stroke fill;text-shadow:3px 3px 0 #ff3d8b;line-height:1}
+  .rbig.bad{color:#fff;text-shadow:3px 3px 0 #555}
+  #dlg .reward{margin-top:8px}
+  #dlg .timer{margin-top:10px;box-shadow:none;border-color:#2fe0ea;background:#1d1030}
+  #dlg .timer span{color:#fff}
+  #dlg .tx{white-space:normal}
+  #dlg .tx.raw::after{content:none}
+  #dlg .ch button small{display:block;font-size:12px;color:#7ff6ff;margin-top:2px;letter-spacing:.3px}
+  #dlg .por.none{display:none}
+  #dlg .nm:empty{display:none}
+  #dlg .box.np{padding-left:14px;padding-top:26px}
+  #dlg .box.np .nm{left:12px;top:-14px;width:auto;background:#000;border:2px solid #ffe14d;padding:0 10px;font-size:19px}
+
+  #jobbar{position:fixed;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 96px);transform:translate(-50%,-400%);z-index:45;display:flex;align-items:center;gap:8px;
+    background:rgba(14,6,26,.94);border:2px solid #2fe0ea;border-radius:30px;box-shadow:0 0 0 2px #000,0 0 14px rgba(47,224,234,.5);padding:4px 14px 4px 4px;color:#fff;
+    font-family:'Oswald',sans-serif;cursor:pointer;transition:transform .4s cubic-bezier(.2,1.4,.4,1);min-width:210px;flex-wrap:wrap}
+  #jobbar.on{transform:translate(-50%,0)}
+  #jobbar img{width:38px;height:38px;border-radius:50%;border:2px solid #ffe14d;object-fit:cover}
+  #jobbar div{flex:1;text-align:left;line-height:1.1}
+  #jobbar b{display:block;font-size:14px}
+  #jobbar span{font-size:12px;color:#7ff6ff}
+  #jobbar em{display:block;height:4px;background:#2a1d40;border-radius:2px;margin-top:3px;overflow:hidden}
+  #jobbar em i{display:block;height:100%;background:#2fe0ea;width:0}
+  #jobbar small{width:100%;text-align:center;font-size:9px;color:#8a7fa8;margin-top:-2px}
+  #jobbar.done{border-color:#ffe14d;animation:pulse3 1s infinite}
+  #jobbar.done span{color:#ffe14d;font-weight:700}
+  #jobbar.done small{display:none}
+
+  /* ===== INVENTAR ===== */
+  #inv{position:fixed;inset:0;z-index:48;background:rgba(5,0,12,.82);display:none;overflow:auto;padding:max(12px,env(safe-area-inset-top)) 10px 20px}
+  #inv.on{display:block}
+  #inv .ip{max-width:460px;margin:0 auto;background:rgba(16,8,30,.97);border:2px solid #2fe0ea;border-radius:14px;box-shadow:0 0 0 2px #000,0 0 24px rgba(47,224,234,.45);padding:12px;color:#fff}
+  #inv .ih{display:flex;justify-content:space-between;align-items:center}
+  #inv .ih b{font-family:'Bangers',cursive;font-size:26px;letter-spacing:1px;color:#ff6fb5;text-shadow:0 0 10px rgba(255,61,139,.8)}
+  #inv .ix{background:#000;color:#fff;border:2px solid #ff3d8b;font-size:18px;width:38px;height:38px;cursor:pointer}
+  #inv .isub{font-size:13px;color:#cbbbe6;margin:8px 0 6px}
+  #inv .lo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  #inv .slot,#inv .cell{position:relative;aspect-ratio:1;border:2px dashed #4b3a6e;border-radius:8px;background:#1b1030;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;cursor:pointer;font-family:'Oswald',sans-serif}
+  #inv .slot small{position:absolute;top:2px;left:0;right:0;text-align:center;font-size:9px;color:#7ff6ff;letter-spacing:.5px}
+  #inv .slot i{font-size:11px;color:#6d5b8f}
+  #inv .slot.full,#inv .cell{border-style:solid;border-color:#2fe0ea}
+  #inv .slot.safe{border-color:#ffe14d}
+  #inv .slot img,#inv .cell img{max-width:62%;max-height:52%;object-fit:contain;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.6))}
+  #inv .slot b,#inv .cell b{font-size:10px;font-weight:500;line-height:1.1;text-align:center;margin-top:3px}
+  #inv .cell small{font-size:10px;color:#7dffb2}
+  #inv .cell.loot{border-color:#ffd34d;background:#2a1d10}
+  #inv .cell.empty{border:2px dashed #2c2045;cursor:default}
+  #inv .bagslot{cursor:default;border-color:#ff3d8b}
+  #inv .st{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  #inv .itip{margin-top:10px;font-size:13px;color:#ffe14d;min-height:34px}
+  #inv .igo{width:100%;height:54px;margin-top:8px;background:#ff3d8b;color:#fff;border:3px solid #000;box-shadow:5px 5px 0 #ffe14d;font-family:'Bangers',cursive;font-size:21px;letter-spacing:1px;cursor:pointer;-webkit-text-stroke:.8px #000;white-space:nowrap}
+  /* ===== HEIST ===== */
+  #heist{background:#05020b}
+  #hbar{position:absolute;left:0;right:0;top:0;z-index:15;padding:max(8px,env(safe-area-inset-top)) 10px 18px;background:linear-gradient(180deg,rgba(5,0,12,.95),rgba(5,0,12,0));display:flex;flex-direction:column;gap:6px;pointer-events:none}
+  #heist #hud{display:none}
+  #hbar .r1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  #hname{font-family:'Bangers',cursive;font-size:24px;letter-spacing:2px;color:#ffe14d;-webkit-text-stroke:1px #000;paint-order:stroke fill;text-shadow:2px 2px 0 #ff3d8b}
+  #hbar .stats{display:flex;gap:6px;pointer-events:auto}
+  #hbar .stats span,#hbar .stats button{background:#000;color:#fff;border:2px solid #2fe0ea;padding:2px 8px;font-size:13px;font-weight:700;font-family:'Oswald',sans-serif}
+  #hbar .stats button{border-color:#ffe14d;color:#ffe14d;cursor:pointer}
+  #hbar .al{height:16px;border:2px solid #000;background:#1d1030;position:relative;box-shadow:0 0 0 1px #ff3d8b}
+  #hbar .al i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#ffe14d,#ff9f43,#ff3d3d);transition:width .4s}
+  #hbar .al span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;text-shadow:1px 1px 0 #000;letter-spacing:1px}
+  #hbar.hot .al{animation:shake .15s linear infinite}
+  #hcop{position:absolute;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 70px);transform:translateX(-50%);z-index:16;background:#c62828;color:#fff;border:3px solid #000;font-family:'Bangers',cursive;font-size:24px;letter-spacing:1px;padding:2px 14px;display:none;animation:blink .6s steps(1) infinite}
+  #hcop.on{display:block}
+  #htoast{top:30%}
+  .hsp .lb{font-size:13px !important}
+  .exitp .mk{background:#7dffb2 !important}
+  .exitp .lb{background:#7dffb2 !important}
+  #heist.labels .hs .lb{opacity:1}
+  .bag{position:relative;margin:10px auto 4px;background:#000;border:2px solid #ff3d8b;background-image:linear-gradient(#2c2045 1px,transparent 1px),linear-gradient(90deg,#2c2045 1px,transparent 1px);background-size:46px 46px}
+  .bi{position:absolute;background:rgba(47,224,234,.15);border:2px solid #2fe0ea;border-radius:6px;padding:3px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .bi img{max-width:100%;max-height:100%;object-fit:contain}
+
+  /* ===== Quest, Pinnwand, Werkbank ===== */
+  #hud .qst{margin-top:4px;background:#ffe14d;color:#000;font-size:11px;font-weight:700;line-height:1.15;padding:2px 5px;border:2px solid #000;max-width:52vw}
+  #hud .qst:empty{display:none}
+  #inv .cell em.cnt{position:absolute;right:4px;top:3px;font-style:normal;font-size:12px;font-weight:700;color:#ffe14d;text-shadow:1px 1px 0 #000}
+  #inv .cell.mat{border-color:#b98cff}
+  #sheet .qline{font-size:13px;margin-bottom:8px}
+  #sheet .tlist,#sheet .rlist{display:flex;flex-direction:column;gap:7px;max-height:52vh;overflow:auto;margin-bottom:6px;padding-right:2px}
+  #sheet .tgt{height:auto;flex:none;text-align:left;background:#1d1030;color:#fff;border:2px solid #2fe0ea;box-shadow:3px 3px 0 #000;padding:6px 10px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0;display:flex;flex-direction:column;gap:1px;cursor:pointer}
+  #sheet .tgt b{font-family:'Bangers',cursive;font-size:20px;letter-spacing:1px;font-weight:400;color:#ffe14d}
+  #sheet .tgt span{color:#e4dcf5}
+  #sheet .tgt small{color:#7ff6ff;font-size:12px}
+  #sheet .tgt.gold{border-color:#ffd34d;background:linear-gradient(135deg,#3a2400,#1d1030)}
+  #sheet .tgt.lock{opacity:.5}
+  #sheet .rcp{display:flex;align-items:center;gap:9px;background:#1d1030;border:2px solid #4b3a6e;padding:6px 8px;color:#fff}
+  #sheet .rcp.lock{opacity:.5}
+  #sheet .rcp .ri{width:40px;height:40px;object-fit:contain;flex:none;display:flex;align-items:center;justify-content:center;font-family:'Bangers',cursive;font-size:26px;color:#4b3a6e}
+  #sheet .rcp>div{flex:1;min-width:0}
+  #sheet .rcp b{display:block;font-size:15px}
+  #sheet .rcp small{display:block;font-size:11px;color:#cbbbe6;line-height:1.2}
+  #sheet .need{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px}
+  #sheet .need i{font-style:normal;font-size:12px;font-weight:700;display:flex;align-items:center;gap:2px}
+  #sheet .need i img{width:18px;height:18px;object-fit:contain}
+  #sheet .need i.y{color:#7dffb2}#sheet .need i.n{color:#ff6f6f}
+  #sheet .rcp .mk{flex:none;width:76px;height:40px;font-size:17px;box-shadow:2px 2px 0 #000}
+  #sheet .rcp .mk:disabled{opacity:.35}
+
+  #inv .doll{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:6px;align-items:stretch}
+  #inv .doll .side{display:flex;flex-direction:column;gap:6px}
+  #inv .doll .slot{aspect-ratio:auto;height:72px}
+  #inv .doll .slot img{max-height:40%}
+  #inv .dollw{position:relative;border:2px solid #4b3a6e;border-radius:10px;background:radial-gradient(ellipse at 50% 85%,#2a1440,#0b0616 70%);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #inv #doll{width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}
+  #inv .dtip{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:9px;color:#6d5b8f}
+  #inv .bagrow{display:flex;align-items:center;gap:8px;margin-top:6px;border:2px solid #ff3d8b;border-radius:8px;background:#1b1030;padding:4px 8px}
+  #inv .bagrow img{width:30px;height:30px;object-fit:contain}
+  #inv .bagrow b{font-size:12px;color:#ff9fd0}
+  #inv .bagrow span{font-size:12px;color:#cbbbe6}
+</style>
+</head>
+<body>
+
+<!-- ============ START ============ -->
+<section class="screen on" id="start">
+  <div class="stage" id="stageA">
+    <div class="layer" id="bg">
+      <img src="bg.webp" alt="">
+      <div id="sunglow"></div><div id="shimmer"></div><div id="neon"></div><div id="neon2"></div><div id="wet"></div>
+    </div>
+    <div class="layer" id="carlayer">
+      <div id="carwrap"><div id="car"><div class="body"><div class="streak"></div><img src="car.webp" alt=""><div class="lights"></div></div></div></div>
+    </div>
+    <div class="layer" id="fig"><div id="figin"><img src="figur.webp" alt=""><canvas id="smoke"></canvas></div></div>
+    <canvas id="dust" class="layer"></canvas>
+    <div class="vig"></div>
+  </div>
+  <div id="startui">
+    <div id="logo"><div class="t">NEON</div><div class="t t2">HUSTLER</div></div>
+    <div id="tap">TIPPEN ZUM STARTEN</div>
+  </div>
+</section>
+
+<!-- ============ INTRO ============ -->
+<section class="screen" id="intro">
+  <button id="skip" type="button">Intro überspringen ▸▸</button>
+  <div id="panelbox"></div>
+  <div id="dots"></div>
+  <div id="next">TIPPEN ▸</div>
+</section>
+
+<!-- ============ VERSTECK ============ -->
+<section class="screen" id="hide">
+  <div class="stage" id="stageB">
+    <div class="layer" id="gl">
+      <img src="garage.webp" alt="">
+      <div class="win"></div><div class="tvglow"></div><div class="tv"></div><div class="bulb"></div>
+      <button class="hs alert" id="h-phone"  type="button" aria-label="Telefon"      style="left:1%;top:24%;width:11%;height:11%"><span class="mk"></span><span class="lb">TELEFON</span></button>
+      <button class="hs" id="h-tv"     type="button" aria-label="Fernseher"    style="left:8%;top:37%;width:20%;height:11%"><span class="mk"></span><span class="lb">TV</span></button>
+      <button class="hs" id="h-board"  type="button" aria-label="Heist-Planung" style="left:35.5%;top:28%;width:35%;height:29%"><span class="mk"></span><span class="lb">HEIST-PLANUNG</span></button>
+      <button class="hs" id="h-door"   type="button" aria-label="Rolltor zur Stadt" style="left:31%;top:14%;width:49%;height:13%"><span class="mk"></span><span class="lb">RAUS IN DIE STADT</span></button>
+      <button class="hs" id="h-locker" type="button" aria-label="Spind / Stash" style="left:79%;top:23%;width:11.5%;height:32%"><span class="mk"></span><span class="lb">STASH</span></button>
+      <button class="hs" id="h-bench"  type="button" aria-label="Werkbank"     style="left:90.5%;top:21%;width:9.5%;height:46%"><span class="mk"></span><span class="lb">WERKBANK</span></button>
+      <button class="hs" id="h-bed"    type="button" aria-label="Matratze"     style="left:2%;top:63%;width:48%;height:30%"><span class="mk"></span><span class="lb">AUSRUHEN</span></button>
+      <button class="hs" id="h-radio"  type="button" aria-label="Radio"        style="left:79%;top:73%;width:21%;height:12%"><span class="mk"></span><span class="lb">RADIO</span></button>
+    </div>
+    <div class="vig"></div>
+  </div>
+  <div id="hud">
+    <div class="who"><b>DU</b><small>Stufe <span id="lvl">1</span> · Kleinganove</small><div class="xp"><i id="xpbar"></i></div><div class="qst" id="quest"></div></div>
+    <div class="stats"><div class="pill cash">$ <span id="cash">40</span></div><div class="pill heat">Heat <span id="heat">☆☆☆☆☆</span></div><div class="pill">Energie <span id="nrg">10</span>/10</div><div class="pill buff" id="buff">Milchshake: Charme +15 %</div></div>
+  </div>
+  <div id="toast"></div>
+  <div id="sheet" role="dialog" aria-live="polite"></div>
+  <div id="fade"></div>
+</section>
+
+
+<!-- ============ STADTKARTE ============ -->
+<section class="screen" id="map">
+  <div class="stage" id="stageC">
+    <div class="layer" id="ml">
+      <img src="map2.webp" alt="">
+      <div id="spots"></div>
+    </div>
+    <div class="vig"></div>
+  </div>
+  <div id="maphint">◂ KARTE ZIEHEN ▸</div>
+  <div id="maptop"><button type="button" id="backHome">◂ VERSTECK</button><div id="mission"></div></div>
+  <div id="toast2" class="tst"></div>
+  <div id="sheet2" class="sheetx" role="dialog" aria-live="polite"></div>
+</section>
+
+
+<!-- ============ DINER ============ -->
+<section class="screen scr2" id="diner">
+  <div class="stage" id="stageD">
+    <div class="layer" id="dl">
+      <img src="diner.webp" alt="">
+      <div id="tubes"></div>
+      <div id="winlight"><i></i><i></i></div>
+      <div id="clock"><i class="hh"></i><i class="mh"></i></div>
+      <div id="juke"></div>
+      <button class="hs" id="d-sal"   type="button" aria-label="Big Sal" style="left:0;top:44%;width:34%;height:22%;--my:30%"><span class="mk"></span><span class="lb">SALS ECKE</span></button>
+      <button class="hs" id="d-candy" type="button" aria-label="Theke mit Candy" style="left:24%;top:30%;width:56%;height:22%;--my:45%"><span class="mk"></span><span class="lb">THEKE · ESSEN</span></button>
+      <button class="hs" id="d-juke"  type="button" aria-label="Jukebox" style="left:86.5%;top:29%;width:13.5%;height:36%;--my:30%"><span class="mk"></span><span class="lb">JUKEBOX</span></button>
+      <button class="hs" id="d-door"  type="button" aria-label="Ausgang" style="left:81%;top:20%;width:6%;height:30%;--my:25%"><span class="mk"></span><span class="lb">RAUS</span></button>
+    </div>
+    <div class="vig"></div>
+  </div>
+  <div id="veil"></div>
+  <div id="bust"><img alt=""></div>
+  <div id="paper"></div>
+  <div id="menu2"></div>
+  <div id="dlg"><div class="box"><div class="por"></div><div class="nm"></div><div class="tx"></div><div class="ch"></div></div></div>
+  <div id="toast3" class="tst"></div>
+</section>
+
+
+<!-- ============ ORT (generisch) ============ -->
+<section class="screen scr2" id="place">
+  <div class="stage" id="stageP">
+    <div class="layer" id="pl"><img id="pimg" alt=""><canvas id="pfx"></canvas></div>
+    <div class="vig"></div>
+  </div>
+  <div id="ptop"><button type="button" id="pback">◂ KARTE</button><div id="pname"></div></div>
+  <button type="button" id="ptalk"><img alt=""><span></span></button>
+</section>
+
+
+<!-- ============ HEIST ============ -->
+<section class="screen scr2" id="heist">
+  <div class="stage" id="stageH">
+    <div class="layer" id="hl"><img id="himg" alt=""><div id="hspots"></div></div>
+    <div class="vig"></div>
+  </div>
+  <div id="hbar"><div class="r1"><div id="hname"></div><div class="stats"><span>♥ <b id="hhp">100</b></span><button type="button" id="hbagb">TASCHE <b id="hbag">0/12</b> · <b id="hval">$0</b></button></div></div>
+    <div class="al"><i id="halarm"></i><span>ALARM&nbsp;<b id="halarmt">0 %</b></span></div></div>
+  <div id="hcop">POLIZEI IN 60 s</div>
+  <div id="htoast" class="tst"></div>
+</section>
+<div id="inv"></div>
+
+<!-- ============ SZENE ============ -->
+<section class="screen" id="scene">
+  <div id="scbox"></div>
+  <div id="scbtns"></div>
+</section>
+
+<button type="button" id="jobbar"><img alt=""><div><b></b><span></span><em><i></i></em></div><small>TIPPEN = SOFORT (TEST)</small></button>
+<div id="wipe"></div>
+
+<script src="pix.js"></script>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  function fit(stage){
+    const vw=innerWidth, vh=innerHeight, r=944/1680;
+    if(stage.id==='stageC'){if(MV)fitMap();return;}
+    if(stage.id==='stageB'||stage.id==='stageD'||stage.id==='stageP'||stage.id==='stageH'){
+      // Versteck: ganze Breite zeigen, damit alle Objekte erreichbar sind; unten bündig
+      const w=vw*1.04, h=w/r;
+      stage.style.width=w+'px'; stage.style.height=h+'px';
+      stage.style.top=(h<vh? (vh-h/2+vw*.0)+'px' : '50%');
+      if(h<vh) stage.style.top=(vh-h/2)+'px';
+      return;
+    }
+    let w=vw, h=vw/r; if(h<vh){h=vh; w=vh*r;}
+    stage.style.width=(w*1.06)+'px'; stage.style.height=(h*1.06)+'px';
+  }
+  const stages=[$('stageA'),$('stageB'),$('stageC'),$('stageD'),$('stageP'),$('stageH')];
+  const fitAll=()=>stages.forEach(fit); fitAll(); addEventListener('resize',fitAll);
+
+  let scene='start';
+  function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));scene=id;if(id==='hide'||id==='diner'||id==='place'||id==='map'||id==='heist'){const sc=document.getElementById(id);['hud','veil','bust','paper','menu2','dlg','toast3'].forEach(x=>{const e=document.getElementById(x);if(e)sc.appendChild(e);});sc.classList.remove('talk');const d=document.getElementById('dlg');if(d)d.classList.remove('on');}}
+  function wipeTo(fn){const w=$('wipe');w.classList.remove('go');void w.offsetWidth;w.classList.add('go');setTimeout(fn,500);}
+
+  // ---------- Parallax ----------
+  let tx=0,ty=0,cx=0,cy=0,auto=true;
+  function setTarget(x,y){tx=Math.max(-1,Math.min(1,x));ty=Math.max(-1,Math.min(1,y));auto=false;clearTimeout(setTarget.t);setTarget.t=setTimeout(()=>auto=true,3000);}
+  addEventListener('pointermove',e=>setTarget((e.clientX/innerWidth-.5)*2,(e.clientY/innerHeight-.5)*2));
+  const startLayers=[['bg',8],['carlayer',14],['fig',26],['dust',40]].map(([id,d])=>[$(id),d]);
+  const hideLayers=[[$('gl'),10]];
+  const mapLayers=[[$('ml'),12]];
+  const dinerLayers=[[$('dl'),10]];
+
+  // ---------- Rauch & Partikel ----------
+  const sm=$('smoke'), sx=sm.getContext('2d'), du=$('dust'), dx=du.getContext('2d');
+  function size(){[sm,du].forEach(c=>{c.width=c.clientWidth*devicePixelRatio;c.height=c.clientHeight*devicePixelRatio;});}
+  size(); addEventListener('resize',()=>setTimeout(size,50));
+  const puffs=[], motes=[];
+  for(let i=0;i<34;i++)motes.push({x:Math.random(),y:Math.random(),r:Math.random()*2.2+.6,s:Math.random()*.00025+.00008,p:Math.random()*6.28,c:Math.random()<.5?'255,120,210':'120,240,255'});
+  const t0=performance.now();
+  function frame(now){
+    const t=(now-t0)/1000;
+    if(auto){tx=Math.sin(t*.35)*.45;ty=Math.cos(t*.27)*.25;}
+    cx+=(tx-cx)*.06; cy+=(ty-cy)*.06;
+    const L=scene==='hide'?hideLayers:scene==='map'?[]:scene==='diner'?dinerLayers:scene==='place'?[[$('pl'),10]]:scene==='heist'?[[$('hl'),8]]:scene==='start'?startLayers:[];
+    L.forEach(([el,d])=>{el.style.transform=`translate3d(${-cx*d}px,${-cy*d*.6}px,0)`;});
+    if(scene==='start'){
+      const W=sm.width,H=sm.height; sx.clearRect(0,0,W,H);
+      if(Math.random()<.35)puffs.push({x:.49*W,y:.257*H,vx:(Math.random()*.4+.15)*devicePixelRatio,vy:-(Math.random()*.5+.45)*devicePixelRatio,r:2*devicePixelRatio,a:.32});
+      for(let i=puffs.length-1;i>=0;i--){const p=puffs[i];p.x+=p.vx+Math.sin(t*2+i)*.25;p.y+=p.vy;p.r+=.09*devicePixelRatio;p.a-=.0035;
+        if(p.a<=0){puffs.splice(i,1);continue;} sx.fillStyle=`rgba(235,225,245,${p.a})`;sx.beginPath();sx.arc(p.x,p.y,p.r,0,6.283);sx.fill();}
+      const DW=du.width,DH=du.height; dx.clearRect(0,0,DW,DH);
+      motes.forEach(m=>{m.y-=m.s*16;m.x+=Math.sin(t*.6+m.p)*.0004;if(m.y<-.02){m.y=1.02;m.x=Math.random();}
+        const a=.35+.35*Math.sin(t*2+m.p); dx.fillStyle=`rgba(${m.c},${a})`;dx.shadowColor=`rgba(${m.c},1)`;dx.shadowBlur=8*devicePixelRatio;
+        dx.beginPath();dx.arc(m.x*DW,m.y*DH,m.r*devicePixelRatio,0,6.283);dx.fill();});
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  const car=$('car');
+  function drive(){if(scene!=='start')return;car.classList.remove('drive');void car.offsetWidth;car.classList.add('drive');}
+  setTimeout(drive,1600); setInterval(drive,8000);
+
+  // ---------- Start -> Intro ----------
+  $('start').addEventListener('click',()=>{ if(scene!=='start')return; wipeTo(()=>{show('intro');panel(0);}); });
+
+  // ---------- Intro-Comic ----------
+  const P=[
+    {img:'p1.webp',cap:'Palm Harbor, 1986. Ich kam mit 40 Dollar, einer Sporttasche und großen Plänen.'},
+    {img:'p2.webp',cap:'Mein einziger Kontakt in der Stadt: Big Sal.',
+      bubbles:[{t:'Ist nicht das Ritz, Kleiner. Aber da stellt keiner Fragen.',x:'57%',y:'5%'}]},
+    {img:'p3.webp',cap:'Mein neues Zuhause. Eine Garage, eine Matratze und eine Glühbirne.'},
+    {img:'p4.webp',cap:'Ich war keine zehn Minuten da …',shake:true,sfx:{t:'RIIING!',x:'52%',y:'4%'}},
+    {img:'p5.webp',cap:null,
+      bubbles:[{t:'Ja?',x:'6%',y:'8%'},{t:'Willkommen in der Stadt, Kleiner. Ich hab einen Job für dich.',x:'44%',y:'52%',phone:true,delay:900}]}
+  ];
+  let pi=0, busy=false;
+  const dots=$('dots'); dots.innerHTML=P.map(()=>'<span></span>').join('');
+  function panel(i){
+    pi=i; const p=P[i]; const box=$('panelbox');
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k<=i));
+    box.className=p.shake?'shake':'';
+    let h='<div class="panel-in">';
+    if(p.cap)h+=`<div class="cap">${p.cap}</div>`;
+    h+=`<div class="frame"><img src="${p.img}" alt="">`;
+    if(p.sfx)h+=`<div class="sfx" style="left:${p.sfx.x};top:${p.sfx.y}">${p.sfx.t}</div>`;
+    (p.bubbles||[]).forEach(b=>{h+=`<div class="bubble${b.phone?' phone':''}" style="left:${b.x};top:${b.y};animation-delay:${(b.delay||350)}ms">${b.t}</div>`;});
+    h+='</div></div>'; box.innerHTML=h;
+    busy=true; setTimeout(()=>busy=false,500);
+  }
+  function toHideout(){ wipeTo(()=>{show('hide');enterHideout();}); }
+  $('intro').addEventListener('click',e=>{
+    if(e.target.id==='skip'){toHideout();return;}
+    if(busy)return;
+    if(pi<P.length-1)panel(pi+1); else toHideout();
+  });
+
+  // ---------- Versteck ----------
+  let entered=false;
+  function enterHideout(){
+    fitAll();
+    setTimeout(()=>$('fade').style.opacity=0,50);
+    if(!entered){entered=true;const h=$('hide');h.classList.add('labels');setTimeout(()=>h.classList.remove('labels'),4500);
+      setTimeout(()=>toastMsg('DEIN VERSTECK'),700);}
+  }
+  function toastMsg(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toastMsg.t);toastMsg.t=setTimeout(()=>el.classList.remove('on'),1900);}
+  const sheet=$('sheet');
+  function open(html){sheet.innerHTML=html;sheet.classList.add('open');}
+  function close(){sheet.classList.remove('open');}
+  sheet.addEventListener('click',e=>{const a=e.target.closest('[data-a]');if(!a)return;e.stopPropagation();acts[a.dataset.a](a);});
+  $('stageB').addEventListener('click',e=>{if(!e.target.closest('.hs'))close();});
+
+  let cash=40, nrg=10, jobTaken=false, job=0, xp=0, lvl=1, heat=0, buff=false;
+  let Q=0, PEND=null, BAGLV=0, KNOWN=[]; const TARGETS=[], CALLS=[1,3,6,8,11], BAGS=[[5,4],[6,4],[6,5]];
+  const acts={
+    close,
+    takeJob(){jobTaken=true;job=1;$('h-phone').classList.remove('alert');close();toastMsg('JOB ANGENOMMEN!');
+      setTimeout(()=>{$('h-door').classList.add('flash','alert');setTimeout(()=>$('h-door').classList.remove('flash'),2500);},900);},
+    heist(){close();invOpen('heist');},
+    plan(a){const T=TARGETS[+a.dataset.i];if(!T)return;if(lvl<T.req){toastMsg('AB STUFE '+T.req);return;}if(nrg<T.e){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND=T;close();invOpen('heist');},
+    golden(){if(Q<10||lvl<4){toastMsg(Q<10?'SAL HAT NOCH KEINEN PLAN':'AB STUFE 4');return;}if(nrg<4){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND={kind:'golden',type:'golden',name:'Golden Palm',e:4,diff:3};close();invOpen('heist');},
+    craft(a){craft(a.dataset.r);},
+    rest(){if(nrg>=10){toastMsg('SCHON AUSGERUHT');close();return;}nrg=10;$('nrg').textContent=nrg;close();toastMsg('ZZZ … AUSGERUHT');},
+    go(){close();wipeTo(()=>{show('map');fitAll();updateMap();});}
+  };
+  const btns=(ok,okA,no='Zurück')=>`<div class="row"><button type="button" class="no" data-a="close">${no}</button>${ok?`<button type="button" class="ok" data-a="${okA}">${ok}</button>`:''}</div>`;
+  const content={
+    'h-phone':()=> jobTaken
+      ? (job>=3?`<h2>Telefon</h2><p>Big Sal: „Saubere Arbeit, Kleiner. Ich meld mich wieder.“ Neue Jobs kommen im nächsten Schritt.</p>${btns()}`:`<h2>Telefon</h2><p>Keine neuen Nachrichten. Dein Auftrag: ${job===1?'Päckchen bei Big Sal im Diner abholen':'Päckchen zum Hafen bringen'}.</p>${btns()}`)
+      : `<span class="tag">1 NEUER AUFTRAG</span><h2>Dein erster Job</h2><p>„Hol ein Päckchen bei Big Sal im Diner ab und bring es zum Hafen. Keine Fragen, kein Ärger.“</p><p><b>Belohnung:</b> $150 · <b>Dauer:</b> 2 Min · <b>Energie:</b> 2</p>${btns('Annehmen','takeJob','Später')}`,
+    'h-tv':()=>`<h2>Kanal 6 – Nachrichten</h2><p>„… und in Palm Harbor bleibt es ruhig.“ Noch kennt dich keiner. Hier siehst du später Fahndungsstufe, Schlagzeilen über deine Coups und die Rangliste.</p>${btns()}`,
+    'h-board':()=>boardHTML(),
+    'h-door':()=>`<h2>Raus in die Stadt</h2><p>Durchs Rolltor geht es zur Stadtkarte mit Diner, Hafen, Strand, Clubs und Hehlern. Dort erledigst du die kleinen Jobs.</p>${btns('Losfahren','go')}`,
+    'h-locker-old':()=>`<h2>Stash</h2><p>8 Plätze · ausbaubar</p><div class="grid"><div class="full">Sport-<br>tasche</div><div class="full">Taschen-<br>lampe</div><div></div><div></div><div></div><div></div><div></div><div></div></div>${btns()}`,
+    'h-bench':()=>benchHTML(),
+    'h-bed':()=>`<h2>Matratze</h2><p>Ausruhen füllt deine Energie wieder auf. Später: Bett, Wasserbett, Penthouse …</p>${btns('Ausruhen','rest')}`
+  };
+  document.querySelectorAll('#hide .hs').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation(); const id=b.id;
+    if(id==='h-radio'){radio();return;}
+    if(id==='h-locker'){invOpen('stash');return;}
+    if(id==='h-phone'&&CALLS.includes(Q)){storyCall();return;}
+    if(id==='h-phone'&&job>=3){$('h-phone').classList.remove('alert');anonCall();return;}
+    open(content[id]());
+  }));
+
+
+  // ---------- Werte / HUD ----------
+  function hud(){ questTick(); $('cash').textContent=cash; $('nrg').textContent=nrg; $('lvl').textContent=lvl;
+    $('heat').textContent='★'.repeat(heat)+'☆'.repeat(5-heat); $('buff').style.display=buff?'block':'none'; $('xpbar').style.width=Math.min(100,xp)+'%'; }
+  hud();
+
+
+  // ---------- Orte auf der Karte ----------
+  const SPOTS=[{"id": "m-hafen", "l": "CONTAINERHAFEN", "x": 73.2, "y": 10.6}, {"id": "m-yacht", "l": "YACHTHAFEN", "x": 26.46, "y": 24.0}, {"id": "m-pier", "l": "PIER", "x": 6.19, "y": 41.29}, {"id": "m-beach", "l": "STRAND", "x": 18.02, "y": 52.46}, {"id": "m-villa", "l": "VILLEN", "x": 23.65, "y": 72.54}, {"id": "m-towers", "l": "INNENSTADT", "x": 46.73, "y": 18.97}, {"id": "m-casino", "l": "CASINO", "x": 47.3, "y": 34.6}, {"id": "m-club", "l": "NACHTCLUB", "x": 69.82, "y": 25.11}, {"id": "m-motel", "l": "MOTEL", "x": 87.27, "y": 31.81}, {"id": "m-diner", "l": "BIG SALS DINER", "x": 39.41, "y": 58.04}, {"id": "m-police", "l": "POLIZEI", "x": 61.94, "y": 49.11}, {"id": "m-shop", "l": "WERKSTATT", "x": 80.52, "y": 62.5}, {"id": "m-junk", "l": "SCHROTTPLATZ", "x": 91.22, "y": 52.46}, {"id": "m-pawn", "l": "JUWELIER & PFANDLEIHE", "x": 67.0, "y": 82.03}, {"id": "m-slum", "l": "DIE SIEDLUNG", "x": 48.42, "y": 88.17}, {"id": "m-home", "l": "DEINE GARAGE", "x": 88.96, "y": 80.36}];
+  $('spots').innerHTML=SPOTS.map(p=>`<button class="hs spot" id="${p.id}" type="button" aria-label="${p.l}" style="left:calc(${p.x}% - 45px);top:calc(${p.y}% - 45px);width:90px;height:90px"><span class="mk"></span><span class="lb">${p.l}</span></button>`).join('');
+
+  // ---------- Verschiebbare Karte ----------
+  var MV={x:0,y:0,w:0,h:0,vx:0,vy:0,ar:1776/896,drag:false,moved:false,lx:0,ly:0,lt:0,raf:0};
+  function fitMap(){const st=$('stageC'),vw=innerWidth,vh=innerHeight;let h=vh,w=h*MV.ar;if(w<vw){w=vw;h=w/MV.ar;}
+    st.style.width=w+'px';st.style.height=h+'px';MV.w=w;MV.h=h;clampMap();applyMap();}
+  function clampMap(){MV.x=Math.min(0,Math.max(innerWidth-MV.w,MV.x));MV.y=Math.min(0,Math.max(innerHeight-MV.h,MV.y));}
+  function applyMap(){$('stageC').style.transform=`translate3d(${MV.x}px,${MV.y}px,0)`;}
+  function centerMapOn(el){if(!el)return;MV.x=innerWidth/2-(el.offsetLeft+el.offsetWidth/2);MV.y=innerHeight/2-(el.offsetTop+el.offsetHeight/2);clampMap();applyMap();}
+  (function(){const m=$('map');
+    m.addEventListener('pointerdown',e=>{if(e.target.closest('#maptop,#sheet2'))return;cancelAnimationFrame(MV.raf);MV.drag=true;MV.moved=false;MV.lx=e.clientX;MV.ly=e.clientY;MV.lt=performance.now();MV.vx=MV.vy=0;m.classList.add('drag');});
+    addEventListener('pointermove',e=>{if(!MV.drag)return;const dx=e.clientX-MV.lx,dy=e.clientY-MV.ly,now=performance.now(),dt=Math.max(1,now-MV.lt);
+      if(Math.abs(dx)+Math.abs(dy)>2&&!MV.moved){if(Math.hypot(e.clientX-MV.lx,e.clientY-MV.ly)>0)MV.movedDist=(MV.movedDist||0)+Math.abs(dx)+Math.abs(dy);if(MV.movedDist>8){MV.moved=true;$('maphint').style.opacity=0;close2();}}
+      MV.x+=dx;MV.y+=dy;MV.vx=dx/dt*16;MV.vy=dy/dt*16;MV.lx=e.clientX;MV.ly=e.clientY;MV.lt=now;clampMap();applyMap();});
+    addEventListener('pointerup',()=>{if(!MV.drag)return;MV.drag=false;MV.movedDist=0;m.classList.remove('drag');
+      const glide=()=>{MV.vx*=.93;MV.vy*=.93;MV.x+=MV.vx;MV.y+=MV.vy;clampMap();applyMap();if(Math.abs(MV.vx)+Math.abs(MV.vy)>.3)MV.raf=requestAnimationFrame(glide);};
+      if(MV.moved)MV.raf=requestAnimationFrame(glide);});
+    m.addEventListener('click',e=>{if(MV.moved){e.stopPropagation();e.preventDefault();MV.moved=false;}},true);
+  })();
+
+
+  // ---------- Sofort-Fahrt mit Spritkosten + Zufallsereignisse ----------
+  const FUEL=3;
+  function travel(b,enter){
+    if(cash<FUEL){toast2('KEIN GELD FÜR SPRIT');return;}
+    cash-=FUEL; hud(); toast2('SPRIT −$'+FUEL);
+    zoomInto(b,()=>{enter(); if(Math.random()<.25)setTimeout(roadEvent,900);});
+  }
+  function roadEvent(){
+    const ev=[
+      ()=>sayRaw('erz','<b>Unterwegs:</b> Eine Polizeikontrolle winkt dich raus. Der Beamte leuchtet dir ins Gesicht.',[
+        {t:'Ganz ruhig bleiben <small>CHARME · 65 %</small>',f:()=>diceRoll('erz',65,'Charme',w=>{if(w){sayRaw('erz','„Gute Fahrt noch.“ Glück gehabt.',[{t:'Weiter',f:closeDlg}]);}else{addReward(-15,0,heat>0?0:1);sayRaw('erz','Er findet einen kaputten Rücklicht. Strafzettel.<div class="reward"><b class="h">−$15</b></div>',[{t:'Mist',f:closeDlg}]);}})},
+        {t:'Zwanziger zustecken <small>SICHER · −$20</small>',f:()=>{addReward(-20,0,0);sayRaw('erz','Der Schein verschwindet in seiner Jackentasche. „Weiterfahren.“',[{t:'Weiter',f:closeDlg}]);}}]),
+      ()=>{addReward(15,5,0);sayRaw('erz','<b>Unterwegs:</b> Auf dem Bürgersteig liegt eine verlorene Geldbörse. Keiner schaut hin.<div class="reward"><b>+ $15</b><b class="x">+ 5 XP</b></div>',[{t:'Eingesteckt',f:closeDlg}]);},
+      ()=>{addReward(-8,0,0);sayRaw('erz','<b>Unterwegs:</b> Platter Reifen. Der Typ an der Tankstelle nimmt dich aus.<div class="reward"><b class="h">−$8</b></div>',[{t:'Na super',f:closeDlg}]);},
+      ()=>{addReward(0,10,0);sayRaw('erz','<b>Unterwegs:</b> Ein Tramper steigt kurz ein. „Am Containerhafen ist nachts auf Pier 4 was los. Hast du nicht von mir.“<div class="reward"><b class="x">+ 10 XP</b></div>',[{t:'Danke für den Tipp',f:closeDlg}]);}
+    ];
+    ev[Math.floor(Math.random()*ev.length)]();
+  }
+
+  // ---------- Stadtkarte ----------
+  const sheet2=$('sheet2');
+  function toast2(t){const el=$('toast2');el.textContent=t;el.classList.add('on');clearTimeout(toast2.t);toast2.t=setTimeout(()=>el.classList.remove('on'),1900);}
+  function open2(h){sheet2.innerHTML=h;sheet2.classList.add('open');}
+  function close2(){sheet2.classList.remove('open');}
+  function updateMap(){
+    document.querySelectorAll('#map .hs').forEach(b=>b.classList.remove('target'));
+    const m=$('mission');
+    if(job===1){$('m-diner').classList.add('target');m.textContent='Päckchen bei Big Sal abholen';}
+    else if(job===2){$('m-hafen').classList.add('target');m.textContent='Päckchen zum Hafen bringen';}
+    else if(job>=3){$('m-home').classList.add('target');m.textContent='Job erledigt – ab nach Hause';}
+    else {m.textContent='Kein Auftrag – ruf mal an';}
+    if(Q>0)m.textContent=questText();
+    fitMap(); const tg=document.querySelector('#map .hs.target')||$('m-home'); centerMapOn(tg);
+  }
+  $('backHome').addEventListener('click',e=>{e.stopPropagation();goHome();});
+  function goHome(){close2();wipeTo(()=>{show('hide');fitAll();hud();if(job>=3){$('h-door').classList.remove('alert');$('h-phone').classList.add('alert');}});}
+  $('stageC').addEventListener('click',e=>{if(!e.target.closest('.hs'))close2();});
+  sheet2.addEventListener('click',e=>{const a=e.target.closest('[data-a]');if(!a)return;e.stopPropagation();mapActs[a.dataset.a]();});
+  const btn2=(ok,okA,no='Zurück')=>`<div class="row"><button type="button" class="no" data-a="close">${no}</button>${ok?`<button type="button" class="ok" data-a="${okA}">${ok}</button>`:''}</div>`;
+  const mapActs={close:close2,home:goHome,diner:()=>{close2();sceneDiner();},hafen:()=>{close2();sceneDrive();}};
+  const mapContent={
+    'm-diner':()=>job===1?`<span class="tag">AUFTRAG</span><h2>Big Sals Diner</h2><p>Sal wartet in seiner Ecke. Das Päckchen liegt schon bereit.</p>${btn2('Reingehen','diner')}`
+                         :`<h2>Big Sals Diner</h2><p>Milchshakes, fettige Burger und Big Sal, der alles mitbekommt. Hier gibt's später neue Aufträge.</p>${btn2()}`,
+    'm-hafen':()=>job===2?`<span class="tag">AUFTRAG</span><h2>Containerhafen, Pier 9</h2><p>Hier wartet der Abnehmer. Fahrt: kurz · Energie: 2</p>${btn2('Hinfahren','hafen')}`
+                         :`<h2>Hafen</h2><p>Container, Schmuggler, Zoll. Später der Ort für die ersten großen Heists.</p>${btn2()}`,
+
+    'm-yacht':()=>`<span class="tag">AB STUFE 8</span><h2>Yachthafen</h2><p>Hier liegen die Boote der Reichen. Später: Schmuggelfahrten und dein eigenes Speedboot.</p>${btn2()}`,
+    'm-pier':()=>`<h2>Pier</h2><p>Angler, Pärchen, zwielichtige Treffen im Dunkeln. Kleine Übergabe-Jobs kommen hier bald dazu.</p>${btn2()}`,
+    'm-villa':()=>`<span class="tag">AB STUFE 15</span><h2>Villenviertel</h2><p>Pools, Wachhunde, Alarmanlagen. Das Ziel deiner ersten großen Einbruchs-Heists.</p>${btn2()}`,
+    'm-towers':()=>`<h2>Innenstadt</h2><p>Banken, Anwälte, Geldwäsche. Hier sitzt später dein korrupter Anwalt.</p>${btn2()}`,
+    'm-casino':()=>`<span class="tag">AB STUFE 10</span><h2>Casino</h2><p>Glücksspiel um echtes Spielgeld, Kontakte zur Unterwelt und irgendwann der ganz große Heist.</p>${btn2()}`,
+    'm-motel':()=>`<h2>Motel</h2><p>Stundenweise Zimmer, keine Fragen. Ein Ort zum Untertauchen, wenn die Heat zu hoch wird.</p>${btn2()}`,
+    'm-police':()=>`<h2>Polizeirevier</h2><p>Hier landest du, wenn ein Heist schiefgeht. Später: Kaution zahlen, Beamte bestechen, Akten verschwinden lassen.</p>${btn2()}`,
+    'm-shop':()=>`<h2>Werkstatt</h2><p>Autos tunen, Nummernschilder tauschen, Fluchtwagen vorbereiten. Kommt bald.</p>${btn2()}`,
+    'm-junk':()=>`<h2>Schrottplatz</h2><p>Ersatzteile und Material für deine Werkbank. Und ein guter Ort, um Autos verschwinden zu lassen.</p>${btn2()}`,
+    'm-slum':()=>`<h2>Die Siedlung</h2><p>Straßenecken, kleine Deals, Gerüchte. Hier gibt's später die schnellen Kleinjobs für zwischendurch.</p>${btn2()}`,
+    'm-club':()=>`<span class="tag">GESPERRT · AB STUFE 5</span><h2>Nachtclub</h2><p>Der Türsteher mustert deine Jeansjacke und schüttelt nur den Kopf.</p>${btn2()}`,
+    'm-beach':()=>`<h2>Strand</h2><p>Sonnenbrillen verticken, Touristen abziehen, Bootsverleih. Kleine Jobs kommen hier bald dazu.</p>${btn2()}`,
+    'm-pawn':()=>`<h2>Juwelier & Pfandleihe</h2><p>Der Hehler kauft alles, was du findest, und fragt nicht, woher es kommt. Handel kommt bald.</p>${btn2()}`,
+    'm-home':()=>`<h2>Deine Garage</h2><p>Zurück ins Versteck.</p>${btn2('Heimfahren','home')}`
+  };
+  document.querySelectorAll('#map .hs').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();sfx('click');
+    if(b.id==='m-diner'){travel(b,enterDiner);return;}
+    if(PLACES[b.id]){travel(b,()=>enterPlace(b.id));return;}
+    open2(mapContent[b.id]());}));
+
+  // ---------- Szenen ----------
+  function sceneSet(img,cap,bubbles,buttons,extra=''){
+    let h='<div class="panel-in">';
+    if(cap)h+=`<div class="cap">${cap}</div>`;
+    h+=`<div class="frame" id="scf"><img src="${img}" alt="">`;
+    (bubbles||[]).forEach(b=>{h+=`<div class="bubble${b.phone?' phone':''}" style="left:${b.x};top:${b.y};animation-delay:${b.delay||350}ms">${b.t}</div>`;});
+    h+='</div>'+extra+'</div>';
+    $('scbox').innerHTML=h;
+    const bb=$('scbtns'); bb.innerHTML='';
+    buttons.forEach(o=>{const b=document.createElement('button');b.type='button';if(o.hot)b.className='hot';b.innerHTML=o.t+(o.s?`<small>${o.s}</small>`:'');b.onclick=o.f;bb.appendChild(b);});
+  }
+  function sceneDiner(){
+    wipeTo(()=>{show('scene');
+      sceneSet('p2.webp','Big Sals Diner, Ecke am Fenster.',
+        [{t:'Da ist es. Nicht reinschauen. Hafen, Pier 9. Der Typ zahlt 150.',x:'54%',y:'5%'}],
+        [{t:'Päckchen nehmen',s:'+ PÄCKCHEN',hot:true,f:()=>{job=2;toastScene('PÄCKCHEN ERHALTEN');setTimeout(()=>sceneDrive(),700);}}]);
+    });
+  }
+  function toastScene(t){const r=document.createElement('div');r.className='result';r.style.fontSize='clamp(30px,9vw,48px)';r.textContent=t;$('scf').appendChild(r);}
+  function sceneDrive(){
+    nrg=Math.max(0,nrg-2); hud();
+    wipeTo(()=>{show('scene');
+      const dur=8;
+      sceneSet('drive.webp','Unterwegs zum Hafen …',[],[
+        {t:'Sofort ankommen',s:'TESTMODUS',f:()=>{clearInterval(tm);sceneHafen();}}
+      ],`<div class="timer"><i id="tbar"></i><span id="ttxt">0:0${dur}</span></div>`);
+      let left=dur*10;const tm=setInterval(()=>{left--;const bar=$('tbar');if(!bar){clearInterval(tm);return;}
+        bar.style.width=(100-left/(dur*10)*100)+'%';$('ttxt').textContent='0:0'+Math.ceil(left/10);
+        if(left<=0){clearInterval(tm);sceneHafen();}},100);
+    });
+  }
+  const stats={Muskeln:42,Charme:54};
+  function sceneHafen(){
+    job=2; wipeTo(()=>{enterPlace('m-hafen');});
+    return;
+    wipeTo(()=>{show('scene');
+      sceneSet('hafen.webp','Pier 9. Nebel, Container und ein Typ mit Narbe.',
+        [{t:'Hundertfünfzig? Der Preis ist gerade auf fünfundsiebzig gefallen, Kleiner.',x:'2%',y:'4%'}],
+        [{t:'Einschüchtern',s:'MUSKELN · 45 %',hot:true,f:()=>roll('Muskeln',45)},
+         {t:'Quatschen',s:'CHARME · '+(60+(buff?15:0))+' %',f:()=>{const c=60+(buff?15:0);buff=false;hud();roll('Charme',c);}},
+         {t:'Nachgeben',s:'SICHER · $75',f:()=>finish('give')}]);
+    });
+  }
+  function roll(stat,chance){
+    document.querySelectorAll('#scbtns button').forEach(b=>b.disabled=true);
+    const f=$('scf'); const d=document.createElement('div');d.className='dice';f.appendChild(d);
+    let n=0;const it=setInterval(()=>{d.textContent=Math.floor(Math.random()*100)+1;n++;
+      if(n>14){clearInterval(it);const r=Math.floor(Math.random()*100)+1;d.textContent=r;
+        setTimeout(()=>{d.remove();finish(r<=chance?'win':'lose',stat);},700);}},70);
+  }
+  function finish(res,stat){
+    let money=75, gx=25, gh=0, cap, big, bad=false, txt;
+    if(res==='win'){money=150;gx=60;if(stat==='Muskeln'){gh=1;txt='Er zahlt die vollen 150 – mit zitternden Händen.';}else txt='Ein paar nette Worte, und plötzlich passt der Preis wieder.';big='GESCHAFFT!';}
+    else if(res==='lose'){money=75;gx=35;bad=true;big='MIST!';txt=stat==='Muskeln'?'Er zieht ein Messer. Du nimmst die 75 und gehst.':'Er lacht dich aus. 75, und tschüss.';if(stat==='Muskeln'){nrg=Math.max(0,nrg-2);}}
+    else {big='DEAL.';txt='Du nimmst die 75. Kein Ärger, aber auch kein Respekt.';}
+    cash+=money; xp+=gx; heat=Math.min(5,heat+gh); if(xp>=100){xp-=100;lvl++;}
+    job=3; hud();
+    const f=$('scf'); const r=document.createElement('div');r.className='result'+(bad?' bad':'');r.textContent=big;f.appendChild(r);
+    const cap2=document.querySelector('#scbox .cap'); if(cap2)cap2.textContent=txt;
+    const rw=document.createElement('div');rw.className='reward';
+    rw.innerHTML=`<b>+ $${money}</b><b class="x">+ ${gx} XP</b>${gh?'<b class="h">+1 Heat ★</b>':''}`;
+    $('scbox').firstChild.appendChild(rw);
+    const bb=$('scbtns');bb.innerHTML='';
+    const b=document.createElement('button');b.type='button';b.className='hot';b.innerHTML='Zurück zur Karte<small>JOB ERLEDIGT</small>';
+    b.onclick=()=>wipeTo(()=>{show('map');fitAll();updateMap();});bb.appendChild(b);
+  }
+
+
+  // ---------- Sound-Effekte ----------
+  let sctx=null;
+  function sfx(t){
+    try{ if(!sctx)sctx=new (window.AudioContext||window.webkitAudioContext)(); if(sctx.state==='suspended')sctx.resume(); }catch(e){return;}
+    const n=sctx.currentTime;
+    const tone=(f,d,type='sine',g=.15,at=0)=>{const o=sctx.createOscillator(),v=sctx.createGain();o.type=type;o.frequency.value=f;v.gain.setValueAtTime(g,n+at);v.gain.exponentialRampToValueAtTime(.001,n+at+d);o.connect(v);v.connect(sctx.destination);o.start(n+at);o.stop(n+at+d+.02);};
+    if(t==='click')tone(880,.05,'square',.05);
+    if(t==='type')tone(1400+Math.random()*300,.018,'square',.015);
+    if(t==='cash'){tone(1318,.12,'triangle',.15);tone(1760,.25,'triangle',.15,.08);}
+    if(t==='stamp'){tone(90,.18,'sawtooth',.25);tone(60,.25,'sine',.3);}
+    if(t==='door'){tone(220,.1,'triangle',.1);tone(330,.15,'triangle',.08,.08);}
+  }
+  document.addEventListener('click',e=>{if(e.target.closest('button'))sfx('click');},true);
+
+  // ---------- Reinzoomen von der Karte ----------
+  function zoomInto(el,cb){
+    const st=$('stageC');
+    st.style.transformOrigin=(el.offsetLeft+el.offsetWidth/2)+'px '+(el.offsetTop+el.offsetHeight/2)+'px'; st.style.transition='transform .75s cubic-bezier(.6,0,.9,.4), filter .75s';
+    st.style.transform=`translate3d(${MV.x}px,${MV.y}px,0) scale(4)`; st.style.filter='brightness(2) blur(2px)'; sfx('door');
+    setTimeout(()=>{cb(); st.style.transition='none'; st.style.transformOrigin='0 0'; applyMap(); st.style.filter='';},720);
+  }
+
+  // ---------- DINER ----------
+  function enterDiner(){
+    show('diner'); fitAll(); hud();
+    const d=$('diner'); d.style.opacity=0; d.style.transition='none'; requestAnimationFrame(()=>{d.style.transition='opacity .5s';d.style.opacity=1;});
+    $('d-sal').classList.toggle('alert', job===1||job===0);
+    d.classList.add('labels'); setTimeout(()=>d.classList.remove('labels'),3500);
+    setTimeout(()=>say('candy','Hey Süßer! Setz dich, wo du willst. Sal wartet schon auf dich.',[{t:'Danke, Candy.',f:closeDlg}]),600);
+  }
+  $('diner').addEventListener('click',e=>{if(e.target.id==='veil'){closePaper();closeMenu();}});
+  const people={sal:{n:'BIG SAL',p:'por_sal.webp',b:'bust_sal.webp',side:'l',rim:'#ff3d8b'},candy:{n:'CANDY',p:'por_candy.webp',b:'bust_candy.webp',side:'r',rim:'#2fe0ea'},
+    rico:{n:'RICO „NARBE“',p:'por_rico.webp',b:'bust_rico.webp',side:'r',rim:'#4f8bff'},gus:{n:'GUS',p:'por_gus.webp',b:'bust_gus.webp',side:'l',rim:'#ffe14d'},
+    sunny:{n:'SUNNY',p:'por_sunny.webp',b:'bust_sunny.webp',side:'r',rim:'#ff9f43'},joe:{n:'OLD JOE',p:'por_joe.webp',b:'bust_joe.webp',side:'l',rim:'#ff9f43'},
+    dee:{n:'DEE',p:'por_dee.webp',b:'bust_dee.webp',side:'r',rim:'#ffd34d'},duke:{n:'DUKE',p:'por_duke.webp',b:'bust_duke.webp',side:'r',rim:'#ffffff'},
+    mags:{n:'MAGS',p:'por_mags.webp',b:'bust_mags.webp',side:'r',rim:'#4f8bff'},rosie:{n:'ROSIE',p:'por_rosie.webp',b:'bust_rosie.webp',side:'l',rim:'#ff3d8b'},
+    lola:{n:'LOLA',p:'por_lola.webp',b:'bust_lola.webp',side:'r',rim:'#ff3d8b'},doyle:{n:'DET. DOYLE',p:'por_doyle.webp',b:'bust_doyle.webp',side:'l',rim:'#ff4f4f'},
+    whitlock:{n:'MR. WHITLOCK',p:'por_whitlock.webp',b:'bust_whitlock.webp',side:'r',rim:'#ffd34d'},harvey:{n:'HARVEY KLINE',p:'por_harvey.webp',b:'bust_harvey.webp',side:'r',rim:'#b18bff'},
+    crane:{n:'VICTOR CRANE',p:'por_crane.webp',b:'bust_crane.webp',side:'r',rim:'#ffffff'},
+    tito:{n:'TITO',p:'por_tito.webp',b:'bust_tito.webp',side:'l',rim:'#2fe0ea'},
+    anon:{n:'ANONYM',p:''},erz:{n:'',p:''},du:{n:'DU',p:''}};
+  let typeT=null;
+  function say(who,text,choices){
+    const dl=$('dlg'); dl.classList.add('on'); dl.querySelector('.tx').classList.remove('raw'); if(people[who].b)showBust(who); else hideBust(); dl.querySelector('.por').style.backgroundImage=people[who].p?`url(${people[who].p})`:'none'; dl.querySelector('.por').classList.toggle('none',!people[who].p); dl.querySelector('.box').classList.toggle('np',!people[who].p);
+    dl.querySelector('.nm').textContent=people[who].n;
+    const tx=dl.querySelector('.tx'), ch=dl.querySelector('.ch'); ch.innerHTML=''; tx.textContent='';
+    clearInterval(typeT); let i=0;
+    const finish=()=>{clearInterval(typeT);tx.textContent=text;ch.innerHTML='';(choices||[]).forEach((c,k)=>{const b=document.createElement('button');b.type='button';b.innerHTML=c.t;b.style.animationDelay=(k*70)+'ms';b.onclick=e=>{e.stopPropagation();c.f();};ch.appendChild(b);});};
+    typeT=setInterval(()=>{i++;tx.textContent=text.slice(0,i);if(i>=text.length)finish();},22);
+    dl.onclick=e=>{if(e.target.closest('button'))return; if(tx.textContent.length<text.length)finish();};
+  }
+
+  function curScr(){return document.getElementById(scene);}
+  function showBust(who){
+    const b=$('bust'),P=people[who],left=P.side==='l',img=b.querySelector('img');
+    curScr().classList.add('talk');
+    if(b.dataset.who===who&&b.classList.contains('on'))return;
+    b.dataset.who=who;
+    b.style.transition='none'; b.classList.remove('on'); b.style.opacity=0; img.removeAttribute('src');
+    b.className=left?'l':'r'; b.style.setProperty('--rim',P.rim||'#ff3d8b');
+    const go=()=>{if(b.dataset.who!==who)return;void b.offsetWidth;b.style.transition='';b.style.opacity='';requestAnimationFrame(()=>b.classList.add('on'));};
+    img.onload=go; img.src=P.b; if(img.complete&&img.naturalWidth)go();
+  }
+  function hideBust(){const b=$('bust');b.style.transition='none';b.classList.remove('on');b.style.opacity=0;b.dataset.who='';document.querySelectorAll('.scr2,#hide').forEach(x=>x.classList.remove('talk'));}
+  function sayRaw(who,html,choices){
+    const dl=$('dlg'); dl.classList.add('on'); clearInterval(typeT); const P=people[who];
+    if(P.b)showBust(who); else hideBust();
+    dl.querySelector('.por').style.backgroundImage=P.p?`url(${P.p})`:'none'; dl.querySelector('.por').classList.toggle('none',!P.p); dl.querySelector('.box').classList.toggle('np',!P.p); dl.querySelector('.nm').textContent=P.n;
+    const tx=dl.querySelector('.tx'); tx.classList.add('raw'); tx.innerHTML=html; const ch=dl.querySelector('.ch'); ch.innerHTML='';
+    (choices||[]).forEach((c,k)=>{const b=document.createElement('button');b.type='button';b.innerHTML=c.t;b.style.animationDelay=(k*70)+'ms';b.onclick=e=>{e.stopPropagation();c.f();};ch.appendChild(b);});
+    dl.onclick=null;
+  }
+  function closeDlg(){$('dlg').classList.remove('on');clearInterval(typeT);hideBust();}
+  function leaveDiner(){closeDlg();closePaper();closeMenu();sfx('door');wipeTo(()=>{show('map');fitAll();updateMap();});}
+
+  // Sal
+  function talkSal(){
+    closeMenu();closePaper();
+    if(job===2){say('sal','Was stehst du noch hier rum? Pier 9, Kleiner. Der Typ wartet nicht ewig.',[{t:'Bin schon weg.',f:leaveDiner},{t:'Moment noch.',f:closeDlg}]);return;}
+    if(job>=3){say('sal','Saubere Arbeit am Hafen. Du lernst schnell. Komm morgen wieder, dann hab ich was Größeres.',[{t:'Ich bin dabei.',f:closeDlg}]);return;}
+    say('sal','Da bist du ja. Setz dich, iss was, wenn du willst. Ich hab da ein Päckchen, das muss heute noch zum Hafen.',[
+      {t:'Was ist drin?',f:()=>say('sal','Die Art Päckchen, bei der man keine Fragen stellt. Kapiert?',[{t:'Kapiert. Zeig mal den Auftrag.',f:showPaper}])},
+      {t:'Zeig mal den Auftrag.',f:showPaper}]);
+  }
+  function showPaper(){
+    closeDlg(); $('veil').classList.add('on');
+    const p=$('paper');
+    p.innerHTML=`<div class="tape"></div>
+      <div class="pol"><img src="pol_hafen.webp" alt=""><span>der Abnehmer</span></div>
+      <h3>AUFTRAG #001</h3>
+      <div class="tt">Lieferung an Pier 9</div>
+      <dl><dt>Auftraggeber</dt><dd>Big Sal</dd><dt>Ziel</dt><dd>Hafen, Pier 9</dd><dt>Belohnung</dt><dd>$150 · 60 XP</dd>
+      <dt>Risiko</dt><dd>★★☆☆☆</dd><dt>Energie</dt><dd>2</dd><dt>Gut für</dt><dd>Charme, Muskeln</dd></dl>
+      <div class="note">„Der Typ ist knausrig. Lass dich nicht abziehen.“ – S.</div>
+      <div class="acts"><button type="button" class="nope" id="pNo">Später</button><button type="button" class="yes" id="pYes">Annehmen</button></div>
+      <div class="stamp">ANGENOMMEN</div>`;
+    requestAnimationFrame(()=>p.classList.add('on'));
+    $('pNo').onclick=e=>{e.stopPropagation();closePaper();};
+    $('pYes').onclick=e=>{e.stopPropagation();const st=p.querySelector('.stamp');st.classList.add('hit');setTimeout(()=>sfx('stamp'),250);
+      $('pYes').disabled=true;$('pNo').disabled=true;
+      setTimeout(()=>{closePaper();job=2;jobTaken=true;$('d-sal').classList.remove('alert');$('h-phone').classList.remove('alert');
+        say('sal','Gut. Das Päckchen liegt hinten im Wagen. Und Kleiner … nicht reinschauen.',[{t:'Ab zum Hafen.',f:leaveDiner},{t:'Erst noch was essen.',f:openMenu}]);},1300);};
+  }
+  function closePaper(){$('paper').classList.remove('on');$('veil').classList.remove('on');}
+
+  // Candy + Speisekarte
+  const food=[
+    {id:'kaffee',n:'Kaffee',d:'+2 Energie',p:2,e:2},
+    {id:'burger',n:'Cheeseburger',d:'+5 Energie',p:6,e:5},
+    {id:'pancakes',n:'Pancakes',d:'+4 Energie',p:5,e:4},
+    {id:'shake',n:'Milchshake',d:'+1 Energie · Charme +15 % für den nächsten Job',p:4,e:1,b:true}];
+  function talkCandy(){
+    closePaper();
+    say('candy',nrg<10?'Du siehst fertig aus, Süßer. Was zu essen?':'Na, Hunger? Der Kaffee ist frisch, der Shake ist legendär.',[{t:'Zeig mal die Karte.',f:openMenu},{t:'Nichts, danke.',f:closeDlg}]);
+  }
+  function openMenu(){
+    closeDlg(); $('veil').classList.add('on');
+    const m=$('menu2');
+    m.innerHTML=`<div class="hd"><b>CANDYS KARTE</b></div>`+food.map(f=>`<div class="it"><img src="i_${f.id}.webp" alt=""><div class="nm">${f.n}<small>${f.d}</small></div><button type="button" data-f="${f.id}">$${f.p}</button></div>`).join('')+
+      `<div class="ft"><span>Energie ${nrg}/10 · $${cash}</span><button type="button" id="mClose">Fertig</button></div>`;
+    requestAnimationFrame(()=>m.classList.add('on'));
+    $('mClose').onclick=e=>{e.stopPropagation();closeMenu();};
+    m.querySelectorAll('[data-f]').forEach(b=>b.onclick=e=>{e.stopPropagation();buy(food.find(x=>x.id===b.dataset.f),b);});
+  }
+  function closeMenu(){$('menu2').classList.remove('on');$('veil').classList.remove('on');}
+  function toast3(t){const el=$('toast3');el.textContent=t;el.classList.add('on');clearTimeout(toast3.t);toast3.t=setTimeout(()=>el.classList.remove('on'),1600);}
+  function buy(f,btn){
+    if(cash<f.p){toast3('ZU WENIG KOHLE');return;}
+    if(nrg>=10&&!f.b){toast3('DU BIST SATT');return;}
+    cash-=f.p; nrg=Math.min(10,nrg+f.e); if(f.b)buff=true; hud(); sfx('cash');
+    const r=btn.parentNode.querySelector('img').getBoundingClientRect(), t=$('nrg').getBoundingClientRect();
+    const im=document.createElement('img');im.src=`i_${f.id}.webp`;im.className='fly';im.style.left=r.left+'px';im.style.top=r.top+'px';document.body.appendChild(im);
+    requestAnimationFrame(()=>{im.style.left=(t.left-10)+'px';im.style.top=(t.top-10)+'px';im.style.transform='scale(.3) rotate(25deg)';im.style.opacity=.2;});
+    setTimeout(()=>im.remove(),850);
+    $('menu2').querySelector('.ft span').textContent=`Energie ${nrg}/10 · $${cash}`;
+    toast3(f.b?'CHARME-BOOST!':'+'+f.e+' ENERGIE');
+  }
+  $('d-sal').addEventListener('click',e=>{e.stopPropagation();talkSal();});
+  $('d-candy').addEventListener('click',e=>{e.stopPropagation();talkCandy();});
+  $('d-juke').addEventListener('click',e=>{e.stopPropagation();radio();});
+  $('d-door').addEventListener('click',e=>{e.stopPropagation();leaveDiner();});
+
+
+  // ================= ORTE, FIGUREN & JOBS =================
+  const STATS={Muskeln:12,'Köpfchen':10,Charme:14,Ausdauer:11,'Glück':8};
+  function addReward(m,x,h){cash+=m;xp+=x;heat=Math.max(0,Math.min(5,heat+(h||0)));while(xp>=100){xp-=100;lvl++;setTimeout(()=>{sfx('cash');},300);}hud();}
+  const PLACES={
+    'm-hafen':{n:'CONTAINERHAFEN',img:'pl_hafen.webp',npc:'rico',greet:'Was willst du? Hier wird gearbeitet, nicht gequatscht.',
+      jobs:[{n:'Kisten verladen',stat:'Ausdauer',p:75,t:6,m:25,x:12,e:1,ev:'Der Vorarbeiter meint, wenn du die Nachtschicht dranhängst, legt er was drauf.',safe:'Pünktlich Feierabend',risk:'Nachtschicht schieben'},
+            {n:'Zöllner ablenken',stat:'Charme',p:55,t:8,m:60,x:20,e:2,h:1,ev:'Der Zöllner wird misstrauisch und will deinen Ausweis sehen.',safe:'Rückzieher machen',risk:'Weiterquatschen'}],
+      rumor:'Auf Pier 4 liegt seit Tagen ein Container ohne Papiere. Und keiner traut sich ran.'},
+    'm-pier':{n:'PIER',img:'pl_pier.webp',npc:'gus',greet:'Na, Jungchen? Die Fische beißen heute nicht. Die Gauner schon eher.',
+      jobs:[{n:'Fischkutter entladen',stat:'Ausdauer',p:80,t:5,m:20,x:10,e:1,ev:'Unter den Fischen liegt eine wasserdichte Kiste. Der Kapitän schaut gerade weg.',safe:'Nur Fische schleppen',risk:'Kiste einstecken'},
+            {n:'Boote beobachten',stat:'Köpfchen',p:65,t:7,m:35,x:15,e:1,ev:'Ein Speedboot legt ohne Licht an. Du könntest dir die Nummer merken und verkaufen.',safe:'Normal Bericht erstatten',risk:'Nummer an Rico verkaufen'}],
+      rumor:'Dukes Yacht fährt jeden Donnerstag raus. Und kommt jedes Mal tiefer im Wasser zurück.'},
+    'm-beach':{n:'STRAND',img:'pl_beach.webp',npc:'sunny',greet:'Hey Bro! Sonne, Wellen, Touristen mit dicken Brieftaschen. Was geht?',
+      jobs:[{n:'Sonnenbrillen verticken',stat:'Charme',p:70,t:5,m:30,x:12,e:1,ev:'Eine Reisegruppe aus Ohio will gleich zehn Stück – zum Freundschaftspreis.',safe:'Normaler Preis',risk:'Preis verdoppeln'},
+            {n:'Liegestuhl-Abzocke',stat:'Glück',p:60,t:6,m:40,x:15,e:1,h:1,ev:'Der echte Liegestuhlvermieter kommt um die Ecke.',safe:'Abhauen mit dem, was du hast',risk:'Weiterkassieren'}],
+      rumor:'Die Rettungsschwimmer verstecken was im Turm. Bestimmt keine Schwimmflügel.'},
+    'm-junk':{n:'SCHROTTPLATZ',img:'pl_junk.webp',npc:'joe',greet:'Pass auf, wo du hintrittst. Und auf den Hund. Vor allem auf den Hund.',
+      jobs:[{n:'Schrott sortieren',stat:'Ausdauer',p:80,t:5,m:20,x:10,e:1,ev:'Im Kofferraum eines Wracks klappert etwas.',safe:'Weiter sortieren',risk:'Kofferraum aufbrechen'},
+            {n:'Auto ausschlachten',stat:'Köpfchen',p:55,t:8,m:50,x:20,e:2,ev:'Der Motor ist noch gut – aber die Fahrgestellnummer ist weggefeilt.',safe:'Nur Reifen und Radio',risk:'Motor ausbauen'}],
+      rumor:'Mags in der Werkstatt sucht Teile für einen Fluchtwagen. Für wen, sagt sie nicht.'},
+    'm-pawn':{n:'JUWELIER & PFANDLEIHE',img:'pl_pawn.webp',npc:'dee',greet:'Schätzchen, wenn du was verkaufen willst: Ich frag nicht woher. Ich frag nur wie viel.',
+      jobs:[{n:'Botengang',stat:'Ausdauer',p:85,t:5,m:20,x:10,e:1,ev:'Das Päckchen ist schwerer als gedacht. Ein Umweg wäre schneller – durch die Siedlung.',safe:'Normaler Weg',risk:'Abkürzung nehmen'},
+            {n:'Ware abholen',stat:'Glück',p:50,t:9,m:70,x:25,e:2,h:1,ev:'Der Verkäufer will mehr Geld als abgemacht.',safe:'Bezahlen, was er will',risk:'Ware einfach mitnehmen'}],
+      rumor:'Bei mir verkauft bald einer Diamanten aus der Villa. Wenn die Polizei fragt: Du weißt von nichts.'},
+    'm-slum':{n:'DIE SIEDLUNG',img:'pl_slum.webp',npc:'tito',greet:'Yo, der Neue! Kaugummi? Zigaretten? Oder suchst du Arbeit?',
+      jobs:[{n:'Schulden eintreiben',stat:'Muskeln',p:55,t:7,m:50,x:20,e:2,h:1,ev:'Der Schuldner hat nur die Hälfte. Er fleht dich an.',safe:'Die Hälfte nehmen',risk:'Ihn unter Druck setzen'},
+            {n:'Ware verteilen',stat:'Charme',p:65,t:5,m:35,x:12,e:1,ev:'Ein Streifenwagen rollt langsam die Straße runter.',safe:'Ware verstecken, abwarten',risk:'Cool bleiben und weitermachen'}],
+      rumor:'Big Sal hat Schulden bei jemandem, mit dem man sich nicht anlegt. Mehr sag ich nicht.'},
+    'm-yacht':{n:'YACHTHAFEN',img:'pl_yacht.webp',npc:'duke',greet:'Du stehst auf meinem Steg, Junge. Entweder du hast Geld – oder du willst welches verdienen.',
+      jobs:[{n:'Deck schrubben',stat:'Ausdauer',p:85,t:5,m:25,x:10,e:1,ev:'Unter einer Plane liegen versiegelte Kisten. Duke ist an der Bar.',safe:'Weiterschrubben',risk:'Kurz reinschauen'},
+            {n:'Gäste unterhalten',stat:'Charme',p:60,t:7,m:55,x:18,e:2,ev:'Ein betrunkener Gast lässt seine dicke Brieftasche liegen.',safe:'Zurückgeben, Trinkgeld kassieren',risk:'Ein paar Scheine abzweigen'}],
+      rumor:'Die Kisten auf meiner Yacht? Gehören einem Freund. Einem sehr reichen Freund. Mehr musst du nicht wissen.'},
+    'm-villa':{n:'VILLENVIERTEL',img:'pl_villa.webp',npc:'crane',lock:15,msg:'Du hast dich verlaufen, Junge. Komm wieder, wenn du jemand bist. Und dann – überleg dir gut, ob du wirklich kommen willst.'},
+    'm-towers':{n:'INNENSTADT · KANZLEI',img:'pl_towers.webp',npc:'harvey',lock:6,msg:'Ich vertrete nur Klienten mit Substanz, mein Freund. Ab Stufe 6 reden wir über Geldwäsche und Versicherungen für deine Ausrüstung.'},
+    'm-casino':{n:'CASINO',img:'pl_casino.webp',npc:'whitlock',lock:10,msg:'Willkommen im Casino, Sir. Bedauerlicherweise ist Ihre Garderobe … unzureichend. Ab Stufe 10 empfange ich Sie mit Vergnügen.'},
+    'm-club':{n:'NACHTCLUB',img:'pl_club.webp',npc:'lola',lock:5,msg:'Süß, wie du dich reinschleichst. Komm ab Stufe 5 wieder, dann reden wir über Jobs – und über eine Crew.'},
+    'm-motel':{n:'MOTEL',img:'pl_motel.webp',npc:'rosie',msg:'Zimmer 102 ist frei. Fünfzig Dollar, bar, keine Fragen. Hier sucht dich keiner, Schätzchen.',motel:true},
+    'm-police':{n:'POLIZEIREVIER',img:'pl_police.webp',npc:'doyle',msg:'Na sieh mal an. Ein neues Gesicht. Ich merk mir Gesichter, Kleiner. Später kannst du hier Kaution zahlen – oder mir einen Kaffee spendieren, wenn du verstehst.'},
+    'm-shop':{n:'WERKSTATT',img:'pl_shop.webp',npc:'mags',msg:'Du brauchst einen Fluchtwagen? Bring mir Teile vom Schrottplatz und Kohle, dann bau ich dir was, das schneller ist als jeder Streifenwagen. Kommt bald.'}
+  };
+  let curPlace=null;
+  function enterPlace(id){
+    const P=PLACES[id]; curPlace=id;
+    show('place'); $('pimg').src=P.img; $('pname').textContent=P.n; fitAll(); hud();
+    const pl=$('place'); pl.style.opacity=0; requestAnimationFrame(()=>{pl.style.transition='opacity .5s';pl.style.opacity=1;});
+    const t=$('ptalk');
+    if(P.npc){t.style.display='';t.querySelector('img').src=people[P.npc].p;t.querySelector('img').style.display='';t.querySelector('span').textContent='MIT '+people[P.npc].n.split(' ')[0]+' REDEN';}
+    else {t.style.display='';t.querySelector('img').style.display='none';t.querySelector('span').textContent='UMSEHEN';}
+    setTimeout(()=>{if(Math.random()<.25&&!(id==='m-hafen'&&job===2))travelEvent();else placeTalk();},650);
+  }
+  $('ptalk').addEventListener('click',e=>{e.stopPropagation();placeTalk();});
+  $('pback').addEventListener('click',e=>{e.stopPropagation();closeDlg();sfx('door');wipeTo(()=>{show('map');fitAll();updateMap();});});
+  function placeTalk(){
+    const P=PLACES[curPlace];
+    if(curPlace==='m-hafen'&&job===2){ricoStory();return;}
+    if(!P.jobs){
+      const ch=[];
+      if(P.motel)ch.push({t:`Zimmer nehmen · $50 · Heat −1, Energie voll`,f:()=>{if(cash<50){say('rosie','Fünfzig, Schätzchen. Nicht neunundvierzig.',[{t:'Mist.',f:closeDlg}]);return;}
+        addReward(-50,0,-1);nrg=10;hud();sfx('cash');sayRaw('erz','Du schläfst wie ein Stein. Draußen fährt zweimal ein Streifenwagen vorbei – ohne anzuhalten.<div class="reward"><b>Energie voll</b><b class="h">Heat −1</b></div>',[{t:'Weiter',f:closeDlg}]);}});
+      ch.push({t:'Zurück',f:closeDlg});
+      const who=P.npc||'erz';
+      if(P.npc){say(who,P.msg,ch);return;}
+      sayRaw('erz',(P.lock&&lvl<P.lock?`<b>Gesperrt bis Stufe ${P.lock}.</b><br>`:'')+P.msg,ch);return;
+    }
+    npcMenu();
+  }
+  function npcMenu(greet){
+    const P=PLACES[curPlace];
+    const ch=P.jobs.map(j=>({t:`${j.n}<small>$${j.m} · ${j.stat} · Energie ${j.e}${j.h?' · Heat-Risiko':''}</small>`,f:()=>startJob(j,P.npc,()=>npcMenu('Noch was?'))}));
+    if(P.npc==='dee')ch.unshift({t:'Beute verkaufen <small>60 % VOM WERT</small>',f:sellLoot});
+    if(SHOP[P.npc])ch.unshift({t:'Material kaufen <small>FÜR DIE WERKBANK</small>',f:()=>shopMenu(P.npc)});
+    ch.push({t:'Was gibt’s Neues?',f:()=>say(P.npc,P.rumor,[{t:'Interessant.',f:()=>npcMenu('Sonst noch was?')}])});
+    ch.push({t:'Tschüss',f:closeDlg});
+    say(P.npc,greet||P.greet,ch);
+    setTimeout(()=>document.querySelectorAll('#dlg .ch button').forEach((b,k)=>{if(k<P.jobs.length)b.classList.add('jlist');}),30);
+  }
+
+  // ---------- Job-Ablauf: Timer -> Ereignis -> Entscheidung/Würfel -> Belohnung ----------
+  let jobTimer=null;
+  let JOB=null;
+  function startJob(j,who,again){
+    if(JOB){say(who,`Du hast doch schon was am Laufen: ${JOB.j.n}. Eins nach dem anderen.`,[{t:'Stimmt.',f:closeDlg}]);return;}
+    if(nrg<j.e){say(who,'Du siehst völlig fertig aus. Iss erst mal was oder schlaf dich aus.',[{t:'Okay.',f:closeDlg}]);return;}
+    nrg-=j.e; hud(); sfx('click');
+    const dur=j.t*6000; JOB={j,who,start:Date.now(),end:Date.now()+dur,done:false};
+    say(who,'Alles klar. Ich meld mich, wenn’s ernst wird. Mach in der Zwischenzeit, was du willst.',[{t:'Bis gleich.',f:closeDlg}]);
+    renderJob(); clearInterval(jobTimer); jobTimer=setInterval(renderJob,250);
+  }
+  function renderJob(){
+    const jb=$('jobbar');
+    if(!JOB){jb.classList.remove('on','done');return;}
+    jb.classList.add('on');
+    const left=Math.max(0,JOB.end-Date.now()), pct=100-left/(JOB.end-JOB.start)*100;
+    jb.querySelector('i').style.width=pct+'%';
+    jb.querySelector('img').src=people[JOB.who].p||'';
+    if(left<=0&&!JOB.done){JOB.done=true;sfx('cash');}
+    jb.classList.toggle('done',JOB.done);
+    jb.querySelector('b').textContent=JOB.j.n;
+    jb.querySelector('span').textContent=JOB.done?'FERTIG – TIPPEN':`${Math.floor(left/60000)}:${String(Math.ceil(left/1000)%60).padStart(2,'0')}`;
+  }
+  function openJob(){
+    if(!JOB)return;
+    if(!JOB.done){JOB.end=Date.now();renderJob();return;} // Testmodus: Tippen = sofort fertig
+    if(!['hide','diner','place','map'].includes(scene))return;
+    const {j,who}=JOB; clearInterval(jobTimer); JOB=null; renderJob(); show(scene); jobEvent(j,who,()=>closeDlg());
+  }
+  function jobEvent(j,who,again){
+    const ch=Math.min(95,j.p+(buff&&j.stat==='Charme'?15:0));
+    sayRaw(who,`<b>Zwischenfall!</b><br>${j.ev}`,[
+      {t:`${j.safe}<small>SICHER · $${j.m}</small>`,f:()=>jobResult(j,who,again,'safe')},
+      {t:`${j.risk}<small>${j.stat.toUpperCase()} · ${ch} % · $${j.m*2}${j.h?' · Heat':''}</small>`,f:()=>{if(j.stat==='Charme'&&buff){buff=false;hud();}diceRoll(who,ch,j.stat,win=>jobResult(j,who,again,win?'win':'lose'));}}]);
+  }
+  function diceRoll(who,ch,stat,cb){
+    let n=0; const r=Math.floor(Math.random()*100)+1;
+    const draw=v=>sayRaw(who,`<div class="dice2">${v}</div><div class="dsub">Würfel auf ${stat} · Ziel: ${ch} oder weniger</div>`,[]);
+    const it=setInterval(()=>{n++;draw(n<16?Math.floor(Math.random()*100)+1:r);if(n>=16){clearInterval(it);setTimeout(()=>cb(r<=ch),800);}},65);
+  }
+  function jobResult(j,who,again,res){
+    let m=j.m,x=j.x,h=0,big='ERLEDIGT.',bad=false,txt='Sauber und ohne Ärger.';
+    if(res==='win'){m=j.m*2;x=Math.round(j.x*1.5);h=j.h||0;big='GESCHAFFT!';txt='Riskant, aber es hat sich gelohnt.';}
+    if(res==='lose'){m=Math.round(j.m*.3);x=Math.round(j.x*.5);h=j.h||0;big='MIST!';bad=true;txt='Das ging schief. Mit Glück kommst du mit ein paar Kröten davon.';}
+    addReward(m,x,h); sfx(bad?'stamp':'cash');
+    sayRaw(who,`<div class="rbig${bad?' bad':''}">${big}</div>${txt}<div class="reward"><b>+ $${m}</b><b class="x">+ ${x} XP</b>${h?'<b class="h">+1 Heat ★</b>':''}</div>`,
+      [{t:'Fertig',f:closeDlg}]);
+  }
+
+  $('jobbar').addEventListener('click',e=>{e.stopPropagation();openJob();});
+
+  // ---------- Zufallsereignisse unterwegs ----------
+  function travelEvent(){
+    const E=[
+      ()=>sayRaw('erz','<b>Polizeikontrolle!</b><br>Ein Streifenwagen winkt dich raus. Der Beamte leuchtet dir ins Gesicht.',[
+        {t:'Freundlich bleiben <small>CHARME · 65 %</small>',f:()=>diceRoll('erz',65,'Charme',w=>{if(w){sayRaw('erz','„Gute Fahrt noch.“ Glück gehabt.',[{t:'Weiter',f:placeTalk}]);}else{addReward(-20,0,1);sayRaw('erz','Er findet einen Grund. Strafzettel.<div class="reward"><b class="h">− $20 · +1 Heat</b></div>',[{t:'Mist.',f:placeTalk}]);}})},
+        {t:'$20 zustecken <small>SICHER</small>',f:()=>{if(cash<20){sayRaw('erz','Du hast nicht mal 20 Dollar. Er lacht und lässt dich fahren.',[{t:'Weiter',f:placeTalk}]);return;}addReward(-20,0,0);sayRaw('erz','Der Schein verschwindet in seiner Brusttasche. „Hab dich nie gesehen.“',[{t:'Weiter',f:placeTalk}]);}}]),
+      ()=>{addReward(0,10,0);sayRaw('erz','<b>Tramper</b><br>Du nimmst einen Typen mit. Er erzählt, dass Crane nachts Leute am Hafen hat.<div class="reward"><b class="x">+10 XP</b></div>',[{t:'Interessant.',f:placeTalk}]);},
+      ()=>{const m=Math.floor(Math.random()*20)+10;addReward(m,0,0);sayRaw('erz',`<b>Glück gehabt</b><br>Auf dem Beifahrersitz liegt ein vergessener Umschlag.<div class="reward"><b>+ $${m}</b></div>`,[{t:'Nett.',f:placeTalk}]);},
+      ()=>{addReward(-10,0,0);sayRaw('erz','<b>Platter Reifen</b><br>Mitten auf der Straße. Der Reifenflicker kostet dich 10 Dollar.<div class="reward"><b class="h">− $10</b></div>',[{t:'Na toll.',f:placeTalk}]);}
+    ];
+    E[Math.floor(Math.random()*E.length)]();
+  }
+  // ---------- Story: Rico am Hafen ----------
+  function ricoStory(){
+    const c=60+(buff?15:0);
+    say('rico','Du bist Sals Kurier? Hundertfünfzig, hat er gesagt? Der Preis ist gerade auf fünfundsiebzig gefallen, Kleiner.',[
+      {t:'Einschüchtern <small>MUSKELN · 45 %</small>',f:()=>diceRoll('rico',45,'Muskeln',w=>ricoEnd(w?'win':'lose','Muskeln'))},
+      {t:`Quatschen <small>CHARME · ${c} %</small>`,f:()=>{buff=false;hud();diceRoll('rico',c,'Charme',w=>ricoEnd(w?'win':'lose','Charme'));}},
+      {t:'Nachgeben <small>SICHER · $75</small>',f:()=>ricoEnd('give')}]);
+  }
+  function ricoEnd(res,stat){
+    let m=75,x=25,h=0,big='DEAL.',bad=false,txt='Du nimmst die 75. Kein Ärger, aber auch kein Respekt.';
+    if(res==='win'){m=150;x=60;big='GESCHAFFT!';if(stat==='Muskeln'){h=1;txt='Er zahlt die vollen 150 – mit zitternden Händen. Aber er wird sich dein Gesicht merken.';}else txt='Ein paar nette Worte, und plötzlich passt der Preis wieder. Rico grinst sogar.';}
+    if(res==='lose'){m=75;x=35;big='MIST!';bad=true;txt=stat==='Muskeln'?'Er zieht ein Messer. Du nimmst die 75 und gehst.':'Er lacht dich aus. 75, und tschüss.';}
+    addReward(m,x,h); job=3; sfx(bad?'stamp':'cash');
+    sayRaw('rico',`<div class="rbig${bad?' bad':''}">${big}</div>${txt}<div class="reward"><b>+ $${m}</b><b class="x">+ ${x} XP</b>${h?'<b class="h">+1 Heat ★</b>':''}</div>`,
+      [{t:'Story-Job erledigt – ab nach Hause',f:()=>{closeDlg();wipeTo(()=>{show('map');fitAll();updateMap();});}},{t:'Noch bleiben',f:closeDlg}]);
+  }
+
+  // ---------- Anonyme Anrufe in der Garage ----------
+  function anonCall(){
+    const pool=[];Object.keys(PLACES).forEach(k=>(PLACES[k].jobs||[]).forEach(j=>pool.push(j)));
+    const j=pool[Math.floor(Math.random()*pool.length)];
+    const lines=['Hör zu und stell keine Fragen.','Du kennst mich nicht. Aber ich kenne dich.','Ein Freund von Sal hat deine Nummer.','Kurz und schmerzlos, Kleiner.'];
+    say('anon',`*knack* … ${lines[Math.floor(Math.random()*lines.length)]} Job: ${j.n}. Bezahlung: $${j.m}. Interessiert?`,[
+      {t:`Annehmen <small>${j.stat} · Energie ${j.e}</small>`,f:()=>startJob(j,'anon',()=>{closeDlg();})},
+      {t:'Auflegen',f:closeDlg}]);
+  }
+
+
+  // ================= STASH, LOADOUT & HEIST =================
+  const ITEMS={
+    dietrich:{n:'Dietrich-Set',t:'tool',w:1,h:2,v:40,d:'Öffnet Schlösser leise.'},
+    brecheisen:{n:'Brecheisen',t:'tool',w:1,h:3,v:25,d:'Öffnet alles – aber laut.'},
+    bohrer:{n:'Akkubohrer',t:'tool',w:2,h:2,v:120,d:'Knackt Safes und Tresortüren – laut.'},
+    seil:{n:'Kletterseil',t:'tool',w:2,h:2,v:60,d:'Noch ohne Funktion im Einsatz.'},
+    schlaeger:{n:'Baseballschläger',t:'weapon',w:1,h:3,v:30,d:'Ausschalten von hinten: 85 %.'},
+    messer:{n:'Klappmesser',t:'weapon',w:1,h:2,v:35,d:'Ausschalten von hinten: 80 %.'},
+    revolver:{n:'Revolver',t:'weapon',w:2,h:2,v:300,d:'Ausschalten immer – aber laut.'},
+    schlagring:{n:'Schlagring',t:'weapon',w:1,h:1,v:20,d:'Ausschalten von hinten: 70 %.'},
+    medkit:{n:'Erste Hilfe',t:'cons',w:2,h:2,v:30,d:'+50 Gesundheit.'},
+    rauch:{n:'Rauchgranate',t:'cons',w:1,h:2,v:50,d:'Rauchwolke: Wachen sehen nichts, Verfolger verlieren dich.'},
+    ring:{n:'Diamantring',t:'loot',w:1,h:1,v:150},
+    uhr:{n:'Golduhr',t:'loot',w:1,h:2,v:260},
+    collier:{n:'Diamantcollier',t:'loot',w:2,h:2,v:700},
+    gold:{n:'Goldbarren',t:'loot',w:2,h:1,v:900},
+    geld:{n:'Bargeld',t:'loot',w:1,h:1,v:200},
+    dietrich2:{n:'Profi-Dietrich',t:'tool',w:1,h:2,v:90,d:'3 Stifte, breitere Zone, bricht nie.'},
+    blend:{n:'Blendgranate',t:'cons',w:1,h:1,v:60,d:'Blendet Wachen vor dir für 6 s – dann leicht auszuschalten.'},
+    stoer:{n:'Störsender',t:'cons',w:1,h:1,v:90,d:'25 s lang: Kameras, Laser und Alarmanlagen gestört.'},
+    kabel:{n:'Kabel',t:'mat',w:1,h:1,v:10},klebeband:{n:'Klebeband',t:'mat',w:1,h:1,v:8},metall:{n:'Metallteile',t:'mat',w:1,h:2,v:15},
+    chemie:{n:'Chemikalien',t:'mat',w:1,h:2,v:25},platine:{n:'Platine',t:'mat',w:1,h:1,v:40},pillen:{n:'Medikamente',t:'mat',w:1,h:1,v:45},
+    bauplan:{n:'Bauplan',t:'plan',w:1,h:1,v:0}
+  };
+  let STASH=['dietrich','brecheisen','schlaeger','messer','medkit','rauch'];
+  let LOADOUT={weapon:null,tool1:null,tool2:null,q1:null,q2:null,safe:null};
+  const SLOTN={weapon:'WAFFE',tool1:'WERKZEUG',tool2:'WERKZEUG',q1:'SCHNELL',q2:'SCHNELL',safe:'SICHER (1×1)'};
+  const BAGW=4,BAGH=3; let BAG=[]; // {id,x,y}
+  const ico=id=>`it_${id}.webp`;
+  function slotFits(slot,id){const t=ITEMS[id].t;
+    if(slot==='weapon')return t==='weapon'; if(slot.startsWith('tool'))return t==='tool'; if(slot.startsWith('q'))return t==='cons';
+    if(slot==='safe')return ITEMS[id].w*ITEMS[id].h===1; return false;}
+  function invOpen(mode){
+    const o=$('inv'); o.dataset.mode=mode||'stash'; renderInv(); o.classList.add('on');
+  }
+  function invClose(){$('inv').classList.remove('on');}
+  function renderInv(){
+    const o=$('inv'), mode=o.dataset.mode;
+    const sl=k=>{const id=LOADOUT[k];return `<button type="button" class="slot ${id?'full':''} ${k==='safe'?'safe':''}" data-slot="${k}"><small>${SLOTN[k]}</small>${id?`<img src="${ico(id)}" alt=""><b>${ITEMS[id].n}</b>`:'<i>leer</i>'}</button>`;};
+    const lo=`<div class="side">${sl('weapon')}${sl('tool1')}${sl('tool2')}</div><div class="dollw"><canvas id="doll" width="30" height="32"></canvas><div class="dtip">antippen = drehen</div></div><div class="side">${sl('q1')}${sl('q2')}${sl('safe')}</div>`;
+    const ord={tool:0,weapon:1,cons:2,mat:3,loot:4};const uniq=[...new Set(STASH)].sort((a,b)=>ord[ITEMS[a].t]-ord[ITEMS[b].t]);
+    const st=uniq.map(id=>{const n=STASH.filter(x=>x===id).length,i=STASH.indexOf(id);return `<button type="button" class="cell ${ITEMS[id].t}" data-i="${i}"><img src="${ico(id)}" alt=""><b>${ITEMS[id].n}</b>${n>1?`<em class="cnt">×${n}</em>`:''}${ITEMS[id].t==='loot'?`<small>$${ITEMS[id].v}</small>`:''}</button>`;}).join('')+
+      Array(Math.max(0,8-uniq.length)).fill('<div class="cell empty"></div>').join('');
+    o.innerHTML=`<div class="ip">
+      <div class="ih"><b>${mode==='heist'?'LOADOUT FÜR DEN HEIST':'SPIND · STASH'}</b><button type="button" class="ix">✕</button></div>
+      <div class="isub">Was du mitnimmst, kannst du verlieren. Nur der <b>sichere Slot</b> bleibt dir immer.</div>
+      <div class="doll">${lo}</div><div class="bagrow"><img src="${ico('tasche')}" alt=""><b>RUCKSACK</b><span>${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]} Felder · ausbaubar an der Werkbank</span></div>
+      <div class="isub">Stash – antippen zum Ausrüsten</div>
+      <div class="st">${st}</div>
+      <div class="itip" id="itip">Tipp: Dietrich = leise Türen · Brecheisen = schnell, aber laut · Bohrer = Safes & Tresor · Granaten & Störsender in die Schnellslots</div>
+      ${mode==='heist'&&PEND?`<button type="button" class="igo" style="height:auto;padding:6px 8px;white-space:normal;line-height:1.05">LOS: ${PEND.name.toUpperCase()}<br><small style="font-size:14px;-webkit-text-stroke:0">kostet ${PEND.e} Energie</small></button>`:''}
+    </div>`;
+    o.querySelector('.ix').onclick=invClose;
+    dollStart();
+    o.querySelectorAll('.cell[data-i]').forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.i,id=STASH[i];
+      if(ITEMS[id].t==='loot'){$('itip').textContent=`${ITEMS[id].n}: Wert $${ITEMS[id].v}. Bei Dee in der Pfandleihe verkaufen.`;return;}
+      if(ITEMS[id].t==='mat'){$('itip').textContent=`${ITEMS[id].n}: Bastelmaterial für die Werkbank.`;return;}
+      const slot=Object.keys(LOADOUT).find(k=>!LOADOUT[k]&&slotFits(k,id))||Object.keys(LOADOUT).find(k=>k==='safe'&&!LOADOUT[k]&&slotFits(k,id));
+      if(!slot){$('itip').textContent=`Kein freier Slot für ${ITEMS[id].n}. ${ITEMS[id].d||''}`;return;}
+      LOADOUT[slot]=id; STASH.splice(i,1); sfx('click'); renderInv();});
+    o.querySelectorAll('.slot[data-slot]').forEach(b=>b.onclick=()=>{const k=b.dataset.slot;if(!LOADOUT[k])return;STASH.push(LOADOUT[k]);LOADOUT[k]=null;renderInv();});
+    const go=o.querySelector('.igo'); if(go)go.onclick=()=>{if(nrg<PEND.e){$('itip').textContent='Zu müde. Ruh dich auf der Matratze aus oder iss was bei Candy.';return;}nrg-=PEND.e;hud();invClose();startPixHeist(PEND);};
+  }
+
+  // ---------- Heist-Zustand ----------
+  let H=null;
+  const has=id=>Object.values(LOADOUT).includes(id);
+  const hasT=t=>Object.values(LOADOUT).some(id=>id&&ITEMS[id].t===t);
+  const ROOMS={
+    gasse:{n:'HINTERGASSE',img:'h_gasse.webp',spots:[
+      {id:'door',l:'HINTERTÜR',x:35,y:29,w:23,h:28},{id:'cam',l:'KAMERA',x:26,y:6,w:16,h:10},
+      {id:'ladder',l:'FEUERLEITER ↑',x:70,y:5,w:22,h:35},{id:'exit',l:'FLUCHTWAGEN',x:30,y:76,w:40,h:14,exit:1}]},
+    lager:{n:'LAGER',img:'h_lager.webp',spots:[
+      {id:'shelf',l:'REGALE',x:0,y:8,w:28,h:38},{id:'bench',l:'WERKTISCH',x:0,y:52,w:44,h:18},
+      {id:'fuse',l:'STROMKASTEN',x:63,y:24,w:15,h:12},{id:'toVer',l:'VERKAUFSRAUM →',x:86,y:30,w:14,h:50},
+      {id:'toBuero',l:'BÜRO',x:33,y:20,w:24,h:30},{id:'toGasse',l:'↓ GASSE',x:35,y:86,w:30,h:10}]},
+    buero:{n:'BÜRO',img:'h_buero.webp',spots:[
+      {id:'safe',l:'WANDSAFE',x:36,y:31,w:19,h:11},{id:'desk',l:'SCHREIBTISCH',x:5,y:52,w:88,h:18},
+      {id:'mon',l:'KAMERA-MONITOR',x:74,y:8,w:24,h:18},{id:'pic',l:'GEMÄLDE',x:30,y:13,w:31,h:16},
+      {id:'toLager',l:'↓ LAGER',x:30,y:86,w:40,h:10}]},
+    verkauf:{n:'VERKAUFSRAUM',img:'h_verkauf.webp',spots:[
+      {id:'vit1',l:'VITRINE',x:0,y:55,w:44,h:30},{id:'vit2',l:'VITRINE',x:0,y:43,w:43,h:10},
+      {id:'wall',l:'WANDREGAL',x:25,y:22,w:45,h:22},{id:'vault',l:'TRESORTÜR',x:71,y:28,w:13,h:22},
+      {id:'exit',l:'VORDERTÜR (FLUCHT)',x:0,y:8,w:22,h:34,exit:1},{id:'toLager',l:'↓ LAGER',x:50,y:86,w:45,h:10}]},
+    tresor:{n:'TRESORRAUM',img:'h_tresor.webp',spots:[
+      {id:'big',l:'GROSSER TRESOR',x:22,y:22,w:56,h:32},{id:'cart',l:'GOLDWAGEN',x:0,y:54,w:48,h:32},
+      {id:'box',l:'SCHLIESSFÄCHER',x:86,y:14,w:14,h:50},{id:'toVer',l:'↓ VERKAUFSRAUM',x:55,y:86,w:40,h:10}]},
+    dach:{n:'DACH',img:'h_dach.webp',spots:[
+      {id:'hatch',l:'DACHLUKE',x:37,y:50,w:44,h:12},{id:'exit',l:'ABSEILEN (FLUCHT)',x:77,y:44,w:23,h:22,exit:1},
+      {id:'down',l:'↓ FEUERLEITER',x:0,y:72,w:40,h:22}]}
+  };
+  function startHeist(){
+    if(!LOADOUT.dietrich&&!has('dietrich')&&!has('brecheisen')){ }
+    BAG=[]; H={room:'gasse',alarm:0,hp:100,cop:null,doorOpen:false,camOff:false,lasersOff:false,monOff:false,code:false,safeOpen:false,vaultOpen:false,bigOpen:false,
+      looted:{},gold:3,guardMet:false,cnt:0};
+    show('heist'); fitAll(); heistRoom('gasse',true);
+    setTimeout(()=>sayRaw('erz','<b>01:12 Uhr, Hintergasse vom „Golden Palm“.</b><br>Rein, Beute in die Tasche, raus. Jede laute Aktion treibt den <b>Alarm</b> hoch. Bei 100 % kommt die Polizei – dann hast du 60 Sekunden.',[{t:'Los geht’s',f:closeDlg}]),700);
+  }
+  function heistRoom(r,first){
+    H.room=r; const R=ROOMS[r]; $('himg').src=R.img; $('hname').textContent=R.n;
+    $('hspots').innerHTML=R.spots.filter(s=>!(H.looted[r+s.id]==='gone')).map(s=>`<button type="button" class="hs hsp ${s.exit?'exitp':''}" data-s="${s.id}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h}%"><span class="mk"></span><span class="lb">${s.l}</span></button>`).join('');
+    $('hspots').querySelectorAll('[data-s]').forEach(b=>b.onclick=e=>{e.stopPropagation();act(b.dataset.s);});
+    if(!first)sfx('door'); hudH();
+    const hp=$('heist'); hp.classList.add('labels'); clearTimeout(heistRoom.t); heistRoom.t=setTimeout(()=>hp.classList.remove('labels'),2500);
+  }
+  function noise(n,why){
+    if(!H)return; const mult=H.monOff?.5:1; H.alarm=Math.min(100,H.alarm+Math.round(n*mult)); hudH();
+    if(H.alarm>=100&&!H.cop){H.cop=Date.now()+60000;sfx('stamp');flashH('ALARM! POLIZEI KOMMT');}
+  }
+  function flashH(t){const el=$('htoast');el.textContent=t;el.classList.add('on');clearTimeout(flashH.t);flashH.t=setTimeout(()=>el.classList.remove('on'),1700);}
+  function hudH(){
+    if(!H)return; $('halarm').style.width=H.alarm+'%'; $('halarmt').textContent=H.alarm+' %';
+    $('hhp').textContent=H.hp; const used=BAG.reduce((s,b)=>s+ITEMS[b.id].w*ITEMS[b.id].h,0);
+    $('hbag').textContent=`${used}/${BAGW*BAGH}`; $('hval').textContent='$'+BAG.reduce((s,b)=>s+ITEMS[b.id].v,0);
+    $('hbar').classList.toggle('hot',H.alarm>=60);
+  }
+  setInterval(()=>{if(!H||!H.cop)return;const left=Math.max(0,Math.ceil((H.cop-Date.now())/1000));$('hcop').textContent=`POLIZEI IN ${left} s`;$('hcop').classList.add('on');
+    if(left<=0){busted('Die Tür fliegt auf. „Hände hoch!“ Zu spät.');}},250);
+  function done(){closeDlg();hudH();}
+  // ---------- Tasche (Tetris) ----------
+  function fitBag(id){
+    const it=ITEMS[id],occ=Array.from({length:BAGH},()=>Array(BAGW).fill(0));
+    BAG.forEach(b=>{const t=ITEMS[b.id];for(let y=0;y<(b.r?t.w:t.h);y++)for(let x=0;x<(b.r?t.h:t.w);x++)occ[b.y+y][b.x+x]=1;});
+    for(const r of [0,1]){const w=r?it.h:it.w,h=r?it.w:it.h;
+      for(let y=0;y<=BAGH-h;y++)for(let x=0;x<=BAGW-w;x++){let ok=true;for(let yy=0;yy<h&&ok;yy++)for(let xx=0;xx<w;xx++)if(occ[y+yy][x+xx]){ok=false;break;}
+        if(ok)return {id,x,y,r};}}
+    return null;
+  }
+  function bagHTML(){
+    const c=46; return `<div class="bag" style="width:${BAGW*c}px;height:${BAGH*c}px">`+BAG.map((b,i)=>{const t=ITEMS[b.id],w=(b.r?t.h:t.w)*c,h=(b.r?t.w:t.h)*c;
+      return `<button type="button" class="bi" data-b="${i}" style="left:${b.x*c}px;top:${b.y*c}px;width:${w}px;height:${h}px"><img src="${ico(b.id)}" alt=""></button>`;}).join('')+'</div>';
+  }
+  function grab(list,then){ // list of item ids to put in bag
+    const id=list[0]; if(!id){then&&then();return;}
+    const p=fitBag(id);
+    if(p){BAG.push(p);sfx('cash');hudH();flashH('+ '+ITEMS[id].n.toUpperCase()+' · $'+ITEMS[id].v);grab(list.slice(1),then);return;}
+    sayRaw('erz',`<b>Die Tasche ist voll!</b> ${ITEMS[id].n} ($${ITEMS[id].v}, ${ITEMS[id].w}×${ITEMS[id].h}) passt nicht rein. Tippe etwas an, um es wegzuwerfen.${bagHTML()}`,
+      [{t:`${ITEMS[id].n} liegen lassen`,f:()=>grab(list.slice(1),then)}]);
+    document.querySelectorAll('#dlg .bi').forEach(el=>el.onclick=e=>{e.stopPropagation();BAG.splice(+el.dataset.b,1);hudH();grab(list,then);});
+  }
+  function showBag(){sayRaw('erz',`<b>Sporttasche</b> · Wert $${BAG.reduce((s,b)=>s+ITEMS[b.id].v,0)}${bagHTML()}<div class="dsub">Antippen = wegwerfen</div>`,[{t:'Zu',f:done}]);
+    document.querySelectorAll('#dlg .bi').forEach(el=>el.onclick=e=>{e.stopPropagation();BAG.splice(+el.dataset.b,1);hudH();showBag();});}
+  // ---------- Aktionen ----------
+  function rollH(ch,stat,cb){diceRoll('erz',Math.min(95,ch),stat,cb);}
+  function act(s){
+    const r=H.room,k=r+s,L=H.looted;
+    const ch=[], add=(t,f)=>ch.push({t,f});
+    if(r==='gasse'){
+      if(s==='door'){
+        if(H.doorOpen){heistRoom('lager');return;}
+        if(has('dietrich'))add('Schloss knacken <small>DIETRICH · KÖPFCHEN 75 % · leise</small>',()=>rollH(75,'Köpfchen',w=>{noise(w?3:12);if(w){H.doorOpen=true;done();heistRoom('lager');}else sayRaw('erz','Der Dietrich rutscht ab. Das klang laut.',[{t:'Nochmal',f:()=>act('door')}]);}));
+        if(has('brecheisen'))add('Aufhebeln <small>BRECHEISEN · sicher · +20 % Alarm</small>',()=>{noise(20);H.doorOpen=true;done();heistRoom('lager');});
+        if(!ch.length){sayRaw('erz','Abgeschlossen. Ohne <b>Dietrich</b> oder <b>Brecheisen</b> kommst du hier nicht rein. Probier’s übers Dach.',[{t:'OK',f:done}]);return;}
+        add('Zurück',done); sayRaw('erz',`Eine schwere Metalltür${H.camOff?'':' – und die Kamera schaut genau hin'}.`,ch);return;}
+      if(s==='cam'){if(H.camOff){sayRaw('erz','Die Kamera hängt kaputt runter.',[{t:'OK',f:done}]);return;}
+        if(hasT('weapon'))add('Kamera zerschlagen <small>WAFFE · +5 % Alarm</small>',()=>{noise(5);H.camOff=true;sayRaw('erz','KRACH. Die Kamera ist hinüber.',[{t:'Gut',f:done}]);});
+        add('Ignorieren <small>+15 % Alarm</small>',()=>{noise(15);H.camOff=true;sayRaw('erz','Die Kamera hat dich gesehen. Irgendwo blinkt jetzt was.',[{t:'Weiter',f:done}]);});
+        sayRaw('erz','Eine Überwachungskamera über der Tür.',ch);return;}
+      if(s==='ladder'){heistRoom('dach');return;}
+    }
+    if(r==='dach'){
+      if(s==='down'){heistRoom('gasse');return;}
+      if(s==='hatch'){if(H.hatch){heistRoom('lager');return;}
+        if(has('brecheisen'))add('Luke aufhebeln <small>BRECHEISEN · +10 % Alarm</small>',()=>{noise(10);H.hatch=1;done();heistRoom('lager');});
+        if(has('dietrich'))add('Schloss knacken <small>DIETRICH · KÖPFCHEN 60 %</small>',()=>rollH(60,'Köpfchen',w=>{noise(w?2:10);if(w){H.hatch=1;done();heistRoom('lager');}else sayRaw('erz','Klemmt.',[{t:'OK',f:done}]);}));
+        add('Zurück',done); sayRaw('erz','Eine verriegelte Dachluke. Darunter: das Lager.',ch);return;}
+    }
+    if(r==='lager'){
+      if(s==='toVer'){guard(()=>heistRoom('verkauf'));return;}
+      if(s==='toBuero'){heistRoom('buero');return;}
+      if(s==='toGasse'){if(!H.doorOpen){sayRaw('erz','Die Hintertür ist von innen verriegelt – du kannst sie aber einfach aufschließen.',[{t:'Aufschließen',f:()=>{H.doorOpen=true;done();heistRoom('gasse');}},{t:'Zurück',f:done}]);return;}heistRoom('gasse');return;}
+      if(s==='shelf'){if(L[k]){sayRaw('erz','Nur noch leere Schachteln.',[{t:'OK',f:done}]);return;}
+        L[k]=1;noise(4);grab(['ring','uhr'],done);return;}
+      if(s==='bench'){if(L[k]){sayRaw('erz','Hier ist nichts mehr.',[{t:'OK',f:done}]);return;}
+        L[k]=1;noise(2);grab(['ring'],()=>{H.code=true;sayRaw('erz','Unter der Lupe liegt ein Zettel: <b>„Safe Büro: 19-86-07“</b>. Notiert.',[{t:'Perfekt',f:done}]);});return;}
+      if(s==='fuse'){if(H.lasersOff){sayRaw('erz','Der Strom für die Alarm-Laser ist aus.',[{t:'OK',f:done}]);return;}
+        add('Laser-Sicherung ziehen <small>KÖPFCHEN 70 %</small>',()=>rollH(70,'Köpfchen',w=>{if(w){H.lasersOff=true;sayRaw('erz','Klick. Im Verkaufsraum gehen die roten Laser aus.',[{t:'Sehr gut',f:done}]);}else{noise(15);sayRaw('erz','Falsche Sicherung! Funken sprühen.',[{t:'Mist',f:done}]);}}));
+        add('Finger weg',done); sayRaw('erz','Ein Stromkasten. Eine Sicherung ist mit „LASER“ beschriftet.',ch);return;}
+    }
+    if(r==='buero'){
+      if(s==='toLager'){heistRoom('lager');return;}
+      if(s==='desk'){if(L[k]){sayRaw('erz','Die Schubladen sind leer.',[{t:'OK',f:done}]);return;}L[k]=1;noise(3);grab(['geld'],done);return;}
+      if(s==='pic'){sayRaw('erz','Ein Ölbild mit Krone und Diamant. Zu groß für die Tasche – und hässlich.',[{t:'Weiter',f:done}]);return;}
+      if(s==='mon'){if(H.monOff){sayRaw('erz','Die Kameras zeichnen nichts mehr auf.',[{t:'OK',f:done}]);return;}
+        add('Aufzeichnung stoppen <small>KÖPFCHEN 65 % · Alarm steigt danach halb so schnell</small>',()=>rollH(65,'Köpfchen',w=>{if(w){H.monOff=true;sayRaw('erz','Die Bänder laufen nicht mehr. Ab jetzt ist alles nur noch halb so laut.',[{t:'Nice',f:done}]);}else{noise(10);sayRaw('erz','Ein Piepen. Mist.',[{t:'Weiter',f:done}]);}}));
+        add('Zurück',done); sayRaw('erz','Der Kamera-Monitor zeigt den Verkaufsraum. Keine Wache zu sehen … noch.',ch);return;}
+      if(s==='safe'){if(H.safeOpen){sayRaw('erz','Der Safe ist leer.',[{t:'OK',f:done}]);return;}
+        if(H.code)add('Code eingeben <small>19-86-07 · lautlos</small>',()=>{H.safeOpen=true;done();grab(['collier','geld'],done);});
+        if(has('bohrer'))add('Aufbohren <small>BOHRER · +25 % Alarm</small>',()=>{noise(25);H.safeOpen=true;done();grab(['collier','geld'],done);});
+        if(!ch.length){sayRaw('erz','Ein Wandsafe. Ohne <b>Bohrer</b> oder den <b>Code</b> keine Chance.',[{t:'OK',f:done}]);return;}
+        add('Zurück',done); sayRaw('erz','Ein kleiner Wandsafe hinter dem Schreibtisch.',ch);return;}
+    }
+    if(r==='verkauf'){
+      if(s==='toLager'){heistRoom('lager');return;}
+      if(s==='vit1'||s==='vit2'||s==='wall'){if(L[k]){sayRaw('erz','Leergeräumt.',[{t:'OK',f:done}]);return;}
+        const loot=s==='vit1'?['collier','uhr','ring']:s==='vit2'?['uhr','ring']:['uhr','uhr'];
+        const las=H.lasersOff?0:25;
+        if(has('brecheisen')||hasT('weapon'))add(`Glas einschlagen <small>schnell · +${20+las} % Alarm</small>`,()=>{noise(20+las);L[k]=1;done();grab(loot,done);});
+        add(`Vorsichtig aufschneiden <small>KÖPFCHEN 55 % · +${5+las} %</small>`,()=>rollH(55,'Köpfchen',w=>{noise(w?5+las:30+las);L[k]=1;done();grab(w?loot:loot.slice(0,1),done);}));
+        add('Zurück',done); sayRaw('erz',`Glitzernde Vitrinen.${H.lasersOff?'':' <b>Rote Laser</b> laufen kreuz und quer – jede Bewegung macht’s schlimmer.'}`,ch);return;}
+      if(s==='vault'){if(H.vaultOpen){heistRoom('tresor');return;}
+        if(has('bohrer'))add('Schloss aufbohren <small>BOHRER · +30 % Alarm</small>',()=>{noise(30);H.vaultOpen=true;done();heistRoom('tresor');});
+        if(!ch.length){sayRaw('erz','Eine massive Stahltür in den Keller. Ohne <b>Bohrer</b> keine Chance.',[{t:'OK',f:done}]);return;}
+        add('Zurück',done); sayRaw('erz','Die Tür zum Tresorraum.',ch);return;}
+    }
+    if(r==='tresor'){
+      if(s==='toVer'){heistRoom('verkauf');return;}
+      if(s==='cart'){if(H.gold<=0){sayRaw('erz','Der Wagen ist leer.',[{t:'OK',f:done}]);return;}
+        sayRaw('erz',`Noch ${H.gold} Goldbarren auf dem Wagen. Jeder $900 – aber 2×1 groß.`,[{t:'Einen Barren nehmen',f:()=>{H.gold--;noise(3);done();grab(['gold'],done);}},{t:'Zurück',f:done}]);return;}
+      if(s==='box'){if(L[k]){sayRaw('erz','Alle Fächer offen.',[{t:'OK',f:done}]);return;}
+        L[k]=1;noise(10);grab(['geld','ring','geld'],done);return;}
+      if(s==='big'){if(H.bigOpen){sayRaw('erz','Der große Tresor ist leer.',[{t:'OK',f:done}]);return;}
+        if(has('bohrer'))add('Großen Tresor aufbohren <small>BOHRER · +45 % Alarm · dauert</small>',()=>{noise(45);H.bigOpen=true;done();grab(['collier','gold','geld'],done);});
+        add('Zu riskant',done); sayRaw('erz','Der Haupttresor. Hier liegt das richtig große Geld.',ch);return;}
+    }
+    // Ausgänge
+    const sp=ROOMS[r].spots.find(x=>x.id===s);
+    if(sp&&sp.exit)extract(r);
+  }
+  function guard(then){
+    if(H.guardMet||Math.random()<.5){then();return;}
+    H.guardMet=true; const ch=[];
+    const bonus=LOADOUT.weapon?({schlaeger:20,messer:15,revolver:35,schlagring:10})[LOADOUT.weapon]:0;
+    ch.push({t:'Vorbeischleichen <small>GLÜCK 55 %</small>',f:()=>rollH(55,'Glück',w=>{if(w){sayRaw('erz','Er dreht sich genau im richtigen Moment um. Du bist durch.',[{t:'Weiter',f:()=>{done();then();}}]);}else{noise(35);H.hp-=30;sayRaw('erz','Er sieht dich! Gerangel, er drückt den Alarmknopf.',[{t:'Weiter',f:()=>{done();checkHP()||then();}}]);}})});
+    if(LOADOUT.weapon)ch.push({t:`Niederschlagen <small>${ITEMS[LOADOUT.weapon].n.toUpperCase()} · MUSKELN ${50+bonus} %</small>`,f:()=>rollH(50+bonus,'Muskeln',w=>{noise(LOADOUT.weapon==='revolver'?25:8);if(w){sayRaw('erz','Ein Schlag, er sackt zusammen. Sorry, Kumpel.',[{t:'Weiter',f:()=>{done();then();}}]);}else{H.hp-=40;noise(25);sayRaw('erz','Er wehrt sich heftig und erwischt dich.',[{t:'Weiter',f:()=>{done();checkHP()||then();}}]);}})});
+    const ri=Object.keys(LOADOUT).find(k=>LOADOUT[k]==='rauch');
+    if(ri)ch.push({t:'Rauchgranate <small>SICHER · verbraucht</small>',f:()=>{LOADOUT[ri]=null;sayRaw('erz','PFFFT. Im Qualm schlüpfst du vorbei.',[{t:'Weiter',f:()=>{done();then();}}]);}});
+    if(cash>=50)ch.push({t:'Bestechen <small>$50</small>',f:()=>{cash-=50;hud();sayRaw('erz','„Ich hab nichts gesehen.“ Er dreht sich zur Wand.',[{t:'Weiter',f:()=>{done();then();}}]);}});
+    sayRaw('erz','<b>Ein Wachmann!</b> Er macht gerade seine Runde und kommt direkt auf dich zu.',ch);
+  }
+  function checkHP(){
+    if(H.hp>0)return false;
+    const mi=Object.keys(LOADOUT).find(k=>LOADOUT[k]==='medkit');
+    if(mi){LOADOUT[mi]=null;H.hp=50;sayRaw('erz','Du flickst dich mit dem Erste-Hilfe-Kasten zusammen. Weiter.',[{t:'Weiter',f:done}]);return true;}
+    busted('Du gehst zu Boden. Als du aufwachst, klicken Handschellen.');return true;
+  }
+  function extract(r){
+    const used=BAG.length;
+    if(r==='gasse'){
+      if(H.alarm>=60){sayRaw('erz','Blaulicht am Ende der Gasse! Hier kommst du nicht mehr unbemerkt weg. Nimm das Dach oder die Vordertür.',[{t:'OK',f:done}]);return;}
+      sayRaw('erz',`Der Fluchtwagen wartet mit laufendem Motor. ${used?`${used} Teile in der Tasche.`:'Die Tasche ist leer.'}`,[{t:'EINSTEIGEN & ABHAUEN',f:()=>escape(0)},{t:'Noch nicht',f:done}]);return;}
+    if(r==='dach'){
+      if(!has('seil')){sayRaw('erz','Zu hoch zum Springen. Ohne <b>Kletterseil</b> geht’s hier nicht runter.',[{t:'OK',f:done}]);return;}
+      sayRaw('erz','Du hakst das Seil ein. Unten wartet eine dunkle Seitenstraße.',[{t:'ABSEILEN & ABHAUEN',f:()=>escape(0)},{t:'Noch nicht',f:done}]);return;}
+    if(r==='verkauf'){
+      sayRaw('erz','Die Vordertür geht immer – aber mitten auf der Hauptstraße. Das gibt <b>+2 Heat</b>.',[{t:'RAUS & ABHAUEN <small>+2 HEAT</small>',f:()=>escape(2)},{t:'Lieber nicht',f:done}]);return;}
+  }
+  function escape(extraHeat){
+    const val=BAG.reduce((s,b)=>s+ITEMS[b.id].v,0), n=BAG.length;
+    BAG.forEach(b=>STASH.push(b.id)); Object.keys(LOADOUT).forEach(k=>{if(LOADOUT[k]){STASH.push(LOADOUT[k]);LOADOUT[k]=null;}});
+    const h=(H.alarm>=50?1:0)+extraHeat; addReward(0,80,h); BAG=[]; H=null; $('hcop').classList.remove('on');
+    sfx('cash');
+    sayRaw('erz',`<div class="rbig">ENTKOMMEN!</div>Reifenquietschen, Neonlichter, dann Stille. Du bist raus.<div class="reward"><b>${n} Beutestücke · $${val}</b><b class="x">+ 80 XP</b>${h?`<b class="h">+${h} Heat</b>`:''}</div><div class="dsub">Die Beute liegt jetzt in deinem Stash. Verkaufen kannst du sie bei Dee in der Pfandleihe.</div>`,
+      [{t:'Zurück ins Versteck',f:()=>{closeDlg();wipeTo(()=>{show('hide');fitAll();hud();});}}]);
+  }
+  function busted(txt){
+    if(!H)return;
+    const lost=Object.values(LOADOUT).filter(x=>x).length+BAG.length;
+    const safe=LOADOUT.safe; Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null); if(safe)STASH.push(safe);
+    BAG=[]; H=null; $('hcop').classList.remove('on'); addReward(-Math.min(cash,100),20,2); sfx('stamp');
+    sayRaw('erz',`<div class="rbig bad">ERWISCHT!</div>${txt}<div class="reward"><b class="h">${lost} Gegenstände verloren</b><b class="h">Kaution −$100</b><b class="h">+2 Heat</b></div>${safe?`<div class="dsub">Gerettet im Geheimfach: ${ITEMS[safe].n}</div>`:''}`,
+      [{t:'Zurück ins Versteck',f:()=>{closeDlg();wipeTo(()=>{show('hide');fitAll();hud();});}}]);
+  }
+  // ---------- Pixel-Heist (iframe) ----------
+  // ---------- Figur im Spind ----------
+  let dollDir=Math.PI/2,dollRaf=0,dollT=0;
+  function dollStart(){
+    cancelAnimationFrame(dollRaf);const cv=document.getElementById('doll');if(!cv)return;
+    cv.onclick=()=>{dollDir-=Math.PI/2;};
+    const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+    const loop=t=>{if(!document.getElementById('doll')||!$('inv').classList.contains('on'))return;
+      g.clearRect(0,0,30,32);
+      const grd=g.createRadialGradient(15,22,2,15,22,15);grd.addColorStop(0,'rgba(255,61,139,.35)');grd.addColorStop(1,'rgba(255,61,139,0)');g.fillStyle=grd;g.fillRect(0,0,30,32);
+      g.fillStyle='rgba(47,224,234,.25)';g.beginPath();g.ellipse(15,27.5,9,2.5,0,0,7);g.fill();
+      drawHero(g,15,25,dollDir,t/160,false,{weapon:LOADOUT.weapon,bag:1,swing:0});
+      dollRaf=requestAnimationFrame(loop);};
+    dollRaf=requestAnimationFrame(loop);
+  }
+  // ================= EINBRÜCHE, WERKBANK & STORY =================
+  const TNAMES={werkstatt:['Vinnies Autowerkstatt','Reifen-Ricky','Garage am Kanal','Tonys Tuning','Speedy Lube'],
+    apotheke:['Ocean-Apotheke','Palm-Drugstore','Apotheke am Boulevard','Sunset Pharmacy'],
+    villa:['Villa Flamingo','Casa Rosada','Villa Bellamar','Haus Seeblick']};
+  const TINFO={werkstatt:{n:'Autowerkstatt',req:1,e:3,loot:'Metall · Kabel · Klebeband · Platinen'},apotheke:{n:'Apotheke',req:3,e:3,loot:'Medikamente · Chemikalien · Bargeld'},villa:{n:'Villa',req:4,e:4,loot:'Schmuck · Gold · Platinen · Baupläne'}};
+  function mkTarget(type){const I=TINFO[type];const pool=TNAMES[type];const d=Math.max(1,Math.min(3,1+Math.floor(Math.random()*Math.min(3,lvl-I.req+1))));
+    return {kind:'gen',type,name:pool[Math.floor(Math.random()*pool.length)],diff:d,req:I.req,e:I.e,seed:Math.floor(Math.random()*1e9)};}
+  function refreshTargets(){
+    const types=['werkstatt','apotheke','villa'];
+    while(TARGETS.length<3){const av=types.filter(x=>lvl>=TINFO[x].req||(x==='apotheke'&&Q>=7));const ty=av[Math.floor(Math.random()*av.length)]||'werkstatt';TARGETS.push(mkTarget(ty));}
+    if(Q===2&&!TARGETS.some(x=>x.type==='werkstatt'))TARGETS[0]=mkTarget('werkstatt');
+    if(Q===7&&!TARGETS.some(x=>x.type==='apotheke')){TARGETS[0]=mkTarget('apotheke');TARGETS[0].req=1;}
+    if(Q===7)TARGETS.forEach(x=>{if(x.type==='apotheke')x.req=Math.min(x.req,lvl);});
+  }
+  function boardHTML(){
+    refreshTargets();
+    const gOpen=Q>=10&&lvl>=4;
+    const gold=Q>=10?`<button type="button" class="tgt gold ${gOpen?'':'lock'}" data-a="golden"><b>★ GOLDEN PALM</b><span>Story-Heist · Juwelier · Laser, Kameras, Tresor</span><small>${gOpen?'Energie 4 · Beute: Gold, Diamanten':'ab Stufe 4'}</small></button>`
+      :`<div class="tgt lock"><b>🔒 GROSSER HEIST</b><span>Sal hat noch keinen Plan für dich.</span></div>`;
+    const list=TARGETS.map((x,i)=>{const lk=lvl<x.req;return `<button type="button" class="tgt ${lk?'lock':''}" data-a="plan" data-i="${i}"><b>${x.name}</b><span>${TINFO[x.type].n} · ${'★'.repeat(x.diff)}${'☆'.repeat(3-x.diff)} · ${TINFO[x.type].loot}</span><small>${lk?'ab Stufe '+x.req:'Energie '+x.e+' · zufälliger Grundriss'}</small></button>`;}).join('');
+    return `<h2>Pinnwand</h2><p class="qline">Was du mitnimmst, kannst du verlieren. Jeder Einbruch hat einen neuen Grundriss.</p><div class="tlist">${gold}${list}</div>${btns()}`;
+  }
+  const RECIPES=[
+    {id:'rauch',need:{chemie:1,klebeband:1}},{id:'medkit',need:{pillen:1,klebeband:1}},{id:'dietrich',need:{metall:1,klebeband:1}},
+    {id:'brecheisen',need:{metall:2}},{id:'schlagring',need:{metall:1}},
+    {id:'dietrich2',need:{metall:2,klebeband:1,kabel:1},plan:1},{id:'blend',need:{chemie:2,metall:1},plan:1},
+    {id:'stoer',need:{platine:1,kabel:2},plan:1,story:1},{id:'bohrer',need:{metall:2,kabel:1,platine:1},plan:1},
+    {id:'_bag',need:{metall:1,klebeband:2,kabel:1},plan:1}];
+  const rname=id=>id==='_bag'?'Rucksack vergrößern':ITEMS[id].n;
+  const cnt=id=>STASH.filter(x=>x===id).length;
+  function benchHTML(){
+    const rows=RECIPES.map(r=>{const known=!r.plan||KNOWN.includes(r.id);
+      if(!known)return `<div class="rcp lock"><span class="ri">?</span><div><b>??? – Bauplan fehlt</b><small>${r.story?'Kommt über die Story':'Baupläne findest du bei Einbrüchen'}</small></div></div>`;
+      const maxed=r.id==='_bag'&&BAGLV>=BAGS.length-1;
+      const ok=!maxed&&Object.entries(r.need).every(([k,v])=>cnt(k)>=v);
+      const need=Object.entries(r.need).map(([k,v])=>`<i class="${cnt(k)>=v?'y':'n'}"><img src="${ico(k)}" alt="">${cnt(k)}/${v}</i>`).join('');
+      const sub=r.id==='_bag'?(maxed?'Maximal ausgebaut':`${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]} → ${BAGS[BAGLV+1][0]}×${BAGS[BAGLV+1][1]}`):(ITEMS[r.id].d||'');
+      return `<div class="rcp"><img class="ri" src="${ico(r.id==='_bag'?'tasche':r.id)}" alt=""><div><b>${rname(r.id)}</b><small>${sub}</small><div class="need">${need}</div></div><button type="button" class="ok mk" data-a="craft" data-r="${r.id}" ${ok?'':'disabled'}>BAUEN</button></div>`;}).join('');
+    return `<h2>Werkbank</h2><p class="qline">Material bringst du von Einbrüchen mit. Fertiges landet im Spind.</p><div class="rlist">${rows}</div>${btns()}`;
+  }
+  function craft(id){const r=RECIPES.find(x=>x.id===id);if(!r)return;
+    if(!Object.entries(r.need).every(([k,v])=>cnt(k)>=v))return;
+    Object.entries(r.need).forEach(([k,v])=>{for(let i=0;i<v;i++)STASH.splice(STASH.indexOf(k),1);});
+    if(id==='_bag'){BAGLV=Math.min(BAGS.length-1,BAGLV+1);toastMsg('RUCKSACK GRÖSSER!');}else{STASH.push(id);toastMsg(rname(id).toUpperCase()+' GEBAUT');}
+    sfx('click');addReward(0,8,0);
+    if(Q===4){Q=5;}
+    if(Q===9&&id==='stoer'){Q=10;setTimeout(()=>{close();sayRaw('erz','<b>Störsender fertig.</b><br>Jetzt fehlt nur noch Stufe 4 – dann wartet der <b>Golden Palm</b> an der Pinnwand.',[{t:'Weiter',f:closeDlg}]);},500);}
+    hud();open(benchHTML());
+  }
+  function unlockPlans(n){const out=[];for(let i=0;i<n;i++){const lockd=RECIPES.filter(r=>r.plan&&!r.story&&!KNOWN.includes(r.id));
+      if(!lockd.length){out.push(null);continue;}const r=lockd[Math.floor(Math.random()*lockd.length)];KNOWN.push(r.id);out.push(rname(r.id));}return out;}
+  // ---------- Story ----------
+  function questText(){
+    if(Q===0)return job===0?'Geh ans Telefon':job===1?'Hol das Päckchen bei Big Sal im Diner':'Bring das Päckchen zum Containerhafen';
+    return {1:'📞 Big Sal ruft an – Telefon',2:'Einbruch: eine Autowerkstatt (Pinnwand)',3:'📞 Big Sal ruft an – Telefon',4:'Werkbank: bau dir etwas',
+      5:'Steig auf Stufe 3 auf (Jobs in der Stadt, Einbrüche)',6:'📞 Big Sal ruft an – Telefon',7:'Einbruch: eine Apotheke (Pinnwand)',8:'📞 Big Sal ruft an – Telefon',
+      9:'Bau einen Störsender (Platine aus Autos oder Villen)',10:lvl<4?'Erreiche Stufe 4 – dann: Golden Palm':'Großer Heist: Golden Palm (Pinnwand)',11:'📞 Big Sal ruft an – Telefon',12:'Freies Spiel: Villen, Jobs, Stufe 5 → Nachtclub'}[Q]||'';
+  }
+  function questTick(){
+    if(Q===0&&job>=3){Q=1;}
+    if(Q===5&&lvl>=3){Q=6;}
+    const el=document.getElementById('quest');if(el)el.textContent='ZIEL: '+questText();
+    const ph=document.getElementById('h-phone');if(ph&&CALLS.includes(Q))ph.classList.add('alert');
+  }
+  function storyCall(){
+    $('h-phone').classList.remove('alert');
+    const T={
+      1:['Hab gehört, du hast Rico die Stirn geboten. Gut so. Aber mit Kurierjobs wirst du nicht reich, Kleiner. Du brauchst Werkzeug, Material, Ausrüstung.',
+         'An deiner Pinnwand hängt ab jetzt meine Liste: Läden, die nachts kaum einer bewacht. Fang klein an – mit einer Autowerkstatt. Metall, Kabel, Klebeband. Und merk dir: Was du drinnen verlierst, ist weg.',2],
+      3:['Saubere Arbeit. Jetzt mach was aus dem Kram.','An deiner Werkbank baust du Dietriche, Rauchgranaten, Verbandskästen. Baupläne für besseres Zeug findest du in Schreibtischen und Safes.',4],
+      6:['Du machst dir einen Namen, Kleiner. Zeit für die nächste Stufe.','Apotheken. Chemikalien für Rauch- und Blendgranaten, Medikamente für Verbandskästen. Aber: Da hängt eine Alarmanlage an der Tür. Du hast ein paar Sekunden zum Entschärfen. Steht an deiner Pinnwand.',7],
+      8:['Jetzt hör gut zu. Der Golden Palm. Größter Juwelier der Stadt. Kameras, Laser, ein Tresor voller Gold.',
+         'Dafür brauchst du einen Störsender. Ich schick dir den Bauplan. Die Platine holst du dir aus Autoradios in Werkstätten – oder aus einer Villa, wenn du dich traust.',9],
+      11:['Du hast den Golden Palm ausgeräumt?! Die ganze Stadt redet von nichts anderem.','Und das gefällt nicht jedem. Crane hat nach dir gefragt. Ab jetzt spielst du in einer anderen Liga, Kleiner.',12]}[Q];
+    if(!T)return;
+    say('sal',T[0],[{t:'Ich hör zu.',f:()=>say('sal',T[1],[{t:Q===11?'Bring sie ruhig.':'Verstanden.',f:()=>{
+      Q=T[2];if(Q===9&&!KNOWN.includes('stoer'))KNOWN.push('stoer');if(Q===7)refreshTargets();
+      if(Q===12){sayRaw('erz','<div class="rbig">AKT 1 GESCHAFFT!</div>Vom Kurier zum Mann hinter dem Golden-Palm-Coup. Palm Harbor kennt jetzt deinen Namen.<div class="dsub">Weiter geht’s im freien Spiel: Villen, Jobs, Werkbank. Akt 2 kommt in der nächsten Version.</div>',[{t:'Weiter',f:closeDlg}]);hud();return;}
+      if(Q===9)toastMsg('BAUPLAN: STÖRSENDER');
+      closeDlg();hud();}}])}]);
+  }
+  if(location.hash==='#dbg')window._g={invOpen,LOADOUT,get STASH(){return STASH},get Q(){return Q},set Q(v){Q=v},setLvl:v=>{lvl=v;hud();},TARGETS,open:id=>document.getElementById(id).click(),craft,get KNOWN(){return KNOWN},storyCall,setJob:v=>{job=v;hud();}};
+  // ---------- Pixel-Einsatz (iframe) ----------
+  function startPixHeist(T){
+    let f=$('pixh'); if(f)f.remove();
+    f=document.createElement('iframe'); f.id='pixh'; f.src='heist.html'; f.allow='fullscreen'; f.setAttribute('allowfullscreen','');
+    f.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;z-index:900;background:#05020b';
+    f.dataset.t=JSON.stringify(T);
+    wipeTo(()=>document.body.appendChild(f));
+  }
+  const XPB={werkstatt:35,apotheke:50,villa:75,golden:150};
+  window.addEventListener('message',e=>{
+    const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
+    const T=JSON.parse(f.dataset.t||'{}');
+    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1],heat}},'*');return;}
+    if(d.type!=='heistEnd')return;
+    const known=id=>ITEMS[id];
+    let html; const typ=T.kind==='golden'?'golden':T.type;
+    if(T.kind!=='golden'){const i=TARGETS.findIndex(x=>x.seed===T.seed);if(i>=0)TARGETS.splice(i,1);}
+    if(d.res==='escape'){
+      const bag=(d.bag||[]).filter(known); const plans=bag.filter(id=>id==='bauplan').length; const items=bag.filter(id=>id!=='bauplan');
+      const val=items.reduce((s,id)=>s+(ITEMS[id].t==='mat'?0:ITEMS[id].v),0);
+      items.forEach(id=>STASH.push(id));
+      Object.values(d.lo||{}).forEach(id=>{if(id&&known(id))STASH.push(id);});
+      Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null);
+      const xpG=(XPB[typ]||40)+Math.min(80,Math.round(val/60)); addReward(0,xpG,d.heat||0); sfx('cash');
+      const up=unlockPlans(plans);const pl=up.map(n=>n?`<b class="x">Neuer Bauplan: ${n}</b>`:'<b>Bauplan schon bekannt · +20 XP</b>').join('');
+      if(up.some(n=>!n))addReward(0,20*up.filter(n=>!n).length,0);
+      const mats={};items.filter(id=>ITEMS[id].t==='mat').forEach(id=>mats[id]=(mats[id]||0)+1);
+      const ml=Object.entries(mats).map(([k,v])=>`${v}× ${ITEMS[k].n}`).join(' · ');
+      if(typ==='werkstatt'&&Q===2)Q=3; if(typ==='apotheke'&&Q===7)Q=8; if(typ==='golden'&&Q===10)Q=11;
+      html=`<div class="rbig">ENTKOMMEN!</div>${T.name}: erledigt.<div class="reward"><b>Beute $${val}</b><b class="x">+ ${xpG} XP</b>${d.heat?`<b class="h">+${d.heat} Heat</b>`:''}${pl}</div>${ml?`<div class="dsub">Material: ${ml}</div>`:''}<div class="dsub">Alles liegt im Spind. Beute verkaufst du bei Dee, Material verbaust du an der Werkbank.</div>`;
+    } else {
+      const lost=Object.values(LOADOUT).filter(x=>x).length; const safe=LOADOUT.safe;
+      Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null); if(safe)STASH.push(safe);
+      const bail=Math.min(cash,100); addReward(-bail,15,2); sfx('stamp');
+      html=`<div class="rbig bad">ERWISCHT!</div>Eine Nacht in der Zelle, dann holt dich Sals Anwalt raus.<div class="reward"><b class="h">${lost} Ausrüstungsteile weg</b><b class="h">Kaution −$${bail}</b><b class="h">+2 Heat</b></div>${safe?`<div class="dsub">Gerettet im Geheimfach: ${ITEMS[safe].n}</div>`:''}<div class="dsub">Neues Werkzeug baust du an der Werkbank.</div>`;
+    }
+    refreshTargets();
+    wipeTo(()=>{f.remove();show('hide');fitAll();hud();setTimeout(()=>sayRaw('erz',html,[{t:'Weiter',f:()=>{closeDlg();hud();if(CALLS.includes(Q))toastMsg('DAS TELEFON KLINGELT');}}]),300);});
+  });
+  const SHOP={joe:[['metall',20],['kabel',15],['klebeband',12]],tito:[['chemie',35],['pillen',45],['klebeband',12]]};
+  function shopMenu(npc,msg){
+    const ch=SHOP[npc].map(([id,p])=>({t:`${ITEMS[id].n} <small>$${p} · im Spind: ${STASH.filter(x=>x===id).length}</small>`,f:()=>{
+      if(cash<p){shopMenu(npc,'Ohne Kohle keine Ware.');return;}addReward(-p,0,0);STASH.push(id);sfx('cash');shopMenu(npc,`${ITEMS[id].n} – liegt in deinem Spind. Noch was?`);}}));
+    ch.push({t:'Fertig',f:()=>npcMenu('Sonst noch was?')});
+    say(npc,msg||(npc==='joe'?'Schrott hab ich genug. Kostet aber.':'Ich kenn da jemanden, der kennt jemanden. Was brauchst du?'),ch);
+  }
+  // Dee kauft Beute
+  function sellLoot(){
+    const loot=STASH.filter(id=>ITEMS[id].t==='loot'); if(!loot.length){say('dee','Du hast nichts, was mich interessiert, Schätzchen.',[{t:'OK',f:()=>npcMenu('Sonst noch was?')}]);return;}
+    const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*.6);
+    say('dee',`${loot.length} Teile … heiße Ware. Ich geb dir ${v} Dollar. Keine Fragen, kein Feilschen.`,[
+      {t:`Deal <small>+$${v}</small>`,f:()=>{STASH=STASH.filter(id=>ITEMS[id].t!=='loot');addReward(v,10,0);sfx('cash');say('dee','Angenehm, mit dir Geschäfte zu machen.',[{t:'Bis bald',f:closeDlg}]);}},
+      {t:'Lieber behalten',f:()=>npcMenu('Wie du meinst.')}]);
+  }
+
+  $('hbagb').addEventListener('click',e=>{e.stopPropagation();if(H)showBag();});
+  // ---------- Radio: kleiner Synthwave-Loop ----------
+  let ac=null, playing=false, timer=null, master=null;
+  function radio(){
+    try{
+      if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.18;master.connect(ac.destination);}
+      if(ac.state==='suspended')ac.resume();
+    }catch(e){toastMsg('KEIN TON VERFÜGBAR');return;}
+    playing=!playing;
+    const tm=scene==='diner'?toast3:toastMsg;
+    if(!playing){clearInterval(timer);tm(scene==='diner'?'JUKEBOX AUS':'RADIO AUS');return;}
+    tm(scene==='diner'?'JUKEBOX: NEON NIGHTS':'RADIO NEON 87.6');
+    const bass=[45,45,48,48,43,43,40,40], arp=[69,72,76,72,67,71,74,71,64,67,71,67,64,68,71,68];
+    let step=0; const spb=.125;
+    const note=(m,t,d,type,g)=>{const o=ac.createOscillator(),v=ac.createGain();o.type=type;o.frequency.value=440*Math.pow(2,(m-69)/12);
+      v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g,t+.01);v.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(v);v.connect(master);o.start(t);o.stop(t+d+.05);};
+    timer=setInterval(()=>{const t=ac.currentTime+.05;
+      note(arp[step%16],t,.18,'square',.08);
+      if(step%2===0)note(bass[Math.floor(step/4)%8],t,.24,'sawtooth',.22);
+      if(step%4===0){const o=ac.createOscillator(),v=ac.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.15);
+        v.gain.setValueAtTime(.9,t);v.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(v);v.connect(master);o.start(t);o.stop(t+.25);}
+      step++;},spb*1000);
+  }
+})();
+</script>
+</body>
+</html>
