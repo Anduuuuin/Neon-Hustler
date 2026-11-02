@@ -447,7 +447,7 @@
   #gear{position:fixed;left:max(10px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:60;width:44px;height:44px;border-radius:50%;border:3px solid #000;background:#1d1030;color:#ffe14d;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 0 0 2px #2fe0ea,0 0 14px rgba(47,224,234,.5);padding:0}
   #setov{position:fixed;inset:0;z-index:950;background:rgba(5,0,12,.82);display:none;align-items:center;justify-content:center;padding:16px}
   #setov.on{display:flex}
-  .setp{width:min(92vw,400px);background:rgba(16,8,30,.98);border:2px solid #2fe0ea;border-radius:14px;box-shadow:0 0 0 2px #000,0 0 24px rgba(47,224,234,.45);padding:12px;color:#fff;font-family:'Oswald',sans-serif}
+  .setp{width:min(92vw,400px);max-height:calc(100vh - 32px);overflow:auto;background:rgba(16,8,30,.98);border:2px solid #2fe0ea;border-radius:14px;box-shadow:0 0 0 2px #000,0 0 24px rgba(47,224,234,.45);padding:12px;color:#fff;font-family:'Oswald',sans-serif}
   .seth{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
   .seth b{font-family:'Bangers',cursive;font-size:28px;letter-spacing:1px;font-weight:400;color:#ff6fb5;text-shadow:0 0 10px rgba(255,61,139,.8)}
   .seth button{background:#000;color:#fff;border:2px solid #ff3d8b;font-size:18px;width:38px;height:38px;cursor:pointer}
@@ -465,7 +465,24 @@
   .sst{width:100%;margin-top:4px;background:#0b0616;border:1px solid #4b3a6e;color:#cbbbe6;font-family:'Oswald',sans-serif;font-size:13px;padding:7px;border-radius:8px;cursor:pointer}
   .sst b{color:#ffe14d}
   #gear{opacity:.8}
+  .tsth{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.tsth button{background:#0b0616;border:1px solid #4b3a6e;color:#fff;font-family:'Oswald',sans-serif;font-size:12px;padding:8px 2px;border-radius:6px;cursor:pointer}
   .setv{text-align:center;font-size:11px;color:#6d5b8f;margin-top:4px}
+
+  #inv .doll .side .slot{height:58px}
+  #inv .doll .slot.o{border-color:#b98cff}
+  #inv .doll .slot.o.full{border-style:solid}
+  #inv .doll2{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+  #inv .doll2 .slot{aspect-ratio:auto;height:58px}
+  #inv .doll2 .slot img{max-height:40%}
+  #inv .slot.fac{cursor:default;border-color:#ffe14d}
+  #inv .slot.fac i{font-size:10px;color:#cbbbe6;font-style:normal}
+  #inv .dstat{position:absolute;top:4px;left:0;right:0;display:flex;flex-wrap:wrap;justify-content:center;gap:2px 6px;font-size:9px;color:#cbbbe6}
+  #inv .dstat b{color:#7dffb2}
+  #inv .crewrow{display:flex;gap:6px;flex-wrap:wrap}
+  #inv .crw{flex:1;min-width:80px;background:#1b1030;border:2px dashed #4b3a6e;border-radius:8px;color:#fff;padding:5px;cursor:pointer;font-family:'Oswald',sans-serif}
+  #inv .crw b{display:block;font-size:13px}#inv .crw small{font-size:10px;color:#cbbbe6}
+  #inv .crw.on{border-style:solid;border-color:#7dffb2;background:#123020}
+  #inv .cell.cloth{border-color:#b98cff;background:#1d1236}
 </style>
 </head>
 <body>
@@ -517,7 +534,7 @@
   </div>
   <div id="hud">
     <div class="who"><b>DU</b><small>Stufe <span id="lvl">1</span> · Kleinganove</small><div class="xp"><i id="xpbar"></i></div><div class="qst" id="quest"></div></div>
-    <div class="stats"><div class="pill cash">$ <span id="cash">40</span></div><div class="pill heat">Heat <span id="heat">☆☆☆☆☆</span></div><div class="pill">Energie <span id="nrg">10</span>/10</div><div class="pill buff" id="buff">Milchshake: Charme +15 %</div></div>
+    <div class="stats"><div class="pill cash">$ <span id="cash">40</span></div><div class="pill heat">Heat <span id="heat">☆☆☆☆☆</span></div><div class="pill">Energie <span id="nrg">10</span>/<span id="nmax">10</span></div><div class="pill buff" id="buff">Milchshake: Charme +15 %</div></div>
   </div>
   <div id="toast"></div>
   <div id="sheet" role="dialog" aria-live="polite"></div>
@@ -597,7 +614,8 @@
     <div class="sr"><span>💥</span><b>Effekte</b><input type="range" id="sFx" min="0" max="100"><em id="sFxV"></em></div>
     <button type="button" class="sst" id="sSt">📻 Sender: <b id="sStN"></b> – wechseln</button></div>
   <button type="button" class="setb" id="sFull"><span>⛶</span><div><b>Vollbild</b><small>Browserleisten ausblenden (an/aus)</small></div></button>
-  <button type="button" class="setb" id="sReset"><span>↺</span><div><b>Spiel neu starten</b><small>Zurück zum Titelbild – Fortschritt geht verloren</small></div></button>
+  <button type="button" class="setb" id="sReset"><span>↺</span><div><b>Neues Spiel</b><small>Spielstand löschen und von vorn – automatisch gespeichert wird immer</small></div></button>
+  <div class="setsnd"><div style="font-size:12px;color:#7ff6ff;margin-bottom:6px">🧪 TEST-HILFEN</div><div class="tsth"><button type="button" data-c="cash">+$500</button><button type="button" data-c="lvl">+1 Stufe</button><button type="button" data-c="nrg">Energie voll</button><button type="button" data-c="mat">Material</button></div></div>
   <div class="setv">Neon Hustler · Prototyp</div>
 </div></div>
 
@@ -676,7 +694,7 @@
   setTimeout(drive,1600); setInterval(drive,8000);
 
   // ---------- Start -> Intro ----------
-  $('start').addEventListener('click',()=>{ if(scene!=='start')return; wipeTo(()=>{show('intro');panel(0);}); });
+  $('start').addEventListener('click',()=>{ if(scene!=='start')return; if(window.NH_GAME&&NH_GAME.hasSave()){window.__continue&&window.__continue();return;} wipeTo(()=>{show('intro');panel(0);}); });
 
   // ---------- Intro-Comic ----------
   const P=[
@@ -725,16 +743,21 @@
   $('stageB').addEventListener('click',e=>{if(!e.target.closest('.hs'))close();});
 
   let cash=40, nrg=10, jobTaken=false, job=0, xp=0, lvl=1, heat=0, buff=false;
-  let Q=0, PEND=null, BAGLV=0, KNOWN=[]; const TARGETS=[], CALLS=[1,3,6,8,11], BAGS=[[5,4],[6,4],[6,5]];
+  let Q=0, PEND=null, BAGLV=0, KNOWN=[]; const TARGETS=[], CALLS=[1,3,6,8,11,15,18], BAGS=[[5,4],[6,4],[6,5]];
+  const OUTFIT_EQ={kopf:null,brille:'sonnenbrille',jacke:'sakko_pink',schuhe:'sneaker'}, REP={kartell:0,neon:0,syndikat:0}, CREW=[], CREW_ON=[];
+  let FACTION=null, UPG={bett:0,werkbank:0}, NMAX=10, lastRegen=Date.now();
   const acts={
     close,
     takeJob(){jobTaken=true;job=1;$('h-phone').classList.remove('alert');close();toastMsg('JOB ANGENOMMEN!');
       setTimeout(()=>{$('h-door').classList.add('flash','alert');setTimeout(()=>$('h-door').classList.remove('flash'),2500);},900);},
     heist(){close();invOpen('heist');},
     plan(a){const T=TARGETS[+a.dataset.i];if(!T)return;if(lvl<T.req){toastMsg('AB STUFE '+T.req);return;}if(nrg<T.e){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND=T;close();invOpen('heist');},
+    bank(){if(Q<17||lvl<7){toastMsg('AB STUFE 7');return;}if(nrg<5){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND={kind:'gen',type:'bank',name:'First Palm Bank',e:5,diff:3,seed:777+Math.floor(Math.random()*1e6),story:'bank'};close();invOpen('heist');},
     golden(){if(Q<10||lvl<4){toastMsg(Q<10?'SAL HAT NOCH KEINEN PLAN':'AB STUFE 4');return;}if(nrg<4){toastMsg('ZU MÜDE – ERST AUSRUHEN');return;}PEND={kind:'golden',type:'golden',name:'Golden Palm',e:4,diff:3};close();invOpen('heist');},
     craft(a){craft(a.dataset.r);},
-    rest(){if(nrg>=10){toastMsg('SCHON AUSGERUHT');close();return;}nrg=10;$('nrg').textContent=nrg;close();toastMsg('ZZZ … AUSGERUHT');},
+    bedup(){const nx=BEDS[UPG.bett+1];if(!nx)return;if(cash<nx[2]){toastMsg('ZU WENIG GELD');return;}addReward(-nx[2],0,0);UPG.bett++;NMAX=nx[1];nrg=Math.min(NMAX,nrg+4);sfx('cash');hud();open(bedHTML());},
+    benchup(){if(UPG.werkbank>=1)return;if(cash<600){toastMsg('ZU WENIG GELD');return;}addReward(-600,0,0);UPG.werkbank=1;sfx('cash');hud();open(benchHTML());toastMsg('WERKBANK STUFE 2');},
+    rest(){if(nrg>=NMAX){toastMsg('SCHON AUSGERUHT');close();return;}nrg=NMAX;lastRegen=Date.now();$('nrg').textContent=nrg;close();toastMsg('ZZZ … AUSGERUHT');},
     go(){close();wipeTo(()=>{show('map');fitAll();updateMap();});}
   };
   const btns=(ok,okA,no='Zurück')=>`<div class="row"><button type="button" class="no" data-a="close">${no}</button>${ok?`<button type="button" class="ok" data-a="${okA}">${ok}</button>`:''}</div>`;
@@ -742,12 +765,19 @@
     'h-phone':()=> jobTaken
       ? (job>=3?`<h2>Telefon</h2><p>Big Sal: „Saubere Arbeit, Kleiner. Ich meld mich wieder.“ Neue Jobs kommen im nächsten Schritt.</p>${btns()}`:`<h2>Telefon</h2><p>Keine neuen Nachrichten. Dein Auftrag: ${job===1?'Päckchen bei Big Sal im Diner abholen':'Päckchen zum Hafen bringen'}.</p>${btns()}`)
       : `<span class="tag">1 NEUER AUFTRAG</span><h2>Dein erster Job</h2><p>„Hol ein Päckchen bei Big Sal im Diner ab und bring es zum Hafen. Keine Fragen, kein Ärger.“</p><p><b>Belohnung:</b> $150 · <b>Dauer:</b> 2 Min · <b>Energie:</b> 2</p>${btns('Annehmen','takeJob','Später')}`,
-    'h-tv':()=>`<h2>Kanal 6 – Nachrichten</h2><p>„… und in Palm Harbor bleibt es ruhig.“ Noch kennt dich keiner. Hier siehst du später Fahndungsstufe, Schlagzeilen über deine Coups und die Rangliste.</p>${btns()}`,
+    'h-tv':()=>{const H=[];
+      if(Q>=11)H.push('Golden Palm ausgeraubt! Polizei tappt im Dunkeln.');
+      if(Q>=19)H.push('Bank-Coup des Jahrhunderts: First Palm Bank leer geräumt!');
+      if(FACTION)H.push(`Bandenkrieg? ${FACT[FACTION].n} werden immer mächtiger.`);
+      if(Q>=3&&Q<11)H.push('Einbruchserie in Palm Harbor – Händler besorgt.');
+      H.push(heat>=4?'Det. Doyle: „Wir sind ihm dicht auf den Fersen.“':heat>=2?'Polizei verstärkt nächtliche Streifen.':'Ruhige Nacht in Palm Harbor.');
+      H.push(['Wetter: 29 Grad, schwül, Gewitter am Abend.','Sport: Palm Harbor Dolphins gewinnen knapp.','Victor Crane kauft drei weitere Hotels am Strand.','Neuer Club eröffnet am Boulevard – Schlangen bis zur Straße.'][Math.floor(Math.random()*4)]);
+      return `<h2>Kanal 6 – Nachrichten</h2><div class="news">${H.map(h=>`<p>📺 ${h}</p>`).join('')}</div><p class="qline">Fahndung: ${'★'.repeat(heat)}${'☆'.repeat(5-heat)} · Stufe ${lvl}${FACTION?' · '+FACT[FACTION].n+' ('+rankOf(REP[FACTION])+')':''}</p>${btns()}`;},
     'h-board':()=>boardHTML(),
     'h-door':()=>`<h2>Raus in die Stadt</h2><p>Durchs Rolltor geht es zur Stadtkarte mit Diner, Hafen, Strand, Clubs und Hehlern. Dort erledigst du die kleinen Jobs.</p>${btns('Losfahren','go')}`,
     'h-locker-old':()=>`<h2>Stash</h2><p>8 Plätze · ausbaubar</p><div class="grid"><div class="full">Sport-<br>tasche</div><div class="full">Taschen-<br>lampe</div><div></div><div></div><div></div><div></div><div></div><div></div></div>${btns()}`,
     'h-bench':()=>benchHTML(),
-    'h-bed':()=>`<h2>Matratze</h2><p>Ausruhen füllt deine Energie wieder auf. Später: Bett, Wasserbett, Penthouse …</p>${btns('Ausruhen','rest')}`
+    'h-bed':()=>bedHTML()
   };
   document.querySelectorAll('#hide .hs').forEach(b=>b.addEventListener('click',e=>{
     e.stopPropagation(); const id=b.id;
@@ -760,7 +790,7 @@
 
 
   // ---------- Werte / HUD ----------
-  function hud(){ questTick(); $('cash').textContent=cash; $('nrg').textContent=nrg; $('lvl').textContent=lvl;
+  function hud(){ questTick(); if(window.__nhReady)saveGame(); const nm=document.getElementById('nmax');if(nm)nm.textContent=NMAX; $('cash').textContent=cash; $('nrg').textContent=nrg; $('lvl').textContent=lvl;
     $('heat').textContent='★'.repeat(heat)+'☆'.repeat(5-heat); $('buff').style.display=buff?'block':'none'; $('xpbar').style.width=Math.min(100,xp)+'%'; }
   hud();
 
@@ -991,7 +1021,9 @@
   function talkSal(){
     closeMenu();closePaper();
     if(job===2){say('sal','Was stehst du noch hier rum? Pier 9, Kleiner. Der Typ wartet nicht ewig.',[{t:'Bin schon weg.',f:leaveDiner},{t:'Moment noch.',f:closeDlg}]);return;}
-    if(job>=3){say('sal','Saubere Arbeit am Hafen. Du lernst schnell. Komm morgen wieder, dann hab ich was Größeres.',[{t:'Ich bin dabei.',f:closeDlg}]);return;}
+    if(job>=3){const ch=[];if(Q>=15||lvl>=6)ch.push({t:'Crew anheuern <small>PROFIS FÜR DEINE EINSÄTZE</small>',f:crewMenu});
+      ch.push({t:'Was gibt’s Neues?',f:()=>say('sal',['Crane kauft die halbe Stadt auf. Pass auf, auf wessen Füße du trittst.','Doyle hat mich gestern gefragt, ob ich dich kenne. Ich hab gelogen.','Die First Palm Bank hat einen neuen Tresor. Sagt man.','Iss was, Kleiner. Du siehst aus wie ein Gespenst.'][Math.floor(Math.random()*4)],[{t:'Okay.',f:talkSal}])});
+      ch.push({t:'Tschüss',f:closeDlg});say('sal',Q>=12?'Da ist er ja, der Mann der Stunde. Was brauchst du?':'Saubere Arbeit, Kleiner. Was brauchst du?',ch);return;}
     say('sal','Da bist du ja. Setz dich, iss was, wenn du willst. Ich hab da ein Päckchen, das muss heute noch zum Hafen.',[
       {t:'Was ist drin?',f:()=>say('sal','Die Art Päckchen, bei der man keine Fragen stellt. Kapiert?',[{t:'Kapiert. Zeig mal den Auftrag.',f:showPaper}])},
       {t:'Zeig mal den Auftrag.',f:showPaper}]);
@@ -1088,7 +1120,7 @@
             {n:'Gäste unterhalten',stat:'Charme',p:60,t:7,m:55,x:18,e:2,ev:'Ein betrunkener Gast lässt seine dicke Brieftasche liegen.',safe:'Zurückgeben, Trinkgeld kassieren',risk:'Ein paar Scheine abzweigen'}],
       rumor:'Die Kisten auf meiner Yacht? Gehören einem Freund. Einem sehr reichen Freund. Mehr musst du nicht wissen.'},
     'm-villa':{n:'VILLENVIERTEL',img:'pl_villa.webp',npc:'crane',lock:15,msg:'Du hast dich verlaufen, Junge. Komm wieder, wenn du jemand bist. Und dann – überleg dir gut, ob du wirklich kommen willst.'},
-    'm-towers':{n:'INNENSTADT · KANZLEI',img:'pl_towers.webp',npc:'harvey',lock:6,msg:'Ich vertrete nur Klienten mit Substanz, mein Freund. Ab Stufe 6 reden wir über Geldwäsche und Versicherungen für deine Ausrüstung.'},
+    'm-towers':{n:'INNENSTADT · KANZLEI',img:'pl_towers.webp',npc:'harvey',lock:5,msg:'Ich vertrete nur Klienten mit Substanz, mein Freund. Ab Stufe 5 reden wir weiter.'},
     'm-casino':{n:'CASINO',img:'pl_casino.webp',npc:'whitlock',lock:10,msg:'Willkommen im Casino, Sir. Bedauerlicherweise ist Ihre Garderobe … unzureichend. Ab Stufe 10 empfange ich Sie mit Vergnügen.'},
     'm-club':{n:'NACHTCLUB',img:'pl_club.webp',npc:'lola',lock:5,msg:'Süß, wie du dich reinschleichst. Komm ab Stufe 5 wieder, dann reden wir über Jobs – und über eine Crew.'},
     'm-motel':{n:'MOTEL',img:'pl_motel.webp',npc:'rosie',msg:'Zimmer 102 ist frei. Fünfzig Dollar, bar, keine Fragen. Hier sucht dich keiner, Schätzchen.',motel:true},
@@ -1110,10 +1142,11 @@
   function placeTalk(){
     const P=PLACES[curPlace];
     if(curPlace==='m-hafen'&&job===2){ricoStory();return;}
+    if((P.npc==='lola'||P.npc==='harvey')&&lvl>=P.lock){factionTalk(P.npc);return;}
     if(!P.jobs){
       const ch=[];
       if(P.motel)ch.push({t:`Zimmer nehmen · $50 · Heat −1, Energie voll`,f:()=>{if(cash<50){say('rosie','Fünfzig, Schätzchen. Nicht neunundvierzig.',[{t:'Mist.',f:closeDlg}]);return;}
-        addReward(-50,0,-1);nrg=10;hud();sfx('cash');sayRaw('erz','Du schläfst wie ein Stein. Draußen fährt zweimal ein Streifenwagen vorbei – ohne anzuhalten.<div class="reward"><b>Energie voll</b><b class="h">Heat −1</b></div>',[{t:'Weiter',f:closeDlg}]);}});
+        addReward(-50,0,-1);nrg=NMAX;hud();sfx('cash');sayRaw('erz','Du schläfst wie ein Stein. Draußen fährt zweimal ein Streifenwagen vorbei – ohne anzuhalten.<div class="reward"><b>Energie voll</b><b class="h">Heat −1</b></div>',[{t:'Weiter',f:closeDlg}]);}});
       ch.push({t:'Zurück',f:closeDlg});
       const who=P.npc||'erz';
       if(P.npc){say(who,P.msg,ch);return;}
@@ -1125,7 +1158,8 @@
     const P=PLACES[curPlace];
     const ch=P.jobs.map(j=>({t:`${j.n}<small>$${j.m} · ${j.stat} · Energie ${j.e}${j.h?' · Heat-Risiko':''}</small>`,f:()=>startJob(j,P.npc,()=>npcMenu('Noch was?'))}));
     if(P.npc==='dee')ch.unshift({t:'Beute verkaufen <small>60 % VOM WERT</small>',f:sellLoot});
-    if(SHOP[P.npc])ch.unshift({t:'Material kaufen <small>FÜR DIE WERKBANK</small>',f:()=>shopMenu(P.npc)});
+    if(SHOP[P.npc])ch.unshift({t:SHOPT[P.npc]||'Material kaufen <small>FÜR DIE WERKBANK</small>',f:()=>shopMenu(P.npc)});
+    if(P.npc==='rico'&&Q>=12)ch.unshift({t:FACTION==='kartell'?'Los Cuchillos <small>FRAKTIONSAUFTRÄGE</small>':'Über Los Cuchillos reden <small>FRAKTION</small>',f:()=>factionTalk('rico')});
     ch.push({t:'Was gibt’s Neues?',f:()=>say(P.npc,P.rumor,[{t:'Interessant.',f:()=>npcMenu('Sonst noch was?')}])});
     ch.push({t:'Tschüss',f:closeDlg});
     say(P.npc,greet||P.greet,ch);
@@ -1162,7 +1196,7 @@
     const {j,who}=JOB; clearInterval(jobTimer); JOB=null; renderJob(); show(scene); jobEvent(j,who,()=>closeDlg());
   }
   function jobEvent(j,who,again){
-    const ch=Math.min(95,j.p+(buff&&j.stat==='Charme'?15:0));
+    const ch=Math.max(5,Math.min(95,j.p+(buff&&j.stat==='Charme'?15:0)+(statVal(j.stat)-10)*2));
     sayRaw(who,`<b>Zwischenfall!</b><br>${j.ev}`,[
       {t:`${j.safe}<small>SICHER · $${j.m}</small>`,f:()=>jobResult(j,who,again,'safe')},
       {t:`${j.risk}<small>${j.stat.toUpperCase()} · ${ch} % · $${j.m*2}${j.h?' · Heat':''}</small>`,f:()=>{if(j.stat==='Charme'&&buff){buff=false;hud();}diceRoll(who,ch,j.stat,win=>jobResult(j,who,again,win?'win':'lose'));}}]);
@@ -1176,8 +1210,8 @@
     let m=j.m,x=j.x,h=0,big='ERLEDIGT.',bad=false,txt='Sauber und ohne Ärger.';
     if(res==='win'){m=j.m*2;x=Math.round(j.x*1.5);h=j.h||0;big='GESCHAFFT!';txt='Riskant, aber es hat sich gelohnt.';}
     if(res==='lose'){m=Math.round(j.m*.3);x=Math.round(j.x*.5);h=j.h||0;big='MIST!';bad=true;txt='Das ging schief. Mit Glück kommst du mit ein paar Kröten davon.';}
-    addReward(m,x,h); sfx(bad?'stamp':'cash');
-    sayRaw(who,`<div class="rbig${bad?' bad':''}">${big}</div>${txt}<div class="reward"><b>+ $${m}</b><b class="x">+ ${x} XP</b>${h?'<b class="h">+1 Heat ★</b>':''}</div>`,
+    addReward(m,x,h); sfx(bad?'stamp':'cash'); const rp=j.rep&&FACTION===j.rep?addRep(j.rep,res==='lose'?1:res==='win'?6:4):0;
+    sayRaw(who,`<div class="rbig${bad?' bad':''}">${big}</div>${txt}<div class="reward"><b>+ $${m}</b><b class="x">+ ${x} XP</b>${h?'<b class="h">+1 Heat ★</b>':''}${rp?`<b class="x">+${rp} Ruf</b>`:''}</div>`,
       [{t:'Fertig',f:closeDlg}]);
   }
 
@@ -1258,18 +1292,20 @@
   function invOpen(mode){
     const o=$('inv'); o.dataset.mode=mode||'stash'; renderInv(); o.classList.add('on');
   }
-  function invClose(){$('inv').classList.remove('on');}
+  function invClose(){$('inv').classList.remove('on');saveGame();}
   function renderInv(){
     const o=$('inv'), mode=o.dataset.mode;
     const sl=k=>{const id=LOADOUT[k];return `<button type="button" class="slot ${id?'full':''} ${k==='safe'?'safe':''}" data-slot="${k}"><small>${SLOTN[k]}</small>${id?`<img src="${ico(id)}" alt=""><b>${ITEMS[id].n}</b>`:'<i>leer</i>'}</button>`;};
-    const lo=`<div class="side">${sl('weapon')}${sl('tool1')}${sl('tool2')}</div><div class="dollw"><canvas id="doll" width="30" height="32"></canvas><div class="dtip">antippen = drehen</div></div><div class="side">${sl('q1')}${sl('q2')}${sl('safe')}</div>`;
-    const ord={tool:0,weapon:1,cons:2,mat:3,loot:4};const uniq=[...new Set(STASH)].sort((a,b)=>ord[ITEMS[a].t]-ord[ITEMS[b].t]);
+    const osl=k=>{const id=OUTFIT_EQ[k];return `<button type="button" class="slot o ${id?'full':''}" data-oslot="${k}"><small>${OSLOT[k]}</small>${id?`<img src="${ico(id)}" alt=""><b>${ITEMS[id].n}</b>`:'<i>leer</i>'}</button>`;};
+    const stl=['Muskeln','Köpfchen','Charme','Ausdauer','Glück'].map(s=>`<span>${s.slice(0,3).toUpperCase()} <b>${statVal(s)}</b></span>`).join('');
+    const lo=`<div class="side">${osl('kopf')}${osl('brille')}${osl('jacke')}${osl('schuhe')}</div><div class="dollw"><canvas id="doll" width="30" height="32"></canvas><div class="dstat">${stl}</div><div class="dtip">antippen = drehen</div></div><div class="side">${sl('weapon')}${sl('tool1')}${sl('tool2')}${sl('q1')}</div></div><div class="doll2">${sl('q2')}${sl('safe')}${FACTION?`<div class="slot full fac"><small>FRAKTION</small><b style="color:${FACT[FACTION].col}">${FACT[FACTION].n}</b><i>${rankOf(REP[FACTION])} · ${REP[FACTION]}</i></div>`:''}`;
+    const ord={cloth:0,tool:1,weapon:2,cons:3,mat:4,loot:5};const uniq=[...new Set(STASH)].sort((a,b)=>ord[ITEMS[a].t]-ord[ITEMS[b].t]);
     const st=uniq.map(id=>{const n=STASH.filter(x=>x===id).length,i=STASH.indexOf(id);return `<button type="button" class="cell ${ITEMS[id].t}" data-i="${i}"><img src="${ico(id)}" alt=""><b>${ITEMS[id].n}</b>${n>1?`<em class="cnt">×${n}</em>`:''}${ITEMS[id].t==='loot'?`<small>$${ITEMS[id].v}</small>`:''}</button>`;}).join('')+
       Array(Math.max(0,8-uniq.length)).fill('<div class="cell empty"></div>').join('');
     o.innerHTML=`<div class="ip">
       <div class="ih"><b>${mode==='heist'?'LOADOUT FÜR DEN HEIST':'SPIND · STASH'}</b><button type="button" class="ix">✕</button></div>
       <div class="isub">Was du mitnimmst, kannst du verlieren. Nur der <b>sichere Slot</b> bleibt dir immer.</div>
-      <div class="doll">${lo}</div><div class="bagrow"><img src="${ico('tasche')}" alt=""><b>RUCKSACK</b><span>${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]} Felder · ausbaubar an der Werkbank</span></div>
+      <div class="doll">${lo}</div>${mode==='heist'&&CREW.length?`<div class="isub">Crew – antippen = mitnehmen (max. 2)</div><div class="crewrow">${CREW.map(c=>`<button type="button" class="crw ${CREW_ON.includes(c)?'on':''}" data-crew="${c}"><b>${CREWS[c].n}</b><small>${CREWS[c].role}</small></button>`).join('')}</div>`:''}<div class="bagrow"><img src="${ico('tasche')}" alt=""><b>RUCKSACK</b><span>${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]} Felder · ausbaubar an der Werkbank</span></div>
       <div class="isub">Stash – antippen zum Ausrüsten</div>
       <div class="st">${st}</div>
       <div class="itip" id="itip">Tipp: Dietrich = leise Türen · Brecheisen = schnell, aber laut · Bohrer = Safes & Tresor · Granaten & Störsender in die Schnellslots</div>
@@ -1281,10 +1317,13 @@
       const i=+b.dataset.i,id=STASH[i];
       if(ITEMS[id].t==='loot'){$('itip').textContent=`${ITEMS[id].n}: Wert $${ITEMS[id].v}. Bei Dee in der Pfandleihe verkaufen.`;return;}
       if(ITEMS[id].t==='mat'){$('itip').textContent=`${ITEMS[id].n}: Bastelmaterial für die Werkbank.`;return;}
+      if(ITEMS[id].t==='cloth'){const s=ITEMS[id].slot;if(OUTFIT_EQ[s])STASH.push(OUTFIT_EQ[s]);OUTFIT_EQ[s]=id;STASH.splice(STASH.indexOf(id),1);$('itip').textContent=`${ITEMS[id].n}: ${ITEMS[id].d}`;renderInv();saveGame();return;}
       const slot=Object.keys(LOADOUT).find(k=>!LOADOUT[k]&&slotFits(k,id))||Object.keys(LOADOUT).find(k=>k==='safe'&&!LOADOUT[k]&&slotFits(k,id));
       if(!slot){$('itip').textContent=`Kein freier Slot für ${ITEMS[id].n}. ${ITEMS[id].d||''}`;return;}
       LOADOUT[slot]=id; STASH.splice(i,1); sfx('click'); renderInv();});
     o.querySelectorAll('.slot[data-slot]').forEach(b=>b.onclick=()=>{const k=b.dataset.slot;if(!LOADOUT[k])return;STASH.push(LOADOUT[k]);LOADOUT[k]=null;renderInv();});
+    o.querySelectorAll('.slot[data-oslot]').forEach(b=>b.onclick=()=>{const k=b.dataset.oslot;if(!OUTFIT_EQ[k])return;STASH.push(OUTFIT_EQ[k]);OUTFIT_EQ[k]=null;renderInv();});
+    o.querySelectorAll('.crw').forEach(b=>b.onclick=()=>{const c=b.dataset.crew;if(CREW_ON.includes(c))CREW_ON.splice(CREW_ON.indexOf(c),1);else{if(CREW_ON.length>=2)CREW_ON.shift();CREW_ON.push(c);}renderInv();});
     const go=o.querySelector('.igo'); if(go)go.onclick=()=>{if(nrg<PEND.e){$('itip').textContent='Zu müde. Ruh dich auf der Matratze aus oder iss was bei Candy.';return;}nrg-=PEND.e;hud();invClose();startPixHeist(PEND);};
   }
 
@@ -1498,49 +1537,58 @@
       g.clearRect(0,0,30,32);
       const grd=g.createRadialGradient(15,22,2,15,22,15);grd.addColorStop(0,'rgba(255,61,139,.35)');grd.addColorStop(1,'rgba(255,61,139,0)');g.fillStyle=grd;g.fillRect(0,0,30,32);
       g.fillStyle='rgba(47,224,234,.25)';g.beginPath();g.ellipse(15,27.5,9,2.5,0,0,7);g.fill();
-      drawHero(g,15,25,dollDir,t/160,false,{weapon:LOADOUT.weapon,bag:1,swing:0});
+      drawHero(g,15,25,dollDir,t/160,false,{weapon:LOADOUT.weapon,bag:1,swing:0,outfit:OUTFIT_EQ});
       dollRaf=requestAnimationFrame(loop);};
     dollRaf=requestAnimationFrame(loop);
   }
   // ================= EINBRÜCHE, WERKBANK & STORY =================
-  const TNAMES={werkstatt:['Vinnies Autowerkstatt','Reifen-Ricky','Garage am Kanal','Tonys Tuning','Speedy Lube'],
+  var TNAMES={werkstatt:['Vinnies Autowerkstatt','Reifen-Ricky','Garage am Kanal','Tonys Tuning','Speedy Lube'],
     apotheke:['Ocean-Apotheke','Palm-Drugstore','Apotheke am Boulevard','Sunset Pharmacy'],
     villa:['Villa Flamingo','Casa Rosada','Villa Bellamar','Haus Seeblick']};
-  const TINFO={werkstatt:{n:'Autowerkstatt',req:1,e:3,loot:'Metall · Kabel · Klebeband · Platinen'},apotheke:{n:'Apotheke',req:3,e:3,loot:'Medikamente · Chemikalien · Bargeld'},villa:{n:'Villa',req:4,e:4,loot:'Schmuck · Gold · Platinen · Baupläne'}};
+  const TINFO={werkstatt:{n:'Autowerkstatt',req:1,e:3,loot:'Metall · Kabel · Klebeband · Platinen'},apotheke:{n:'Apotheke',req:3,e:3,loot:'Medikamente · Chemikalien · Bargeld'},villa:{n:'Villa',req:4,e:4,loot:'Schmuck · Gold · Gemälde · Platinen'},
+    lagerhalle:{n:'Lagerhalle',req:4,e:3,loot:'Elektronik · Metall · Waffen · Platinen'},juwelier:{n:'Juwelier',req:5,e:4,loot:'Ringe · Ketten · Uhren · Gold'},nachtclub:{n:'Nachtclub',req:5,e:4,loot:'Chips · Bargeld · Zigarren'},bank:{n:'Bank',req:8,e:5,loot:'Gold · Aktenkoffer · Schließfächer'}};
+  Object.assign(TNAMES,{lagerhalle:['Pier-9-Lagerhalle','Ocean Freight Depot','Kühlhaus Süd'],juwelier:['Diamond Dan','Goldschmiede Rossi','Bijou Royal'],nachtclub:['Club Paradiso','Velvet Lounge','The Electric Flamingo'],bank:['Harbor Savings','Coastline Credit']});
   function mkTarget(type){const I=TINFO[type];const pool=TNAMES[type];const d=Math.max(1,Math.min(3,1+Math.floor(Math.random()*Math.min(3,lvl-I.req+1))));
     return {kind:'gen',type,name:pool[Math.floor(Math.random()*pool.length)],diff:d,req:I.req,e:I.e,seed:Math.floor(Math.random()*1e9)};}
   function refreshTargets(){
-    const types=['werkstatt','apotheke','villa'];
+    const types=Object.keys(TINFO);
     while(TARGETS.length<3){const av=types.filter(x=>lvl>=TINFO[x].req||(x==='apotheke'&&Q>=7));const ty=av[Math.floor(Math.random()*av.length)]||'werkstatt';TARGETS.push(mkTarget(ty));}
     if(Q===2&&!TARGETS.some(x=>x.type==='werkstatt'))TARGETS[0]=mkTarget('werkstatt');
     if(Q===7&&!TARGETS.some(x=>x.type==='apotheke')){TARGETS[0]=mkTarget('apotheke');TARGETS[0].req=1;}
     if(Q===7)TARGETS.forEach(x=>{if(x.type==='apotheke')x.req=Math.min(x.req,lvl);});
+    if(Q===13&&FACTION){const bt=FACT[FACTION].btype;let x=TARGETS.find(x=>x.type===bt&&x.fac);if(!x){x=mkTarget(bt);x.req=1;x.fac=FACTION;x.name=FACT[FACTION].n+': '+x.name;TARGETS[0]=x;}}
+    TARGETS.forEach(x=>{if(!x.fac&&FACTION&&x.type===FACT[FACTION].btype&&Math.random()<.5)x.fac=FACTION;});
   }
   function boardHTML(){
     refreshTargets();
     const gOpen=Q>=10&&lvl>=4;
     const gold=Q>=10?`<button type="button" class="tgt gold ${gOpen?'':'lock'}" data-a="golden"><b>★ GOLDEN PALM</b><span>Story-Heist · Juwelier · Laser, Kameras, Tresor</span><small>${gOpen?'Energie 4 · Beute: Gold, Diamanten':'ab Stufe 4'}</small></button>`
       :`<div class="tgt lock"><b>🔒 GROSSER HEIST</b><span>Sal hat noch keinen Plan für dich.</span></div>`;
-    const list=TARGETS.map((x,i)=>{const lk=lvl<x.req;return `<button type="button" class="tgt ${lk?'lock':''}" data-a="plan" data-i="${i}"><b>${x.name}</b><span>${TINFO[x.type].n} · ${'★'.repeat(x.diff)}${'☆'.repeat(3-x.diff)} · ${TINFO[x.type].loot}</span><small>${lk?'ab Stufe '+x.req:'Energie '+x.e+' · zufälliger Grundriss'}</small></button>`;}).join('');
-    return `<h2>Pinnwand</h2><p class="qline">Was du mitnimmst, kannst du verlieren. Jeder Einbruch hat einen neuen Grundriss.</p><div class="tlist">${gold}${list}</div>${btns()}`;
+    const list=TARGETS.map((x,i)=>{const lk=lvl<x.req;return `<button type="button" class="tgt ${lk?'lock':''}" data-a="plan" data-i="${i}"><b>${x.name}</b><span>${TINFO[x.type].n} · ${'★'.repeat(x.diff)}${'☆'.repeat(3-x.diff)} · ${TINFO[x.type].loot}</span><small>${lk?'ab Stufe '+x.req:'Energie '+x.e+' · zufälliger Grundriss'}${x.fac?` · <b style="color:${FACT[x.fac].col}">Auftrag ${FACT[x.fac].n} (+Ruf)</b>`:''}</small></button>`;}).join('');
+    const bankOpen=Q>=17&&lvl>=7;
+    const bank=Q>=17?`<button type="button" class="tgt gold ${bankOpen?'':'lock'}" data-a="bank"><b>★ FIRST PALM BANK</b><span>Akt-2-Finale · Tresor, Schließfächer, Goldwagen</span><small>${bankOpen?'Energie 5 · nimm deine Crew mit!':'ab Stufe 7'}</small></button>`:'';
+    return `<h2>Pinnwand</h2><p class="qline">Was du mitnimmst, kannst du verlieren. Jeder Einbruch hat einen neuen Grundriss.</p><div class="tlist">${bank}${gold}${list}</div>${btns()}`;
   }
   const RECIPES=[
     {id:'rauch',need:{chemie:1,klebeband:1}},{id:'medkit',need:{pillen:1,klebeband:1}},{id:'dietrich',need:{metall:1,klebeband:1}},
     {id:'brecheisen',need:{metall:2}},{id:'schlagring',need:{metall:1}},
     {id:'dietrich2',need:{metall:2,klebeband:1,kabel:1},plan:1},{id:'blend',need:{chemie:2,metall:1},plan:1},
     {id:'stoer',need:{platine:1,kabel:2},plan:1,story:1},{id:'bohrer',need:{metall:2,kabel:1,platine:1},plan:1},
-    {id:'_bag',need:{metall:1,klebeband:2,kabel:1},plan:1}];
+    {id:'_bag',need:{metall:1,klebeband:2,kabel:1},plan:1},
+    {id:'tarnweste',need:{metall:3,klebeband:2},lv:1},{id:'nachtsicht',need:{platine:2,kabel:1},lv:1},{id:'stoer2',alias:'stoer',need:{platine:1,kabel:2},lv:1,hide:1}];
   const rname=id=>id==='_bag'?'Rucksack vergrößern':ITEMS[id].n;
   const cnt=id=>STASH.filter(x=>x===id).length;
   function benchHTML(){
-    const rows=RECIPES.map(r=>{const known=!r.plan||KNOWN.includes(r.id);
+    const rows=RECIPES.filter(r=>!r.hide).map(r=>{const known=!r.plan||KNOWN.includes(r.id);
+      if(r.lv&&UPG.werkbank<r.lv)return `<div class="rcp lock"><img class="ri" src="${ico(r.id)}" alt=""><div><b>${ITEMS[r.id].n}</b><small>Braucht Werkbank Stufe 2</small></div></div>`;
       if(!known)return `<div class="rcp lock"><span class="ri">?</span><div><b>??? – Bauplan fehlt</b><small>${r.story?'Kommt über die Story':'Baupläne findest du bei Einbrüchen'}</small></div></div>`;
       const maxed=r.id==='_bag'&&BAGLV>=BAGS.length-1;
       const ok=!maxed&&Object.entries(r.need).every(([k,v])=>cnt(k)>=v);
       const need=Object.entries(r.need).map(([k,v])=>`<i class="${cnt(k)>=v?'y':'n'}"><img src="${ico(k)}" alt="">${cnt(k)}/${v}</i>`).join('');
       const sub=r.id==='_bag'?(maxed?'Maximal ausgebaut':`${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]} → ${BAGS[BAGLV+1][0]}×${BAGS[BAGLV+1][1]}`):(ITEMS[r.id].d||'');
       return `<div class="rcp"><img class="ri" src="${ico(r.id==='_bag'?'tasche':r.id)}" alt=""><div><b>${rname(r.id)}</b><small>${sub}</small><div class="need">${need}</div></div><button type="button" class="ok mk" data-a="craft" data-r="${r.id}" ${ok?'':'disabled'}>BAUEN</button></div>`;}).join('');
-    return `<h2>Werkbank</h2><p class="qline">Material bringst du von Einbrüchen mit. Fertiges landet im Spind.</p><div class="rlist">${rows}</div>${btns()}`;
+    return `<span class="tag">STUFE ${UPG.werkbank+1}</span><h2>Werkbank</h2><p class="qline">Material bringst du von Einbrüchen mit. Fertiges landet im Spind.</p><div class="rlist">${rows}</div>
+      <div class="row"><button type="button" class="no" data-a="close">Zurück</button>${UPG.werkbank<1?'<button type="button" class="ok" data-a="benchup">Ausbau $600</button>':''}</div>`;
   }
   function craft(id){const r=RECIPES.find(x=>x.id===id);if(!r)return;
     if(!Object.entries(r.need).every(([k,v])=>cnt(k)>=v))return;
@@ -1558,11 +1606,17 @@
     if(Q===0)return job===0?'Geh ans Telefon':job===1?'Hol das Päckchen bei Big Sal im Diner':'Bring das Päckchen zum Containerhafen';
     return {1:'📞 Big Sal ruft an – Telefon',2:'Einbruch: eine Autowerkstatt (Pinnwand)',3:'📞 Big Sal ruft an – Telefon',4:'Werkbank: bau dir etwas',
       5:'Steig auf Stufe 3 auf (Jobs in der Stadt, Einbrüche)',6:'📞 Big Sal ruft an – Telefon',7:'Einbruch: eine Apotheke (Pinnwand)',8:'📞 Big Sal ruft an – Telefon',
-      9:'Bau einen Störsender (Platine aus Autos oder Villen)',10:lvl<4?'Erreiche Stufe 4 – dann: Golden Palm':'Großer Heist: Golden Palm (Pinnwand)',11:'📞 Big Sal ruft an – Telefon',12:'Freies Spiel: Villen, Jobs, Stufe 5 → Nachtclub'}[Q]||'';
+      9:'Bau einen Störsender (Platine aus Autos oder Villen)',10:lvl<4?'Erreiche Stufe 4 – dann: Golden Palm':'Großer Heist: Golden Palm (Pinnwand)',11:'📞 Big Sal ruft an – Telefon',
+      12:lvl<5?'Akt 2: Stufe 5 erreichen – dann Fraktion wählen':'Akt 2: Wähle eine Fraktion – Rico (Hafen), Lola (Nachtclub) oder Harvey (Kanzlei)',
+      13:FACTION?`Fraktions-Einsatz: ${TINFO[FACT[FACTION].btype].n} (Pinnwand)`:'',14:FACTION?`Ruf bei ${FACT[FACTION].n} auf 45 bringen (${REP[FACTION]}/45)`:'',15:'📞 Anruf – Telefon',
+      16:`Heuere 2 Crew-Mitglieder an – Big Sals Diner (${CREW.length}/2)`,17:lvl<7?'Erreiche Stufe 7 – dann: First Palm Bank':'Akt-2-Finale: First Palm Bank (Pinnwand)',18:'📞 Anruf – Telefon',
+      19:'Freies Spiel: Ruf maximieren, Versteck ausbauen – Akt 3 kommt bald'}[Q]||'';
   }
   function questTick(){
     if(Q===0&&job>=3){Q=1;}
     if(Q===5&&lvl>=3){Q=6;}
+    if(Q===14&&FACTION&&REP[FACTION]>=45){Q=15;}
+    if(Q===16&&CREW.length>=2){Q=17;}
     const el=document.getElementById('quest');if(el)el.textContent='ZIEL: '+questText();
     const ph=document.getElementById('h-phone');if(ph&&CALLS.includes(Q))ph.classList.add('alert');
   }
@@ -1575,15 +1629,119 @@
       6:['Du machst dir einen Namen, Kleiner. Zeit für die nächste Stufe.','Apotheken. Chemikalien für Rauch- und Blendgranaten, Medikamente für Verbandskästen. Aber: Da hängt eine Alarmanlage an der Tür. Du hast ein paar Sekunden zum Entschärfen. Steht an deiner Pinnwand.',7],
       8:['Jetzt hör gut zu. Der Golden Palm. Größter Juwelier der Stadt. Kameras, Laser, ein Tresor voller Gold.',
          'Dafür brauchst du einen Störsender. Ich schick dir den Bauplan. Die Platine holst du dir aus Autoradios in Werkstätten – oder aus einer Villa, wenn du dich traust.',9],
-      11:['Du hast den Golden Palm ausgeräumt?! Die ganze Stadt redet von nichts anderem.','Und das gefällt nicht jedem. Crane hat nach dir gefragt. Ab jetzt spielst du in einer anderen Liga, Kleiner.',12]}[Q];
+      11:['Du hast den Golden Palm ausgeräumt?! Die ganze Stadt redet von nichts anderem.','Und das gefällt nicht jedem. Drei Gruppen wollen dich jetzt: Ricos Los Cuchillos am Hafen, Lolas Neon Kings im Nachtclub – und Cranes Syndikat über Harvey in der Kanzlei. Such dir aus, mit wem du dich ins Bett legst.',12],
+      15:[FACTION?{kartell:'Rico hier. Du hast dir Respekt verdient, Bruder.',neon:'Lola hier, Süßer. Die Kings reden nur noch über dich.',syndikat:'Harvey Kline. Mr. Crane ist … beeindruckt.'}[FACTION]:'',
+          'Wir planen was Großes: die First Palm Bank. Tresor, Schließfächer, Gold. Allein schaffst du das nicht – du brauchst eine Crew. Sal kennt die besten Leute. Geh ins Diner.',16],
+      18:['Die First Palm Bank … leer geräumt. Kleiner, ich hab dreißig Jahre in dieser Stadt verbracht und so was noch nie gesehen.',
+          'Aber jetzt pass auf. Crane weiß, wer das war. Und er will die Stadt für sich allein. Die Fraktionen rüsten auf. Was jetzt kommt, ist Krieg.',19]}[Q];
     if(!T)return;
-    say('sal',T[0],[{t:'Ich hör zu.',f:()=>say('sal',T[1],[{t:Q===11?'Bring sie ruhig.':'Verstanden.',f:()=>{
+    const caller=Q===15&&FACTION?FACT[FACTION].who:'sal';
+    say(caller,T[0],[{t:'Ich hör zu.',f:()=>say(caller,T[1],[{t:Q===11?'Bring sie ruhig.':Q===18?'Soll er kommen.':'Verstanden.',f:()=>{
       Q=T[2];if(Q===9&&!KNOWN.includes('stoer'))KNOWN.push('stoer');if(Q===7)refreshTargets();
-      if(Q===12){sayRaw('erz','<div class="rbig">AKT 1 GESCHAFFT!</div>Vom Kurier zum Mann hinter dem Golden-Palm-Coup. Palm Harbor kennt jetzt deinen Namen.<div class="dsub">Weiter geht’s im freien Spiel: Villen, Jobs, Werkbank. Akt 2 kommt in der nächsten Version.</div>',[{t:'Weiter',f:closeDlg}]);hud();return;}
+      if(Q===12){sayRaw('erz','<div class="rbig">AKT 1 GESCHAFFT!</div>Vom Kurier zum Mann hinter dem Golden-Palm-Coup. Palm Harbor kennt jetzt deinen Namen.<div class="dsub">AKT 2: Wähle eine Fraktion. Ab Stufe 5 öffnen Nachtclub und Kanzlei – Rico am Hafen redet sofort mit dir.</div>',[{t:'Weiter',f:closeDlg}]);hud();return;}
+      if(Q===19){sayRaw('erz','<div class="rbig">AKT 2 GESCHAFFT!</div>Der Bank-Coup macht dich zur Legende. Aber Crane plant den Gegenschlag.<div class="dsub">AKT 3 – Fraktionskrieg & Multiplayer – kommt bald. Bis dahin: Ruf auf 100 bringen, Versteck ausbauen, alle Klamotten sammeln.</div>',[{t:'Weiter',f:closeDlg}]);hud();return;}
       if(Q===9)toastMsg('BAUPLAN: STÖRSENDER');
       closeDlg();hud();}}])}]);
   }
-  if(location.hash==='#dbg')window._g={invOpen,LOADOUT,get STASH(){return STASH},get Q(){return Q},set Q(v){Q=v},setLvl:v=>{lvl=v;hud();},TARGETS,open:id=>document.getElementById(id).click(),craft,get KNOWN(){return KNOWN},storyCall,setJob:v=>{job=v;hud();}};
+  if(location.hash==='#dbg')window._g={invOpen,LOADOUT,get STASH(){return STASH},get Q(){return Q},set Q(v){Q=v},setLvl:v=>{lvl=v;hud();},TARGETS,open:id=>document.getElementById(id).click(),craft,get KNOWN(){return KNOWN},storyCall,setJob:v=>{job=v;hud();},factionTalk:n=>factionTalk(n),crewMenu:()=>crewMenu(),get CREW(){return CREW},get FACTION(){return FACTION},get REP(){return REP},OUTFIT_EQ,addCash:n=>{cash+=n;hud();}};
+  // ================= KLEIDUNG, WERTE, FRAKTIONEN, CREW, AUSBAU, SPEICHERN =================
+  const CLOTH={
+    cap:['kopf','Basecap',{'Glück':1}],fedora:['kopf','Fedora',{Charme:2}],bandana:['kopf','Bandana',{Muskeln:1}],sturmhaube:['kopf','Sturmhaube',{},'Einsatz: −1 Heat'],
+    sonnenbrille:['brille','Pilotenbrille',{Charme:1}],nachtsicht:['brille','Nachtsichtbrille',{},'Einsatz: viel größere Sicht'],nerdbrille:['brille','Hornbrille',{'Köpfchen':2}],
+    sakko_pink:['jacke','Pinkes Sakko',{Charme:1}],lederjacke:['jacke','Lederjacke',{Muskeln:2}],hawaiihemd:['jacke','Hawaiihemd',{'Glück':2}],trainingsjacke:['jacke','Trainingsjacke',{Ausdauer:2}],
+    tarnweste:['jacke','Schutzweste',{},'Einsatz: −45 % Schaden'],anzug_weiss:['jacke','Weißer Anzug',{Charme:3,'Köpfchen':1}],
+    sneaker:['schuhe','Sneaker',{Ausdauer:1}],schleicher:['schuhe','Schleichschuhe',{},'Einsatz: Rennen fast lautlos'],loafer:['schuhe','Slipper',{Charme:1}],boots:['schuhe','Stiefel',{Muskeln:1}]};
+  Object.entries(CLOTH).forEach(([id,c])=>{ITEMS[id]={n:c[1],t:'cloth',slot:c[0],w:1,h:1,v:40,bonus:c[2],d:(c[3]||Object.entries(c[2]).map(([k,v])=>k+' +'+v).join(', '))};});
+  Object.assign(ITEMS,{elektronik:{n:'Videorekorder',t:'loot',w:2,h:1,v:220},gemaelde:{n:'Gemälde',t:'loot',w:2,h:2,v:1400},goldkette:{n:'Goldkette',t:'loot',w:1,h:1,v:320},
+    aktenkoffer:{n:'Aktenkoffer',t:'loot',w:2,h:1,v:650},zigarren:{n:'Zigarrenkiste',t:'loot',w:1,h:1,v:90},chips:{n:'Casino-Chips',t:'loot',w:1,h:1,v:260}});
+  const OSLOT={kopf:'KOPF',brille:'BRILLE',jacke:'JACKE',schuhe:'SCHUHE'};
+  const BASE={Muskeln:10,'Köpfchen':10,Charme:12,Ausdauer:10,'Glück':8};
+  function statVal(s){let v=(BASE[s]||10)+Math.floor((lvl-1)/2);Object.values(OUTFIT_EQ).forEach(id=>{if(id&&ITEMS[id]&&ITEMS[id].bonus&&ITEMS[id].bonus[s])v+=ITEMS[id].bonus[s];});
+    if(FACTION&&FACT[FACTION].stat[0]===s)v+=FACT[FACTION].stat[1];return v;}
+  function heistPerks(){const p={};const o=OUTFIT_EQ;
+    if(o.kopf==='sturmhaube')p.heat=(p.heat||0)+1;if(o.brille==='nachtsicht')p.nv=1;if(o.jacke==='tarnweste')p.vest=1;if(o.schuhe==='schleicher')p.quiet=1;
+    CREW_ON.forEach(c=>{const P=CREWS[c].p;Object.entries(P).forEach(([k,v])=>p[k]=(p[k]||0)+v);});
+    if(FACTION==='syndikat')p.heat=(p.heat||0)+1;return p;}
+  // ---------- Fraktionen ----------
+  const FACT={
+    kartell:{n:'Los Cuchillos',who:'rico',where:'Containerhafen',col:'#4f8bff',stat:['Muskeln',2],btype:'lagerhalle',perk:'Bei Joe 25 % billiger · Muskeln +2',
+      desc:'Schmuggler vom Hafen. Container, Boote, Waffen. Laut, direkt, loyal bis zum Ende.',
+      jobs:[{n:'Container umleiten',stat:'Köpfchen',p:60,t:7,m:90,x:25,e:2,h:1,rep:'kartell',ev:'Ein Zollbeamter stellt Fragen zu den Papieren.',safe:'Papiere vorzeigen',risk:'Bestechen'},
+            {n:'Boot bewachen',stat:'Muskeln',p:65,t:6,m:70,x:20,e:2,rep:'kartell',ev:'Zwei Typen von der Konkurrenz schleichen am Steg herum.',safe:'Funk an Rico',risk:'Selbst verjagen'}]},
+    neon:{n:'Neon Kings',who:'lola',where:'Nachtclub',col:'#ff3d8b',stat:['Charme',2],btype:'nachtclub',perk:'Crew 30 % billiger · Charme +2',
+      desc:'Clubs, Casino, Nachtleben. Wer feiert, zahlt – und wer zahlt, gehört ihnen.',
+      jobs:[{n:'VIP-Gäste betreuen',stat:'Charme',p:65,t:6,m:80,x:22,e:2,rep:'neon',ev:'Ein Promi will „besondere Ware“ und wedelt mit Scheinen.',safe:'Höflich ablehnen',risk:'Was organisieren'},
+            {n:'Türsteher-Schicht',stat:'Muskeln',p:60,t:7,m:75,x:22,e:2,h:1,rep:'neon',ev:'Ein Betrunkener will sich reinprügeln.',safe:'Polizei rufen',risk:'Selbst klären'}]},
+    syndikat:{n:'Crane-Syndikat',who:'harvey',where:'Kanzlei (Innenstadt)',col:'#b18bff',stat:['Köpfchen',2],btype:'juwelier',perk:'Nach jedem Einsatz −1 Heat · Köpfchen +2',
+      desc:'Anwälte, Banker, Villen. Saubere Hände, schmutziges Geld – und Victor Crane zieht die Fäden.',
+      jobs:[{n:'Akten verschwinden lassen',stat:'Köpfchen',p:60,t:7,m:95,x:25,e:2,rep:'syndikat',ev:'Die Sekretärin kommt früher zurück als gedacht.',safe:'Rausschleichen',risk:'Weitersuchen'},
+            {n:'Geld waschen',stat:'Glück',p:55,t:8,m:110,x:28,e:2,h:1,rep:'syndikat',ev:'Die Bank meldet die Einzahlung als verdächtig.',safe:'Kleinere Beträge',risk:'Alles auf einmal'}]}};
+  const FBYNPC={rico:'kartell',lola:'neon',harvey:'syndikat'};
+  const RANKS=[[0,'Anwärter'],[20,'Mitglied'],[45,'Vertrauter'],[70,'Leutnant'],[100,'Rechte Hand']];
+  const rankOf=r=>RANKS.filter(x=>r>=x[0]).pop()[1];
+  function addRep(f,n){if(!f||!FACTION)return 0;REP[f]=Math.max(0,Math.min(100,REP[f]+n));if(f===FACTION)Object.keys(REP).forEach(k=>{if(k!==f)REP[k]=Math.max(0,REP[k]-Math.ceil(n/3));});return n;}
+  function factionTalk(npc){
+    const f=FBYNPC[npc],F=FACT[f];
+    if(!FACTION){
+      if(Q<12){say(npc,{rico:'Du schon wieder. Komm wieder, wenn du dir einen Namen gemacht hast.',lola:'Süß. Aber ich rede nur mit Leuten, über die man spricht.',harvey:'Ich habe keinen Termin mit Ihnen, mein Freund.'}[npc],[{t:'Bis dann.',f:closeDlg}]);return;}
+      say(npc,{rico:'Der Golden-Palm-Typ. Hör zu: Am Hafen gibt es genug Container für uns alle. Werd einer von uns – Los Cuchillos.',
+        lola:'Der Mann, der den Golden Palm geknackt hat … Die Neon Kings könnten jemanden wie dich gebrauchen. Clubs, Casino, Geld ohne Ende.',
+        harvey:'Ihr Ruf eilt Ihnen voraus. Mr. Crane schätzt Talent. Das Syndikat bietet Schutz, Anwälte – und Aufträge mit Stil.'}[npc],[
+        {t:`Beitreten: ${F.n}<small>${F.perk}</small>`,f:()=>say(npc,'Sicher? Wer einmal dabei ist, wechselt nicht einfach die Seiten.',[
+          {t:'Ich bin dabei.',f:()=>{FACTION=f;REP[f]=5;if(Q===12)Q=13;refreshTargets();sfx('stamp');hud();
+            sayRaw(npc,`<div class="rbig">WILLKOMMEN!</div>Du gehörst jetzt zu <b>${F.n}</b>.<div class="reward"><b class="x">${F.perk}</b></div><div class="dsub">Dein erster Auftrag hängt an der Pinnwand.</div>`,[{t:'Los geht’s',f:closeDlg}]);}},
+          {t:'Ich überleg’s mir.',f:closeDlg}])},
+        {t:'Erzähl mehr.',f:()=>say(npc,F.desc,[{t:'Verstehe.',f:()=>factionTalk(npc)}])},{t:'Später.',f:closeDlg}]);return;}
+    if(FACTION!==f){say(npc,{rico:'Du läufst jetzt mit den anderen. Verschwinde von meinem Hafen.',lola:'Falsche Farben, Süßer. Raus hier.',harvey:'Wir haben einander nichts zu sagen.'}[npc],[{t:'Schon gut.',f:closeDlg}]);return;}
+    const ch=F.jobs.map(j=>({t:`${j.n}<small>$${j.m} · +Ruf · ${j.stat} · Energie ${j.e}</small>`,f:()=>startJob(j,npc,()=>factionTalk(npc))}));
+    ch.push({t:`Mein Ruf <small>${REP[f]}/100 · ${rankOf(REP[f])}</small>`,f:()=>say(npc,`Du bist ${rankOf(REP[f])}. ${REP[f]<45?'Da geht noch mehr.':REP[f]<100?'Die Leute reden über dich.':'Ohne dich läuft hier nichts mehr.'}`,[{t:'Okay.',f:()=>factionTalk(npc)}])});
+    ch.push({t:'Tschüss',f:closeDlg});
+    say(npc,{rico:'Was brauchst du, Bruder?',lola:'Hey Partner. Arbeit gefällig?',harvey:'Ah, unser bester Mann. Was kann ich für Sie tun?'}[npc],ch);
+  }
+  // ---------- Crew ----------
+  const CREWS={
+    mags:{n:'Mags',role:'Fahrerin',cost:700,p:{heat:1},txt:'Fluchtwagen: −1 Heat nach jedem Einsatz'},
+    tito:{n:'Tito',role:'Späher',cost:500,p:{code:1},txt:'Kennt den Safe-Code schon vorher'},
+    rosie:{n:'Rosie',role:'Hackerin',cost:800,p:{jam:40},txt:'Kameras, Laser & Alarm die ersten 40 s gestört'},
+    sunny:{n:'Sunny',role:'Muskel',cost:650,p:{ko:1},txt:'Ein Wachmann ist schon ausgeknockt'},
+    gus:{n:'Gus',role:'Schmuggler',cost:900,p:{bag:1},txt:'Rucksack eine Reihe größer'}};
+  const crewCost=id=>Math.round(CREWS[id].cost*(FACTION==='neon'?.7:1));
+  function crewMenu(){
+    const ch=Object.entries(CREWS).map(([id,c])=>{const own=CREW.includes(id),on=CREW_ON.includes(id);
+      return {t:`${c.n} · ${c.role}<small>${c.txt} · ${own?(on?'IM TEAM ✔ (antippen = raus)':'angeheuert (antippen = ins Team)'):'$'+crewCost(id)}</small>`,f:()=>{
+        if(!own){if(cash<crewCost(id)){say('sal','Ohne Kohle kein Profi, Kleiner.',[{t:'Okay.',f:crewMenu}]);return;}addReward(-crewCost(id),0,0);CREW.push(id);sfx('cash');if(CREW_ON.length<2)CREW_ON.push(id);questTick();crewMenu();return;}
+        if(on)CREW_ON.splice(CREW_ON.indexOf(id),1);else{if(CREW_ON.length>=2)CREW_ON.shift();CREW_ON.push(id);}crewMenu();}};});
+    ch.push({t:'Fertig',f:closeDlg});
+    say('sal',`Das sind meine Leute. Höchstens zwei kommen pro Einsatz mit. Im Team: ${CREW_ON.map(c=>CREWS[c].n).join(', ')||'keiner'}.`,ch);
+  }
+  // ---------- Ausbau ----------
+  const BEDS=[['Matratze',10,0],['Bett',14,400],['Wasserbett',18,1500]];
+  function bedHTML(){const b=BEDS[UPG.bett],nx=BEDS[UPG.bett+1];
+    return `<span class="tag">${b[0].toUpperCase()}</span><h2>${b[0]}</h2><p>Ausruhen füllt deine Energie (max. ${NMAX}). Energie lädt sich außerdem von selbst auf: 1 Punkt alle 3 Minuten.</p>${nx?`<p><b>Ausbau: ${nx[0]}</b> – max. Energie ${nx[1]} · $${nx[2]}</p>`:''}
+      <div class="row"><button type="button" class="no" data-a="close">Zurück</button>${nx?`<button type="button" class="no" data-a="bedup">Ausbauen</button>`:''}<button type="button" class="ok" data-a="rest">Ausruhen</button></div>`;}
+  // ---------- Energie über Zeit ----------
+  const REGEN=180000;
+  function regen(){const now=Date.now();if(nrg>=NMAX){lastRegen=now;return;}const n=Math.floor((now-lastRegen)/REGEN);if(n>0){nrg=Math.min(NMAX,nrg+n);lastRegen+=n*REGEN;if(nrg>=NMAX)lastRegen=now;hud();}}
+  setInterval(regen,10000);
+  // ---------- Speichern ----------
+  const SKEY='nh_save_v1';let saveT=0;
+  function saveGame(){clearTimeout(saveT);saveT=setTimeout(()=>{if(scene==='start'||scene==='intro')return;
+    try{localStorage.setItem(SKEY,JSON.stringify({v:1,t:Date.now(),cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,TARGETS,STASH,LOADOUT,OUTFIT_EQ,FACTION,REP,CREW,CREW_ON,UPG,NMAX,lastRegen,JOB}));}catch(e){}},400);}
+  function hasSave(){try{return !!localStorage.getItem(SKEY);}catch(e){return false;}}
+  function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SKEY));}catch(e){return false;}if(!d)return false;
+    ({cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,FACTION,UPG,NMAX,lastRegen}=Object.assign({cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,FACTION,UPG,NMAX,lastRegen},d));
+    STASH=d.STASH||STASH;Object.assign(LOADOUT,d.LOADOUT||{});Object.assign(OUTFIT_EQ,d.OUTFIT_EQ||{});Object.assign(REP,d.REP||{});
+    CREW.splice(0,CREW.length,...(d.CREW||[]));CREW_ON.splice(0,CREW_ON.length,...(d.CREW_ON||[]));TARGETS.splice(0,TARGETS.length,...(d.TARGETS||[]));
+    if(d.JOB){JOB=d.JOB;clearInterval(jobTimer);jobTimer=setInterval(renderJob,250);}
+    return true;}
+  window.addEventListener('pagehide',()=>{clearTimeout(saveT);if(scene!=='start'&&scene!=='intro')try{localStorage.setItem(SKEY,JSON.stringify({v:1,t:Date.now(),cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,TARGETS,STASH,LOADOUT,OUTFIT_EQ,FACTION,REP,CREW,CREW_ON,UPG,NMAX,lastRegen,JOB}));}catch(e){}});
+  function continueGame(){loadGame();regen();wipeTo(()=>{show('hide');enterHideout();
+      $('h-phone').classList.toggle('alert',job===0||CALLS.includes(Q));$('h-door').classList.toggle('alert',job===1||job===2);hud();renderJob();
+      setTimeout(()=>toastMsg('WILLKOMMEN ZURÜCK'),700);});}
+  window.NH_GAME={hasSave,wipe:()=>{try{localStorage.removeItem(SKEY);}catch(e){}},cheat:(k)=>{if(k==='cash')addReward(500,0,0);if(k==='lvl'){addReward(0,100,0);}if(k==='nrg'){nrg=NMAX;hud();}if(k==='mat'){['metall','metall','kabel','kabel','klebeband','klebeband','chemie','platine','pillen'].forEach(i=>STASH.push(i));toastMsg('MATERIAL IM SPIND');}saveGame();},
+    info:()=>({lvl,Q,cash})};
+  window.__continue=continueGame;window.__nhReady=true;
+  if(hasSave()){try{const d=JSON.parse(localStorage.getItem(SKEY));$('tap').innerHTML='TIPPEN ZUM WEITERSPIELEN<br><small style="font-size:.55em">Spielstand: Stufe '+d.lvl+'</small>';}catch(e){}}
   // ---------- Pixel-Einsatz (iframe) ----------
   function startPixHeist(T){
     let f=$('pixh'); if(f)f.remove();
@@ -1593,18 +1751,18 @@
     if(window.NHA){NHA.sfx('door');NHA.mood('action');}
     wipeTo(()=>document.body.appendChild(f));
   }
-  const XPB={werkstatt:35,apotheke:50,villa:75,golden:150};
+  const XPB={werkstatt:35,apotheke:50,villa:75,golden:150,lagerhalle:55,juwelier:70,nachtclub:70,bank:220};
   window.addEventListener('message',e=>{
     const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
     const T=JSON.parse(f.dataset.t||'{}');
-    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1],heat}},'*');return;}
+    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:heistPerks(),outfit:Object.assign({},OUTFIT_EQ)}},'*');return;}
     if(d.type==='sfx'){if(window.NHA)NHA.sfx(d.n);return;}
     if(d.type==='mood'){if(window.NHA)NHA.mood(d.m);return;}
     if(d.type!=='heistEnd')return;
     if(window.NHA)NHA.mood('chill');
     const known=id=>ITEMS[id];
     let html; const typ=T.kind==='golden'?'golden':T.type;
-    if(T.kind!=='golden'){const i=TARGETS.findIndex(x=>x.seed===T.seed);if(i>=0)TARGETS.splice(i,1);}
+    if(T.kind!=='golden'&&!T.story){const i=TARGETS.findIndex(x=>x.seed===T.seed);if(i>=0)TARGETS.splice(i,1);}
     if(d.res==='escape'){
       const bag=(d.bag||[]).filter(known); const plans=bag.filter(id=>id==='bauplan').length; const items=bag.filter(id=>id!=='bauplan');
       const val=items.reduce((s,id)=>s+(ITEMS[id].t==='mat'?0:ITEMS[id].v),0);
@@ -1612,11 +1770,14 @@
       Object.values(d.lo||{}).forEach(id=>{if(id&&known(id))STASH.push(id);});
       Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null);
       const xpG=(XPB[typ]||40)+Math.min(80,Math.round(val/60)); addReward(0,xpG,d.heat||0); sfx('cash');
-      const up=unlockPlans(plans);const pl=up.map(n=>n?`<b class="x">Neuer Bauplan: ${n}</b>`:'<b>Bauplan schon bekannt · +20 XP</b>').join('');
+      const up=unlockPlans(plans);let pl=up.map(n=>n?`<b class="x">Neuer Bauplan: ${n}</b>`:'<b>Bauplan schon bekannt · +20 XP</b>').join('');
       if(up.some(n=>!n))addReward(0,20*up.filter(n=>!n).length,0);
       const mats={};items.filter(id=>ITEMS[id].t==='mat').forEach(id=>mats[id]=(mats[id]||0)+1);
       const ml=Object.entries(mats).map(([k,v])=>`${v}× ${ITEMS[k].n}`).join(' · ');
       if(typ==='werkstatt'&&Q===2)Q=3; if(typ==='apotheke'&&Q===7)Q=8; if(typ==='golden'&&Q===10)Q=11;
+      let rp=0;if(T.fac&&T.fac===FACTION)rp=addRep(FACTION,12);else if(FACTION&&typ===FACT[FACTION].btype)rp=addRep(FACTION,5);
+      if(Q===13&&FACTION&&T.fac===FACTION){Q=14;} if(T.story==='bank'&&Q===17){Q=18;if(FACTION)rp+=addRep(FACTION,20);}
+      if(rp)pl+=`<b class="x">+${rp} Ruf ${FACT[FACTION].n}</b>`;
       html=`<div class="rbig">ENTKOMMEN!</div>${T.name}: erledigt.<div class="reward"><b>Beute $${val}</b><b class="x">+ ${xpG} XP</b>${d.heat?`<b class="h">+${d.heat} Heat</b>`:''}${pl}</div>${ml?`<div class="dsub">Material: ${ml}</div>`:''}<div class="dsub">Alles liegt im Spind. Beute verkaufst du bei Dee, Material verbaust du an der Werkbank.</div>`;
     } else {
       const lost=Object.values(LOADOUT).filter(x=>x).length; const safe=LOADOUT.safe;
@@ -1624,15 +1785,18 @@
       const bail=Math.min(cash,100); addReward(-bail,15,2); sfx('stamp');
       html=`<div class="rbig bad">ERWISCHT!</div>Eine Nacht in der Zelle, dann holt dich Sals Anwalt raus.<div class="reward"><b class="h">${lost} Ausrüstungsteile weg</b><b class="h">Kaution −$${bail}</b><b class="h">+2 Heat</b></div>${safe?`<div class="dsub">Gerettet im Geheimfach: ${ITEMS[safe].n}</div>`:''}<div class="dsub">Neues Werkzeug baust du an der Werkbank.</div>`;
     }
-    refreshTargets();
+    refreshTargets();saveGame();
     wipeTo(()=>{f.remove();show('hide');fitAll();hud();setTimeout(()=>sayRaw('erz',html,[{t:'Weiter',f:()=>{closeDlg();hud();if(CALLS.includes(Q))toastMsg('DAS TELEFON KLINGELT');}}]),300);});
   });
-  const SHOP={joe:[['metall',20],['kabel',15],['klebeband',12]],tito:[['chemie',35],['pillen',45],['klebeband',12]]};
+  const SHOP={joe:[['metall',20],['kabel',15],['klebeband',12],['boots',130],['lederjacke',260],['schleicher',300]],tito:[['chemie',35],['pillen',45],['klebeband',12],['bandana',50],['trainingsjacke',140],['sturmhaube',220]],
+    sunny:[['cap',60],['hawaiihemd',150],['loafer',120],['sonnenbrille',80]],duke:[['fedora',250],['nerdbrille',90],['anzug_weiss',900]]};
+  const SHOPT={sunny:'Klamotten kaufen <small>STRAND-STYLE</small>',duke:'Edle Klamotten <small>FÜR LEUTE MIT GELD</small>'};
+  const price=(npc,p)=>Math.round(p*(npc==='joe'&&FACTION==='kartell'?.75:1));
   function shopMenu(npc,msg){
-    const ch=SHOP[npc].map(([id,p])=>({t:`${ITEMS[id].n} <small>$${p} · im Spind: ${STASH.filter(x=>x===id).length}</small>`,f:()=>{
-      if(cash<p){shopMenu(npc,'Ohne Kohle keine Ware.');return;}addReward(-p,0,0);STASH.push(id);sfx('cash');shopMenu(npc,`${ITEMS[id].n} – liegt in deinem Spind. Noch was?`);}}));
+    const ch=SHOP[npc].map(([id,p0])=>{const p=price(npc,p0);return {t:`${ITEMS[id].n} <small>$${p} · ${ITEMS[id].t==='cloth'?ITEMS[id].d:'im Spind: '+STASH.filter(x=>x===id).length}</small>`,f:()=>{
+      if(cash<p){shopMenu(npc,'Ohne Kohle keine Ware.');return;}addReward(-p,0,0);STASH.push(id);sfx('cash');shopMenu(npc,`${ITEMS[id].n} – liegt in deinem Spind. Noch was?`);}};});
     ch.push({t:'Fertig',f:()=>npcMenu('Sonst noch was?')});
-    say(npc,msg||(npc==='joe'?'Schrott hab ich genug. Kostet aber.':'Ich kenn da jemanden, der kennt jemanden. Was brauchst du?'),ch);
+    say(npc,msg||({joe:'Schrott hab ich genug. Kostet aber.',tito:'Ich kenn da jemanden, der kennt jemanden. Was brauchst du?',sunny:'Bro, mit dem Look kommst du überall rein!',duke:'Qualität hat ihren Preis, Junge.'}[npc]),ch);
   }
   // Dee kauft Beute
   function sellLoot(){
@@ -1678,7 +1842,8 @@
     upd();$('sInstTxt').style.color='#ffe14d';};
   window.addEventListener('appinstalled',()=>{$('sInstTxt').textContent='Installiert ✔';});
   $('sFull').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){}};
-  let rs=0;$('sReset').onclick=()=>{if(rs){location.reload();return;}rs=1;$('sReset').querySelector('b').textContent='Nochmal tippen zum Bestätigen';setTimeout(()=>{rs=0;$('sReset').querySelector('b').textContent='Spiel neu starten';},3000);};
+  let rs=0;$('sReset').onclick=()=>{if(rs){if(window.NH_GAME)NH_GAME.wipe();window.__nhReady=false;location.reload();return;}rs=1;$('sReset').querySelector('b').textContent='Nochmal tippen = alles löschen';setTimeout(()=>{rs=0;$('sReset').querySelector('b').textContent='Neues Spiel';},3000);};
+  document.querySelectorAll(".tsth button").forEach(b=>b.onclick=()=>{if(window.NH_GAME)NH_GAME.cheat(b.dataset.c);b.style.background='#7dffb2';setTimeout(()=>b.style.background='',300);});
   setInterval(()=>{const m=$('map'),s=$('start'),i=$('intro');const vis=id=>{const x=document.getElementById(id);return x&&x.classList.contains('on');};const sh=document.getElementById('sheet');
     const hide=vis('map')||!!document.getElementById('pixh')||vis('dlg')||vis('inv')||(sh&&sh.classList.contains('open'))||vis('paper')||vis('menu2');$('gear').style.display=hide?'none':'';},400);
 })();

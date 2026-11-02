@@ -59,14 +59,35 @@ function drawWeapon(c,x,y,d,bob,id,swing){
   if(swing>0){const s=Math.sin((1-swing/.25)*Math.PI);ang+=(d==='left'||d==='down'?-1:1)*s*1.6;}
   c.save();c.translate(hx,hy+bob);c.rotate(ang);const h=im.height,w=im.width;c.drawImage(im,-Math.floor(w/2),id==='schlagring'?-2:-h+3);c.restore();
 }
-// gear = {weapon, bag, swing}
+// ===== Kleidung =====
+const OUTFIT={
+  jacke:{sakko_pink:{p:'#ff5fa8',P:'#c83c80',w:'#f4f1e8'},lederjacke:{p:'#4a3428',P:'#2a1c12',w:'#d8d0c0'},hawaiihemd:{p:'#2fc8a8',P:'#1f8a76',w:'#ffd34d'},
+    trainingsjacke:{p:'#3a5cd0',P:'#26398a',w:'#f4f1e8'},tarnweste:{p:'#55663f',P:'#36422a',w:'#2a2a2a'},anzug_weiss:{p:'#eeeae0',P:'#bfb8a8',w:'#7ff6ff'}},
+  schuhe:{sneaker:{b:'#f4f1e8'},schleicher:{b:'#1a1a22'},loafer:{b:'#8a4a1a'},boots:{b:'#4a321e'}},
+  brille:{sonnenbrille:{g:'#111',c:'#2fe0ea'},nachtsicht:{g:'#2a3a1a',c:'#7dff5a'},nerdbrille:{g:'#3a2a1a',c:'#d8e8f0'},_:{g:'#e8b088',c:'#3a2a1a'}},
+  hose:{_:{n:'#3a3a6a'}}
+};
+const HATS={
+  cap:{c:{k:'#140a1c',r:'#ff3d8b',R:'#c8286a'},px:["....kkkkkk....","...krrrrrrk...","..krrrrrrrrk..","..kRRRRRRRRRRk"]},
+  fedora:{c:{k:'#140a1c',f:'#3a2a20',F:'#ff5fa8'},px:["....kkkkkk....","...kffffffk...","..kFFFFFFFFk..","kkffffffffffkk"]},
+  bandana:{c:{k:'#140a1c',r:'#d82a2a'},px:["..............","....kkkkkk....","..krrrrrrrrkk.","...........rk."]},
+};
+function outfitPal(o){o=o||{};const P=Object.assign({},PAL_P,(OUTFIT.jacke[o.jacke]||OUTFIT.jacke.sakko_pink),(OUTFIT.schuhe[o.schuhe]||OUTFIT.schuhe.sneaker),(OUTFIT.brille[o.brille]||OUTFIT.brille._));
+  if(o.kopf==='sturmhaube'){Object.assign(P,{h:'#1c1c22',H:'#101014',s:'#1c1c22',S:'#101014',g:'#1c1c22',c:'#f4f1e8'});}
+  return P;}
+const hatCache={};
+function hatImg(id){if(hatCache[id])return hatCache[id];const H=HATS[id];if(!H)return null;const c=document.createElement('canvas');c.width=14;c.height=H.px.length;const g=c.getContext('2d');
+  H.px.forEach((r,y)=>{for(let x=0;x<r.length;x++){const ch=r[x];if(ch==='.')continue;g.fillStyle=H.c[ch];g.fillRect(x,y,1,1);}});return hatCache[id]=c;}
+// gear = {weapon, bag, swing, outfit}
 function drawHero(c,x,y,dir,step,moving,gear){
   gear=gear||{};x=Math.round(x);y=Math.round(y);
   c.fillStyle='rgba(0,0,0,.4)';c.beginPath();c.ellipse(x,y+3,6,2.2,0,0,7);c.fill();
   const d=dirName(dir),fr=moving?1+(Math.floor(step)%2):0,bob=moving&&(Math.floor(step)%2)?-1:0;
   if(gear.bag)drawBag(c,x,y,d,bob,false);
   if(gear.weapon&&d==='up')drawWeapon(c,x,y,d,bob,gear.weapon,gear.swing||0);
-  c.drawImage(sprite(d,fr,PAL_P,'p'),x-7,y-17+bob);
+  const o=gear.outfit||{},key='p'+[o.jacke,o.schuhe,o.brille,o.kopf==='sturmhaube'?'m':''].join('|');
+  c.drawImage(sprite(d,fr,outfitPal(o),key),x-7,y-17+bob);
+  const hi=hatImg(o.kopf);if(hi){if(d==='left'){c.save();c.translate(x+7,0);c.scale(-1,1);c.drawImage(hi,(d==='left'||d==='right')?1:0,y-18+bob);c.restore();}else c.drawImage(hi,x-7+((d==='right')?1:0),y-18+bob);}
   if(gear.bag)drawBag(c,x,y,d,bob,true);
   if(gear.weapon&&d!=='up')drawWeapon(c,x,y,d,bob,gear.weapon,gear.swing||0);
 }
