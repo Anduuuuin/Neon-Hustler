@@ -4,7 +4,7 @@
   const S=Object.assign({mu:.6,fx:.7},(()=>{try{return JSON.parse(localStorage.getItem(LS))||{};}catch(e){return {};}})());
   let ctx=null,comp,mBus,fBus,rev,revIn,dly,started=false;
   const IN_FRAME=window.parent!==window;
-  let mood='chill',nextMood='chill',station=S.st||0,radioOff=!!S.off;
+  let mood='chill',nextMood='chill',station=S.st||0,radioOff=S.off===undefined?true:!!S.off;
   const STATIONS=['NEON 87.6','VICE FM','SUNSET WAVE'];
   const mtof=m=>440*Math.pow(2,(m-69)/12);
 
@@ -60,7 +60,7 @@
   let tempo=92,step=0,bar=0,prog=PROG.chill[0],nextT=0,timer=null,leadMotif=[];
   function newSection(){
     const P=PROG[mood];prog=P[Math.floor(Math.random()*P.length)];
-    tempo=BPM[mood][station%3];
+    tempo=(mood==='chill'&&radioOff)?70:BPM[mood][station%3];
     const base=[0,3,7,10,12,7,3,5];leadMotif=Array.from({length:8},()=>base[Math.floor(Math.random()*base.length)]);
   }
   function clap(t,v=1){[0,.012,.024].forEach(d=>{const n=ctx.createBufferSource();n.buffer=noise();const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1200;f.Q.value=1.2;const g=ctx.createGain();env(g,t+d,.001,.3*v,.08);n.connect(f);f.connect(g);g.connect(mBus);const s=ctx.createGain();s.gain.value=.5;g.connect(s);s.connect(revIn);n.start(t+d);n.stop(t+d+.15);});}
@@ -81,10 +81,16 @@
     if(s16%4===2)pluck(t,tri[(s16+bar)%3]+24,.55,'triangle');
     if(bar%8>=4&&s16===8)lead(t,tri[bar%3]+24,60/tempo*3,.45);
   }
+  function scheduleAmbient(t){ // leise Hintergrund-Atmo ohne Schlagzeug
+    const s16=step%16,ch=prog[bar%4],root=ch[0],tri=triad(root,ch[1]);
+    if(s16===0&&bar%2===0)pad(t,tri.map(n=>n+12),60/tempo*8,.55);
+    if(s16===0)bass(t,root-12,60/tempo*3,.35,260);
+    if(s16===6||s16===14)pluck(t,tri[(bar+s16)%3]+24,.3,'triangle');
+  }
   function schedule(t){
     const s16=step%16,ci=Math.floor(bar%4),ch=prog[ci],root=ch[0],tri=triad(root,ch[1]);
     const act=mood!=='chill',alarm=mood==='alarm',fill=bar%8===7&&s16>=12;
-    if(!act){if(radioOff)return;if(station===1)return scheduleVice(t);if(station===2)return scheduleSunset(t);}
+    if(!act){if(radioOff)return scheduleAmbient(t);if(station===1)return scheduleVice(t);if(station===2)return scheduleSunset(t);}
     // Pads am Taktanfang
     if(s16===0){pad(t,tri.map(n=>n+12),60/tempo*4,act?.8:1);}
     // Schlagzeug
