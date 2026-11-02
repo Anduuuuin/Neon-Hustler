@@ -456,6 +456,15 @@
   .setb b{display:block;font-size:17px}
   .setb small{display:block;font-size:12px;color:#cbbbe6;line-height:1.25}
   #sInstall{border-color:#7dffb2}
+  .setsnd{background:#1d1030;border:2px solid #4b3a6e;border-radius:10px;padding:8px 12px;margin-bottom:8px}
+  .setsnd .sr{display:flex;align-items:center;gap:10px;height:40px}
+  .setsnd .sr span{font-size:20px;width:26px;text-align:center}
+  .setsnd .sr b{width:62px;font-size:16px}
+  .setsnd .sr em{font-style:normal;width:40px;text-align:right;font-size:13px;color:#7ff6ff}
+  .setsnd input{flex:1;accent-color:#ff3d8b;height:28px}
+  .sst{width:100%;margin-top:4px;background:#0b0616;border:1px solid #4b3a6e;color:#cbbbe6;font-family:'Oswald',sans-serif;font-size:13px;padding:7px;border-radius:8px;cursor:pointer}
+  .sst b{color:#ffe14d}
+  #gear{opacity:.8}
   .setv{text-align:center;font-size:11px;color:#6d5b8f;margin-top:4px}
 </style>
 </head>
@@ -584,6 +593,9 @@
 <div id="setov"><div class="setp">
   <div class="seth"><b>EINSTELLUNGEN</b><button type="button" id="setx">✕</button></div>
   <button type="button" class="setb" id="sInstall"><span>📲</span><div><b>Auf dem Handy installieren</b><small id="sInstTxt">Als App auf den Startbildschirm – Vollbild, eigenes Symbol</small></div></button>
+  <div class="setsnd"><div class="sr"><span>🎵</span><b>Musik</b><input type="range" id="sMu" min="0" max="100"><em id="sMuV"></em></div>
+    <div class="sr"><span>💥</span><b>Effekte</b><input type="range" id="sFx" min="0" max="100"><em id="sFxV"></em></div>
+    <button type="button" class="sst" id="sSt">📻 Sender: <b id="sStN"></b> – wechseln</button></div>
   <button type="button" class="setb" id="sFull"><span>⛶</span><div><b>Vollbild</b><small>Browserleisten ausblenden (an/aus)</small></div></button>
   <button type="button" class="setb" id="sReset"><span>↺</span><div><b>Spiel neu starten</b><small>Zurück zum Titelbild – Fortschritt geht verloren</small></div></button>
   <div class="setv">Neon Hustler · Prototyp</div>
@@ -598,6 +610,7 @@
 <button type="button" id="jobbar"><img alt=""><div><b></b><span></span><em><i></i></em></div><small>TIPPEN = SOFORT (TEST)</small></button>
 <div id="wipe"></div>
 
+<script src="audio.js"></script>
 <script src="pix.js"></script>
 <script>
 (function(){
@@ -911,17 +924,7 @@
 
   // ---------- Sound-Effekte ----------
   let sctx=null;
-  function sfx(t){
-    try{ if(!sctx)sctx=new (window.AudioContext||window.webkitAudioContext)(); if(sctx.state==='suspended')sctx.resume(); }catch(e){return;}
-    const n=sctx.currentTime;
-    const tone=(f,d,type='sine',g=.15,at=0)=>{const o=sctx.createOscillator(),v=sctx.createGain();o.type=type;o.frequency.value=f;v.gain.setValueAtTime(g,n+at);v.gain.exponentialRampToValueAtTime(.001,n+at+d);o.connect(v);v.connect(sctx.destination);o.start(n+at);o.stop(n+at+d+.02);};
-    if(t==='click')tone(880,.05,'square',.05);
-    if(t==='type')tone(1400+Math.random()*300,.018,'square',.015);
-    if(t==='cash'){tone(1318,.12,'triangle',.15);tone(1760,.25,'triangle',.15,.08);}
-    if(t==='stamp'){tone(90,.18,'sawtooth',.25);tone(60,.25,'sine',.3);}
-    if(t==='door'){tone(220,.1,'triangle',.1);tone(330,.15,'triangle',.08,.08);}
-  }
-  document.addEventListener('click',e=>{if(e.target.closest('button'))sfx('click');},true);
+  function sfx(t){ if(t==='click'||t==='type')return; if(window.NHA)NHA.sfx(t); }
 
   // ---------- Reinzoomen von der Karte ----------
   function zoomInto(el,cb){
@@ -1587,6 +1590,7 @@
     f=document.createElement('iframe'); f.id='pixh'; f.src='heist.html'; f.allow='fullscreen'; f.setAttribute('allowfullscreen','');
     f.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;z-index:900;background:#05020b';
     f.dataset.t=JSON.stringify(T);
+    if(window.NHA){NHA.sfx('door');NHA.mood('action');}
     wipeTo(()=>document.body.appendChild(f));
   }
   const XPB={werkstatt:35,apotheke:50,villa:75,golden:150};
@@ -1594,7 +1598,10 @@
     const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
     const T=JSON.parse(f.dataset.t||'{}');
     if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1],heat}},'*');return;}
+    if(d.type==='sfx'){if(window.NHA)NHA.sfx(d.n);return;}
+    if(d.type==='mood'){if(window.NHA)NHA.mood(d.m);return;}
     if(d.type!=='heistEnd')return;
+    if(window.NHA)NHA.mood('chill');
     const known=id=>ITEMS[id];
     let html; const typ=T.kind==='golden'?'golden':T.type;
     if(T.kind!=='golden'){const i=TARGETS.findIndex(x=>x.seed===T.seed);if(i>=0)TARGETS.splice(i,1);}
@@ -1638,26 +1645,10 @@
 
   $('hbagb').addEventListener('click',e=>{e.stopPropagation();if(H)showBag();});
   // ---------- Radio: kleiner Synthwave-Loop ----------
-  let ac=null, playing=false, timer=null, master=null;
   function radio(){
-    try{
-      if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.18;master.connect(ac.destination);}
-      if(ac.state==='suspended')ac.resume();
-    }catch(e){toastMsg('KEIN TON VERFÜGBAR');return;}
-    playing=!playing;
     const tm=scene==='diner'?toast3:toastMsg;
-    if(!playing){clearInterval(timer);tm(scene==='diner'?'JUKEBOX AUS':'RADIO AUS');return;}
-    tm(scene==='diner'?'JUKEBOX: NEON NIGHTS':'RADIO NEON 87.6');
-    const bass=[45,45,48,48,43,43,40,40], arp=[69,72,76,72,67,71,74,71,64,67,71,67,64,68,71,68];
-    let step=0; const spb=.125;
-    const note=(m,t,d,type,g)=>{const o=ac.createOscillator(),v=ac.createGain();o.type=type;o.frequency.value=440*Math.pow(2,(m-69)/12);
-      v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g,t+.01);v.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(v);v.connect(master);o.start(t);o.stop(t+d+.05);};
-    timer=setInterval(()=>{const t=ac.currentTime+.05;
-      note(arp[step%16],t,.18,'square',.08);
-      if(step%2===0)note(bass[Math.floor(step/4)%8],t,.24,'sawtooth',.22);
-      if(step%4===0){const o=ac.createOscillator(),v=ac.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.15);
-        v.gain.setValueAtTime(.9,t);v.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(v);v.connect(master);o.start(t);o.stop(t+.25);}
-      step++;},spb*1000);
+    if(!window.NHA){tm('KEIN TON VERFÜGBAR');return;}
+    NHA.start();const n=NHA.station();tm((scene==='diner'?'JUKEBOX: ':'RADIO ')+n);
   }
 })();
 </script>
@@ -1674,8 +1665,13 @@
     else if(dp)t.textContent='Tippen – dann „Installieren“ bestätigen';
     else if(ios)t.textContent='Safari: Teilen-Symbol □↑ → „Zum Home-Bildschirm“';
     else t.textContent='Chrome-Menü ⋮ → „Zum Startbildschirm hinzufügen“ bzw. „App installieren“';}
-  $('gear').onclick=e=>{e.stopPropagation();upd();$('setov').classList.add('on');};
+  $('gear').onclick=e=>{e.stopPropagation();upd();snd();$('setov').classList.add('on');};
   $('setx').onclick=()=>$('setov').classList.remove('on');
+  function snd(){if(!window.NHA)return;const s=NHA.settings;$('sMu').value=Math.round(s.mu*100);$('sFx').value=Math.round(s.fx*100);$('sMuV').textContent=$('sMu').value+'%';$('sFxV').textContent=$('sFx').value+'%';$('sStN').textContent=NHA.stationName();}
+  $('sMu').oninput=e=>{NHA.start();NHA.setMusic(e.target.value/100);snd();};
+  $('sFx').oninput=e=>{NHA.setFx(e.target.value/100);snd();};
+  $('sFx').onchange=()=>NHA.sfx('cash');
+  $('sSt').onclick=()=>{NHA.start();NHA.station();snd();};
   $('setov').addEventListener('click',e=>{if(e.target.id==='setov')$('setov').classList.remove('on');});
   $('sInstall').onclick=async()=>{if(standalone()){upd();return;}
     if(dp){dp.prompt();try{const r=await dp.userChoice;if(r.outcome==='accepted')$('sInstTxt').textContent='Wird installiert – schau auf deinen Startbildschirm';}catch(e){}dp=null;return;}
@@ -1683,7 +1679,8 @@
   window.addEventListener('appinstalled',()=>{$('sInstTxt').textContent='Installiert ✔';});
   $('sFull').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){}};
   let rs=0;$('sReset').onclick=()=>{if(rs){location.reload();return;}rs=1;$('sReset').querySelector('b').textContent='Nochmal tippen zum Bestätigen';setTimeout(()=>{rs=0;$('sReset').querySelector('b').textContent='Spiel neu starten';},3000);};
-  setInterval(()=>{const m=$('map'),s=$('start'),i=$('intro');const hide=(m&&m.classList.contains('on'))||!!document.getElementById('pixh');$('gear').style.display=hide?'none':'';},400);
+  setInterval(()=>{const m=$('map'),s=$('start'),i=$('intro');const vis=id=>{const x=document.getElementById(id);return x&&x.classList.contains('on');};const sh=document.getElementById('sheet');
+    const hide=vis('map')||!!document.getElementById('pixh')||vis('dlg')||vis('inv')||(sh&&sh.classList.contains('open'))||vis('paper')||vis('menu2');$('gear').style.display=hide?'none':'';},400);
 })();
 </script>
 </body>
