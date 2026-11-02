@@ -160,10 +160,18 @@ const IT={
   munition:{n:'Munition (20)',w:1,h:1,v:40},verband:{n:'Verband',w:1,h:1,v:20,use:1},diamant:{n:'Diamant',w:1,h:1,v:1800},goldstatue:{n:'Goldstatue',w:2,h:2,v:3800},
   bauplan:{n:'Bauplan',w:1,h:1,v:0,plan:1},karte:{n:'Key-Card',w:1,h:1,v:0,card:1}
 };
+const CLOTHS={cap:'Basecap',fedora:'Fedora',bandana:'Bandana',sturmhaube:'Sturmhaube',sonnenbrille:'Pilotenbrille',nerdbrille:'Hornbrille',lederjacke:'Lederjacke',hawaiihemd:'Hawaiihemd',trainingsjacke:'Trainingsjacke',anzug_weiss:'Weißer Anzug',sakko_pink:'Pinkes Sakko',sneaker:'Sneaker',loafer:'Slipper',boots:'Stiefel',schleicher:'Schleichschuhe'};
+const RARE={panama:'Panamahut',goldbrille:'Goldene Pilotenbrille',anzug_gold:'Goldener Anzug',krokoschuhe:'Kroko-Slipper'};
+const JACK=['lederjacke','hawaiihemd','trainingsjacke','anzug_weiss','sakko_pink','anzug_gold'];
+Object.entries(CLOTHS).forEach(([id,n])=>IT[id]={n,w:1,h:JACK.includes(id)?2:1,v:0,cloth:1});Object.entries(RARE).forEach(([id,n])=>IT[id]={n,w:1,h:JACK.includes(id)?2:1,v:0,cloth:2});
+const clothPick=()=>rnd()<.08?pick(Object.keys(RARE)):pick(Object.keys(CLOTHS));
+const TREAS={werkstatt:['geld','uhr','elektronik','zigarren','geld','goldkette'],apotheke:['geld','uhr','ring','geld','zigarren'],lagerhalle:['elektronik','zigarren','aktenkoffer','goldkette','geld'],
+  villa:['ring','uhr','collier','goldkette','geld'],juwelier:['ring','goldkette','uhr','geld'],nachtclub:['chips','goldkette','zigarren','geld'],bank:['geld','gold','aktenkoffer'],
+  golden:['ring','uhr','collier'],street:['uhr','elektronik','geld','zigarren','goldkette'],boutique:['geld','uhr','goldkette','ring']};
 const WEAP={schlaeger:{p:85},messer:{p:80},schlagring:{p:70}};
 const GUNS={revolver:{dmg:55,rate:.55,mag:6,spr:.04,rng:150,nz:260,pel:1,rl:1.6},pistole:{dmg:34,rate:.28,mag:12,spr:.06,rng:140,nz:220,pel:1,rl:1.2},
   schrotflinte:{dmg:20,rate:.85,mag:4,spr:.26,rng:95,nz:320,pel:6,rl:2.2},uzi:{dmg:15,rate:.09,mag:25,spr:.13,rng:120,nz:250,pel:1,rl:1.7,auto:1}};
-const ARMED={werkstatt:[0,0,.3],apotheke:[0,.3,.5],villa:[.5,.7,1],lagerhalle:[.6,.8,1],juwelier:[.4,.7,1],nachtclub:[.6,.8,1],bank:[1,1,1]};
+const ARMED={boutique:[0,.2,.4],werkstatt:[0,0,.3],apotheke:[0,.3,.5],villa:[.5,.7,1],lagerhalle:[.6,.8,1],juwelier:[.4,.7,1],nachtclub:[.6,.8,1],bank:[1,1,1]};
 let MAG=0,PART=0,reloadT=0,fireCd=0,firing=false,bullets=[],sparks=[],bleed=false,RAID=480,raidOver=false,uOpen=false,killed=0;
 let LO={weapon:'schlaeger',tool1:'dietrich',tool2:'bohrer',q1:'medkit',q2:'blend',safe:null};
 let PK={};
@@ -197,6 +205,7 @@ const LOOT={
   juwelier:{V:['ring','uhr','goldkette','collier','ring','diamant'],S:['uhr','ring','geld','goldkette'],C:['geld','klebeband','goldkette'],D:['geld','bauplan','ring'],X:['collier','gold','geld','bauplan'],Z:['geld','medkit','rauch'],Y:['collier','gold','ring','goldkette']},
   nachtclub:{K:['zigarren','geld','chips'],Q:['geld','chips','goldkette','zigarren'],D:['geld','bauplan','chips','aktenkoffer'],X:['geld','geld','chips','goldkette','bauplan'],Z:['geld','zigarren','medkit','rauch'],S:['zigarren','chips','kabel','platine'],C:['zigarren','geld','kabel'],V:['chips','goldkette','uhr']},
   bank:{V:['geld','geld','chips','diamant'],D:['geld','aktenkoffer','bauplan','geld'],X:['geld','gold','aktenkoffer','bauplan'],Y:['collier','gold','gemaelde','goldkette','uhr','aktenkoffer','diamant','goldstatue'],G:['gold','gold','gold','goldstatue'],Z:['medkit','rauch','platine','geld','munition','verband'],S:['aktenkoffer','geld','platine','kabel'],C:['geld','geld','kabel']},
+  boutique:{Q:['geld','geld','uhr'],V:['sonnenbrille','goldkette','uhr','ring','geld'],Z:['geld','medkit','zigarren','klebeband'],D:['geld','bauplan','geld','uhr'],X:['geld','geld','goldkette','bauplan'],S:['klebeband','geld','kabel','zigarren'],C:['klebeband','geld','kabel']},
   villa:{V:['ring','uhr','collier','ring','gemaelde','diamant','goldstatue'],Q:['geld','ring','uhr','collier','geld'],D:['platine','geld','bauplan','uhr'],X:['collier','gold','geld','bauplan'],Z:['platine','kabel','rauch','medkit'],S:['kabel','metall','klebeband','platine'],C:['metall','kabel','geld','chemie'],K:['geld','pillen'],A:['platine','kabel','metall','geld']}
 };
 // ---------- Golden Palm (handgebaut) ----------
@@ -231,6 +240,7 @@ const BTYPES={
   juwelier:{n:'Juwelier',cols:2,rows:2,yard:'street',entry:'schmuck',rooms:['schmuck','tresor','buero','personal'],guards:[1,2,2],cams:[1,2,2],alarm:[1,1,1],lasers:1,lockP:.5,acc:'#ff3d8b'},
   nachtclub:{n:'Nachtclub',cols:3,rows:2,yard:'street',entry:'tanz',rooms:['tanz','bar','vip','buero','garderobe','kuehl'],guards:[2,3,3],cams:[1,2,3],alarm:[1,1,1],lasers:0,lockP:.5,acc:'#b98cff'},
   bank:{n:'Bank',cols:3,rows:3,yard:'street',entry:'schalter',rooms:['schalter','tresor','schliess','buero','security','archiv','buero2','flur','tresor'],guards:[3,4,4],cams:[3,4,4],alarm:[1,1,1],lasers:1,lockP:.6,acc:'#ffd34d'},
+  boutique:{n:'Boutique',cols:2,rows:2,yard:'street',entry:'laden',rooms:['laden','anprobe','designer','lager','buero'],guards:[1,2,2],cams:[1,2,2],alarm:[1,1,1],lasers:0,lockP:.4,acc:'#ff5fa8'},
   villa:{n:'Villa',cols:3,rows:3,yard:'grass',entry:'wohnen',rooms:['wohnen','kueche','schlaf','arbeit','bad','garage','security','gast','salon'],guards:[2,3,3],cams:[2,2,3],alarm:[1,1,1],lasers:1,lockP:.5,acc:'#2fe0ea'}
 };
 const ROOMS={
@@ -245,6 +255,7 @@ const ROOMS={
   tanz:{n:'TANZFLÄCHE',fl:'disco',f:['sofa','table','plant']},bar:{n:'BAR',fl:'wood',f:['counter','K','K','table']},vip:{n:'VIP-LOUNGE',fl:'carpet',f:['sofa','sofa','Q','V']},
   garderobe:{n:'GARDEROBE',fl:'wood',f:['Z','Z','Q','Z']},schalter:{n:'SCHALTERHALLE',fl:'chk',f:['counter','V','plant','plant']},
   schliess:{n:'SCHLIESSFÄCHER',fl:'metal',f:['Y','Y','Y','Y']},archiv:{n:'ARCHIV',fl:'carpet',f:['S','S','S','C']},buero2:{n:'DIREKTION',fl:'carpet',f:['D','X','S','plant']},
+  laden:{n:'VERKAUFSRAUM',fl:'carpet',f:['Q','Q','V','plant','counter']},anprobe:{n:'ANPROBE',fl:'wood',f:['Q','Z','Q','plant']},designer:{n:'DESIGNER-ECKE',fl:'chk',f:['V','Q','Q','plant']},
   flur:{n:'FLUR',fl:'conc',f:['plant','C']},gast:{n:'GÄSTEZIMMER',fl:'carpet',f:['bed','Q']},salon:{n:'SALON',fl:'chk',f:['V','V','sofa','plant']}
 };
 function buildGen(cfg){
@@ -297,7 +308,7 @@ function buildGen(cfg){
   // Wachen
   guards=[];const gr=shuf(rooms.filter(r=>r!==entry));
   for(let k=0;k<B.guards[d];k++){const r0=gr[k%gr.length];const ctr=r=>[r.x0+4.5,r.y0+3.5];const path=[ctr(r0)];let cur=r0,prev=null;
-    for(let s=0;s<3;s++){const n=cur.nb.filter(e=>e.open&&e.r!==prev);if(!n.length)break;const e=pick(n);path.push([e.x+.5,e.y+.5]);path.push(ctr(e.r));prev=cur;cur=e.r;}
+    for(let s=0;s<Math.max(5,rooms.length+1);s++){let n=cur.nb.filter(e=>e.open&&e.r!==prev);if(!n.length)n=cur.nb.filter(e=>e.open);if(!n.length)break;const e=pick(n);path.push([e.x+.5,e.y+.5]);path.push(ctr(e.r));prev=cur;cur=e.r;}
     if(path.length===1){const[cx,cy]=path[0];path.push([cx,cy-2],[cx,cy],[cx-3,cy],[cx+2,cy]);}
     else{const back=path.slice(1,-1).reverse();path.push(...back);}
     guards.push(mkG(path));}
@@ -388,8 +399,10 @@ function buildDistrict(cfg){
 function noteIn(o){if(o){o.cont.note=true;}}
 function fillLoot(tab){
   OBJ.forEach(o=>{if(!o.cont||o.kind==='getaway')return;const L=(LOOT[o.tab||tab]||LOOT[tab])[o.kind]||['geld'];const C=o.cont;
-    const n=o.kind==='X'?3:o.kind==='G'?2:o.kind==='A'?3:ri(1,3);
-    for(let k=0;k<n;k++){const id=pick(L);const p=fit(C.items,4,3,id);if(p)C.items.push(p);}
+    const n=o.kind==='X'?3:o.kind==='G'?2:o.kind==='A'?3:ri(1,3);const TR=TREAS[o.tab||tab]||TREAS.street;
+    for(let k=0;k<n;k++){let id=pick(L);if(IT[id]&&IT[id].mat&&rnd()<.45)id=pick(TR);const p=fit(C.items,4,3,id);if(p)C.items.push(p);}
+    const cp=(o.tab||tab)==='boutique'?(o.kind==='Q'?1:o.kind==='V'?.5:.15):(o.kind==='Q'||o.kind==='Z')?.12:.04;
+    if(rnd()<cp){const p=fit(C.items,4,3,clothPick());if(p)C.items.push(p);}
     if(o.kind==='D'&&tab==='golden'){const p=fit(C.items,4,3,'karte');if(p)C.items.unshift(p);}});
 }
 function setupDoors(){DOORS={};for(let y=0;y<H;y++)for(let x=0;x<W;x++){const c=G[y][x];if('LKW'.includes(c))DOORS[x+','+y]={type:c,open:false,x,y};}}
@@ -695,7 +708,7 @@ function makeBody(g){
   const o={kind:'body',x,y,w:1,h:1,cont:{type:'B',items:[],done:false,cw:4,ch:3}};OBJ.push(o);CT[y][x]=o;
   const add=id=>{const p=fit(o.cont.items,4,3,id);if(p)o.cont.items.push(p);};
   if(g.armed){if(rnd()<.7)add('munition');if(rnd()<.4)add('munition');if(rnd()<.22)add('pistole');}
-  if(rnd()<.5)add('geld');if(rnd()<.25)add('verband');if(rnd()<.08)add('karte');
+  if(rnd()<.65)add('geld');if(rnd()<.3)add(pick(['uhr','goldkette','ring','zigarren']));if(rnd()<.18)add(clothPick());if(rnd()<.25)add('verband');if(rnd()<.08)add('karte');
 }
 function kill(g){g.down=true;g.dead=true;g.mode='down';g.sus=0;killed++;NKO++;makeBody(g);toast('AUSGESCHALTET');}
 // ================= Schusswaffen =================
@@ -791,9 +804,9 @@ function openLoot(C){state='loot';curC=C;renderLoot();}
 function cellSize(rows){const land=innerWidth>innerHeight;
   if(land)return Math.max(26,Math.floor(Math.min(52,(innerHeight-150)/Math.max(rows,BH),(Math.min(innerWidth*.97,740)/2-30)/Math.max(BW,4))));
   return Math.floor(Math.min(52,(Math.min(innerWidth*.94,390)-28)/Math.max(BW,4)));}
-function cls(t){return t.card?'card':t.plan?'plan':t.mat?'mat':t.v>=500?'val3':'';}
+function cls(t){return t.card?'card':t.plan?'plan':t.mat?'mat':t.cloth===2?'val3':t.cloth?'plan':t.v>=500?'val3':'';}
 function itemHTML(gid,list,cs){return list.map((p,i)=>{const[ww,hh]=dims(p);const t=IT[p.id];
-  return `<div class="it ${cls(t)}" data-g="${gid}" data-i="${i}" style="left:${p.x*cs}px;top:${p.y*cs}px;width:${ww*cs}px;height:${hh*cs}px">${t.card?'KEY<br>CARD':`<img src="it_${p.id}.webp" alt="">`}${t.v&&!t.mat?`<span class="v">$${t.v}</span>`:''}</div>`;}).join('');}
+  return `<div class="it ${cls(t)}" data-g="${gid}" data-i="${i}" style="left:${p.x*cs}px;top:${p.y*cs}px;width:${ww*cs}px;height:${hh*cs}px">${t.card?'KEY<br>CARD':`<img src="it_${p.id}.webp" alt="">`}${t.cloth?`<span class="v" style="color:${t.cloth===2?'#ffe14d':'#7ff6ff'}">${t.cloth===2?'★ SELTEN':'👕'}</span>`:t.v&&!t.mat?`<span class="v">$${t.v}</span>`:''}</div>`;}).join('');}
 function gridHTML(id,list,w,h,cl,cs){return `<div class="grid ${cl}" id="${id}" style="width:${w*cs}px;height:${h*cs}px;background-size:${cs}px ${cs}px">${itemHTML(id,list,cs)}</div>`;}
 function usables(){const s=new Set();Object.entries(LO).forEach(([k,v])=>{if(v&&IT[v]&&IT[v].use)s.add(v);});BAG.forEach(p=>{if(IT[p.id].use)s.add(p.id);});return [...s];}
 function useBar(){const u=usables();return u.length?`<div class="gl"><span>BENUTZEN</span></div><div class="use">${u.map(id=>`<button type="button" data-u="${id}"><img src="it_${id}.webp" alt="">${IT[id].n} ×${countOf(id)}</button>`).join('')}</div>`:'';}

@@ -576,6 +576,9 @@
   .bztop{display:flex;gap:10px;align-items:center}.bztop button{background:#fff;border:3px solid #000;box-shadow:3px 3px 0 #2fe0ea;font-family:'Bangers',cursive;font-size:18px;padding:3px 10px;cursor:pointer}
   .bztop b{display:block;font-family:'Bangers',cursive;font-size:24px;letter-spacing:1px;color:#ffe14d;-webkit-text-stroke:1px #000;paint-order:stroke fill;text-shadow:2px 2px 0 #ff3d8b}.bztop small{font-size:12px;color:#e4dcf5}
   .bzbot{max-height:64vh;overflow:auto}
+  .matl{background:#1d1030;border:1px solid #4b3a6e;border-radius:8px;padding:6px 8px;margin:6px 0}.matl b{font-family:'Bangers',cursive;font-size:16px;color:#c79bff;letter-spacing:1px}.matl small{display:block;font-size:10px;color:#cbbbe6}
+  .mtl{display:flex;gap:4px;margin-top:4px}.mtl span{flex:1;position:relative;background:#0d0618;border-radius:6px;text-align:center;padding:2px 0}.mtl img{width:30px;height:30px;object-fit:contain;display:block;margin:0 auto}.mtl i{font-style:normal;font-size:11px;font-weight:700;color:#fff}.mtl span.full i{color:#ff9f43}
+
   .bztabs{display:flex;gap:4px;margin-bottom:6px}.bztabs button{flex:1;background:#1d1030;border:2px solid #4b3a6e;color:#e4dcf5;font-family:'Bangers',cursive;font-size:15px;padding:6px 2px;border-radius:8px;cursor:pointer}.bztabs button.on{background:#ff3d8b;border-color:#000;color:#fff;box-shadow:2px 2px 0 #2fe0ea}
   .bzwash{background:#0e2230;border:1px solid #2fe0ea;border-radius:8px;padding:6px 8px;margin-bottom:6px}.bzwash small{display:block;font-size:11px;color:#7ff6ff}.bzwash b{font-family:'Bangers',cursive;font-size:22px;color:#2fe0ea}.bzwash p{font-size:12px;margin:4px 0 0}
   .bzbrk{background:#3a1010;border:1px solid #ff3d6e;border-radius:8px;padding:6px 8px;margin-bottom:6px;font-size:13px}.bzbrk button{display:block;margin-top:4px;background:#ff9f43;border:2px solid #000;font-family:'Bangers',cursive;font-size:15px;padding:4px 10px;border-radius:6px;cursor:pointer}
@@ -879,6 +882,7 @@
   let cash=40, nrg=10, jobTaken=false, job=0, xp=0, lvl=1, heat=0, buff=false;
   let Q=0, PEND=null, BAGLV=0, KNOWN=[]; const TARGETS=[], CALLS=[1,3,6,8,11,15,18], BAGS=[[5,4],[6,4],[6,5]];
   const OUTFIT_EQ={kopf:null,brille:'sonnenbrille',jacke:'sakko_pink',schuhe:'sneaker'}, REP={kartell:0,neon:0,syndikat:0}, CREW=[], CREW_ON=[];
+  let MAT={};const MATL=['metall','kabel','klebeband','chemie','platine','pillen'],MATCAP=30;
   let FACTION=null, UPG={bett:0,werkbank:0,spind:0}, NMAX=10, lastRegen=Date.now();
   let STAT={}, DAILY=null, WEEKLY=null, LOGIN={last:'',streak:0,claimed:''}, ACH=[], ALBUM=[], ALBUMC=[], PRESTIGE=0, ADS={d:'',n:0}, DAILYCOUP='', EMP={biz:{},mods:{},last:0,ht:0}, GARAGE=['rostlaube'], CAR='rostlaube';
   const acts={
@@ -926,7 +930,9 @@
 
 
   // ---------- Werte / HUD ----------
-  function hud(){ questTick(); if(window.__nhReady)saveGame(); const nm=document.getElementById('nmax');if(nm)nm.textContent=NMAX; $('cash').textContent=cash;{const dp=document.getElementById('dirtyp');if(dp&&typeof EMP!=='undefined'){if(EMP.dirty==null)EMP.dirty=0;dp.style.display=EMP.dirty>0?'':'none';$('dirty').textContent=Math.round(EMP.dirty||0).toLocaleString('de-DE');}} $('nrg').textContent=nrg; $('lvl').textContent=lvl;
+  function normMats(){try{for(const id of MATL){let n=MAT[id]||0;while(n<MATCAP){const i=STASH.indexOf(id);if(i<0)break;STASH.splice(i,1);n++;}MAT[id]=n;}}catch(e){}}
+  function takeMat(id,n){const m=Math.min(n,MAT[id]||0);MAT[id]=(MAT[id]||0)-m;n-=m;while(n>0){const i=STASH.indexOf(id);if(i<0)break;STASH.splice(i,1);n--;}normMats();}
+  function hud(){ normMats(); questTick(); if(window.__nhReady)saveGame(); const nm=document.getElementById('nmax');if(nm)nm.textContent=NMAX; $('cash').textContent=cash;{const dp=document.getElementById('dirtyp');if(dp&&typeof EMP!=='undefined'){if(EMP.dirty==null)EMP.dirty=0;dp.style.display=EMP.dirty>0?'':'none';$('dirty').textContent=Math.round(EMP.dirty||0).toLocaleString('de-DE');}} $('nrg').textContent=nrg; $('lvl').textContent=lvl;
     $('heat').textContent='★'.repeat(heat)+'☆'.repeat(5-heat); $('buff').style.display=buff?'block':'none'; $('xpbar').style.width=Math.min(100,xp/(100+(lvl-1)*20)*100)+'%'; if(window.__nhReady){albumScan();} }
   hud();
 
@@ -1446,6 +1452,7 @@
       <div class="ih"><b>${mode==='heist'?'LOADOUT FÜR DEN HEIST':'SPIND · STASH'}</b><button type="button" class="ix">✕</button></div>
       <div class="isub">Was du mitnimmst, kannst du verlieren. Nur der <b>sichere Slot</b> bleibt dir immer.</div>
       <div class="doll">${lo}</div>${mode==='heist'&&CREW.length?`<div class="isub">Crew – antippen = mitnehmen (max. 2)</div><div class="crewrow">${CREW.map(c=>`<button type="button" class="crw ${CREW_ON.includes(c)?'on':''}" data-crew="${c}"><b>${CREWS[c].n}</b><small>${CREWS[c].role}</small></button>`).join('')}</div>`:''}<div class="bagrow"><img src="${ico('tasche')}" alt=""><b>RUCKSACK</b><span>${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]} Felder · ausbaubar an der Werkbank</span></div>
+      <div class="matl"><div><b>MATERIALLAGER</b><small>je Sorte max. ${MATCAP} · belegt keinen Spindplatz</small></div><div class="mtl">${MATL.map(id=>`<span class="${(MAT[id]||0)>=MATCAP?'full':''}"><img src="${ico(id)}" alt=""><i>${MAT[id]||0}</i></span>`).join('')}</div></div>
       <div class="spcap ${spindFull()?'full':''}"><div><b>SPIND</b> ${spindUsed()}/${spindCap()} Felder<div class="pb"><i style="width:${Math.min(100,spindUsed()/spindCap()*100)}%"></i></div></div>
         ${SPIND[(UPG.spind||0)+1]?`<button type="button" class="spup">Ausbau $${fmt(SPIND[(UPG.spind||0)+1][1])} → ${SPIND[(UPG.spind||0)+1][0]}</button>`:''}</div>
       <div class="spbtn"><button type="button" class="sptr ${TRASH?'on':''}">🗑 ${TRASH?'Wegwerfen: AN – antippen löscht':'Wegwerfen'}</button><button type="button" class="spsell">📞 Beute an Dee (${Math.round((deeRate()-.1)*100)} %)</button></div>
@@ -1724,14 +1731,14 @@
     return `<h2>Pinnwand</h2><p class="qline">Was du mitnimmst, kannst du verlieren. Jeder Einbruch hat einen neuen Grundriss.</p><div class="tlist">${coupCard()}${bank}${gold}${list}</div>${btns()}`;
   }
   const RECIPES=[
-    {id:'rauch',need:{chemie:1,klebeband:1}},{id:'medkit',need:{pillen:1,klebeband:1}},{id:'dietrich',need:{metall:1,klebeband:1}},
-    {id:'brecheisen',need:{metall:2}},{id:'schlagring',need:{metall:1}},
-    {id:'dietrich2',need:{metall:2,klebeband:1,kabel:1},plan:1},{id:'blend',need:{chemie:2,metall:1},plan:1},
-    {id:'stoer',need:{platine:1,kabel:2},plan:1,story:1},{id:'bohrer',need:{metall:2,kabel:1,platine:1},plan:1},
-    {id:'_bag',need:{metall:1,klebeband:2,kabel:1},plan:1},
-    {id:'tarnweste',need:{metall:3,klebeband:2},lv:1},{id:'nachtsicht',need:{platine:2,kabel:1},lv:1},{id:'stoer2',alias:'stoer',need:{platine:1,kabel:2},lv:1,hide:1}];
+    {id:'rauch',need:{chemie:3,klebeband:2}},{id:'medkit',need:{pillen:3,klebeband:2}},{id:'dietrich',need:{metall:3,klebeband:2}},
+    {id:'brecheisen',need:{metall:5}},{id:'schlagring',need:{metall:3}},
+    {id:'dietrich2',need:{metall:6,klebeband:3,kabel:3},plan:1},{id:'blend',need:{chemie:5,metall:2},plan:1},
+    {id:'stoer',need:{platine:2,kabel:4},plan:1,story:1},{id:'bohrer',need:{metall:6,kabel:4,platine:3},plan:1},
+    {id:'_bag',need:{metall:5,klebeband:6,kabel:4},plan:1},
+    {id:'tarnweste',need:{metall:10,klebeband:6},lv:1},{id:'nachtsicht',need:{platine:6,kabel:4},lv:1},{id:'stoer2',alias:'stoer',need:{platine:3,kabel:5},lv:1,hide:1}];
   const rname=id=>id==='_bag'?'Rucksack vergrößern':ITEMS[id].n;
-  const cnt=id=>STASH.filter(x=>x===id).length;
+  const cnt=id=>STASH.filter(x=>x===id).length+(MATL.includes(id)?(MAT[id]||0):0);
   function benchHTML(){
     const rows=RECIPES.filter(r=>!r.hide).map(r=>{const known=!r.plan||KNOWN.includes(r.id);
       if(r.lv&&UPG.werkbank<r.lv)return `<div class="rcp lock"><img class="ri" src="${ico(r.id)}" alt=""><div><b>${ITEMS[r.id].n}</b><small>Braucht Werkbank Stufe 2</small></div></div>`;
@@ -1746,7 +1753,7 @@
   }
   function craft(id){const r=RECIPES.find(x=>x.id===id);if(!r)return;
     if(!Object.entries(r.need).every(([k,v])=>cnt(k)>=v))return;
-    Object.entries(r.need).forEach(([k,v])=>{for(let i=0;i<v;i++)STASH.splice(STASH.indexOf(k),1);});
+    Object.entries(r.need).forEach(([k,v])=>{if(MATL.includes(k))takeMat(k,v);else for(let i=0;i<v;i++)STASH.splice(STASH.indexOf(k),1);});
     if(id==='_bag'){BAGLV=Math.min(BAGS.length-1,BAGLV+1);toastMsg('RUCKSACK GRÖSSER!');}else{STASH.push(id);toastMsg(rname(id).toUpperCase()+' GEBAUT');}
     sfx('click');addReward(0,8,0);track('crafted');
     if(hasSet('werkzeug')&&id!=='_bag'&&Math.random()<.25){STASH.push(id);setTimeout(()=>toastMsg('GLÜCK: DOPPELT GEBAUT!'),900);}
@@ -1805,8 +1812,9 @@
     sonnenbrille:['brille','Pilotenbrille',{Charme:1}],nachtsicht:['brille','Nachtsichtbrille',{},'Einsatz: viel größere Sicht'],nerdbrille:['brille','Hornbrille',{'Köpfchen':2}],
     sakko_pink:['jacke','Pinkes Sakko',{Charme:1}],lederjacke:['jacke','Lederjacke',{Muskeln:2}],hawaiihemd:['jacke','Hawaiihemd',{'Glück':2}],trainingsjacke:['jacke','Trainingsjacke',{Ausdauer:2}],
     tarnweste:['jacke','Schutzweste',{},'Einsatz: −45 % Schaden'],anzug_weiss:['jacke','Weißer Anzug',{Charme:3,'Köpfchen':1}],
+    panama:['kopf','Panamahut',{Charme:2,'Glück':2},null,1],goldbrille:['brille','Goldene Pilotenbrille',{Charme:3,'Glück':1},null,1],anzug_gold:['jacke','Goldener Anzug',{Charme:4,'Köpfchen':2,'Glück':1},null,1],krokoschuhe:['schuhe','Kroko-Slipper',{Charme:2,Ausdauer:2},null,1],
     sneaker:['schuhe','Sneaker',{Ausdauer:1}],schleicher:['schuhe','Schleichschuhe',{},'Einsatz: Rennen fast lautlos'],loafer:['schuhe','Slipper',{Charme:1}],boots:['schuhe','Stiefel',{Muskeln:1}]};
-  Object.entries(CLOTH).forEach(([id,c])=>{ITEMS[id]={n:c[1],t:'cloth',slot:c[0],w:1,h:1,v:40,bonus:c[2],d:(c[3]||Object.entries(c[2]).map(([k,v])=>k+' +'+v).join(', '))};});
+  Object.entries(CLOTH).forEach(([id,c])=>{ITEMS[id]={n:c[1],t:'cloth',slot:c[0],w:1,h:1,v:c[4]?400:40,rare:!!c[4],bonus:c[2],d:(c[3]||Object.entries(c[2]).map(([k,v])=>k+' +'+v).join(', '))+(c[4]?' · SELTEN':'')};});
   Object.assign(ITEMS,{elektronik:{n:'Videorekorder',t:'loot',w:2,h:1,v:220},gemaelde:{n:'Gemälde',t:'loot',w:2,h:2,v:1400},goldkette:{n:'Goldkette',t:'loot',w:1,h:1,v:320},
     aktenkoffer:{n:'Aktenkoffer',t:'loot',w:2,h:1,v:650},zigarren:{n:'Zigarrenkiste',t:'loot',w:1,h:1,v:90},chips:{n:'Casino-Chips',t:'loot',w:1,h:1,v:260}});
   const OSLOT={kopf:'KOPF',brille:'BRILLE',jacke:'JACKE',schuhe:'SCHUHE'};
@@ -1882,12 +1890,12 @@
   const SKEY='nh_save_v1';let saveT=0;
   function saveGame(){clearTimeout(saveT);saveT=setTimeout(()=>{if(scene==='start'||scene==='intro')return;
     try{localStorage.setItem(SKEY,JSON.stringify(snap()));}catch(e){}},400);}
-  function snap(){return {v:1,t:Date.now(),cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,TARGETS,STASH,LOADOUT,OUTFIT_EQ,FACTION,REP,CREW,CREW_ON,UPG,NMAX,lastRegen,JOB,STAT,DAILY,WEEKLY,LOGIN,ACH,ALBUM,ALBUMC,PRESTIGE,ADS,DAILYCOUP,EMP,GARAGE,CAR};}
+  function snap(){return {v:1,t:Date.now(),cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,TARGETS,STASH,LOADOUT,OUTFIT_EQ,FACTION,REP,CREW,CREW_ON,UPG,NMAX,lastRegen,JOB,STAT,DAILY,WEEKLY,LOGIN,ACH,ALBUM,ALBUMC,PRESTIGE,ADS,DAILYCOUP,EMP,GARAGE,CAR,MAT};}
   function hasSave(){try{return !!localStorage.getItem(SKEY);}catch(e){return false;}}
   function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SKEY));}catch(e){return false;}if(!d)return false;
     ({cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,FACTION,UPG,NMAX,lastRegen,STAT,DAILY,WEEKLY,LOGIN,ACH,ALBUM,ALBUMC,PRESTIGE,ADS,DAILYCOUP,EMP,GARAGE,CAR}=Object.assign({cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,FACTION,UPG,NMAX,lastRegen,STAT,DAILY,WEEKLY,LOGIN,ACH,ALBUM,ALBUMC,PRESTIGE,ADS,DAILYCOUP,EMP,GARAGE,CAR},d));if(UPG.spind==null)UPG.spind=0;
     STASH=d.STASH||STASH;Object.assign(LOADOUT,d.LOADOUT||{});Object.assign(OUTFIT_EQ,d.OUTFIT_EQ||{});Object.assign(REP,d.REP||{});
-    CREW.splice(0,CREW.length,...(d.CREW||[]));CREW_ON.splice(0,CREW_ON.length,...(d.CREW_ON||[]));TARGETS.splice(0,TARGETS.length,...(d.TARGETS||[]));
+    MAT=d.MAT||{};CREW.splice(0,CREW.length,...(d.CREW||[]));CREW_ON.splice(0,CREW_ON.length,...(d.CREW_ON||[]));TARGETS.splice(0,TARGETS.length,...(d.TARGETS||[]));
     if(d.JOB){JOB=d.JOB;clearInterval(jobTimer);jobTimer=setInterval(renderJob,250);}
     return true;}
   window.addEventListener('pagehide',()=>{clearTimeout(saveT);if(scene!=='start'&&scene!=='intro')try{localStorage.setItem(SKEY,JSON.stringify(snap()));}catch(e){}});
@@ -1933,7 +1941,7 @@
     if(r.mat){for(let i=0;i<r.mat;i++)STASH.push(MATS[Math.floor(Math.random()*MATS.length)]);out.push(r.mat+'× Material');}
     if(r.item){STASH.push(r.item);out.push(ITEMS[r.item].n);}
     if(r.rep&&FACTION){addRep(FACTION,r.rep);out.push('+'+r.rep+' Ruf');}
-    if(r.cloth){const own=new Set([...STASH,...Object.values(OUTFIT_EQ)]);const pool=Object.keys(CLOTH).filter(c=>!own.has(c));const c=(pool.length?pool:Object.keys(CLOTH))[Math.floor(Math.random()*(pool.length||Object.keys(CLOTH).length))];STASH.push(c);out.push('Kleidung: '+ITEMS[c].n);}
+    if(r.cloth){const own=new Set([...STASH,...Object.values(OUTFIT_EQ)]);const pool=Object.keys(CLOTH).filter(c=>!own.has(c)&&!CLOTH[c][4]);const c=(pool.length?pool:Object.keys(CLOTH))[Math.floor(Math.random()*(pool.length||Object.keys(CLOTH).length))];STASH.push(c);out.push('Kleidung: '+ITEMS[c].n);}
     hud();sfx('cash');return out.join(' · ');}
   const rtxt=r=>[r.cash&&'$'+r.cash,r.xp&&r.xp+' XP',r.nrg&&'+'+r.nrg+' ⚡',r.mat&&r.mat+'× Material',r.item&&ITEMS[r.item].n,r.rep&&'+'+r.rep+' Ruf',r.cloth&&'Kleidung'].filter(Boolean).join(' · ');
   // ---------- Tägliche & wöchentliche Aufgaben ----------
@@ -2165,6 +2173,7 @@
   document.getElementById('phoneb').onclick=e=>{e.stopPropagation();phoneOpen();};
   document.getElementById('phone').addEventListener('click',e=>{if(e.target.id==='phone')phoneClose();});
   setInterval(()=>{const b=document.getElementById('phoneb');if(!b)return;rollOffers();const n=OFFERS.list.filter(o=>!o.taken).length+(CALLS.includes(Q)?1:0);b.dataset.n=n||'';},4000);
+  TINFO.boutique={n:'Boutique',req:4,e:3,loot:'Klamotten (auch seltene) · Schmuck · Bargeld'};TNAMES.boutique=['Ocean Drive Couture','Bella Moda','Neon Threads','Palm Avenue Fashion'];
   TINFO.viertel={n:'Viertel (6 Gebäude)',req:3,e:5,loot:'Alles – plus Autos zum Klauen'};TNAMES.viertel=['Little Havana','Ocean Drive Block','Hafenviertel','Sunset Strip'];
   // ================= LÄDEN 2.0: Geräte, Personal, Geldwäsche =================
   const BIZX={
@@ -2206,7 +2215,7 @@
   function bizWashPending(k){const s=bst(k);if(!s||!s.lv)return 0;return Math.floor(Math.min(EMP.dirty||0,bizHours(s)*bizWashH(k,s)));}
   const unitCost=(k,j,n)=>Math.round(BIZ[k].cost*SUNIT[j]*Math.pow(1.32,n));
   const lvlCost=(k,j,l,n)=>Math.round(BIZ[k].cost*SLVL[j]*Math.pow(1.17,l-1)*(1+.15*((n||1)-1)));
-  function msNeed(j,l){const i=MSTONES.indexOf(l+1);return i<0?null:[SMAT[j],(i+1)*2];}
+  function msNeed(j,l){const i=MSTONES.indexOf(l+1);return i<0?null:[SMAT[j],(i+1)*4];}
   const upCost=(k,tr,l)=>Math.round(BIZ[k].cost*{t:.4,s:.45,w:.6}[tr]*Math.pow(l+1,1.5));
   function bizCollect(k,quiet){const s=bst(k);if(!s||!s.lv)return 0;const h=bizHours(s);const net=Math.floor(h*bizIncS(k,s));const wash=bizWashPending(k);
     if(!net&&!wash)return 0;s.t=Date.now();let stolen=0,thief=null;
@@ -2254,7 +2263,7 @@
       {t:'Bluffen · Charme',f:()=>{const ch=40+(statVal('Charme')-10)*3;if(Math.random()*100<ch){addReward(0,15,0);return 'Du redest ihn schwindlig. Er klappt den Koffer zu. (+15 XP)';}const l=Math.round((EMP.dirty||0)*.3);EMP.dirty-=l;heat=Math.min(5,heat+1);hud();return `Er glaubt dir kein Wort: $${fmt(l)} Schwarzgeld beschlagnahmt, +1 Heat.`;}}]});
     return E[Math.floor(Math.random()*E.length)];}
   const stars=(n,m)=>`<em class="stars">${'★'.repeat(n)}<s>${'★'.repeat(Math.max(0,m-n))}</s></em>`;
-  const haveN=id=>STASH.filter(x=>x===id).length;
+  const haveN=id=>STASH.filter(x=>x===id).length+(MAT[id]||0);
   function renderBiz(){const k=BZ,B=BIZ[k],X=BIZX[k],s=bst(k),own=!!(s&&s.lv),P=$('bizp');
     $('bizimg').src=X.img;$('bizimg').onerror=function(){this.onerror=null;this.src=X.fb;};
     let body='';const rk=own?bizRank(k):0;
@@ -2296,7 +2305,7 @@
     P.querySelectorAll('[data-unit]').forEach(b=>b.onclick=()=>{const j=+b.dataset.unit,S=s.st[j],c=unitCost(k,j,S.n);if(cash<c)return done('Zu wenig Geld.');bizCollect(k,1);cash-=c;S.n++;sfx('stamp');track('bizup');crowd();done(`${X.st[j][1]} ${X.st[j][0]} gekauft! Jetzt $${fmt(bizIncS(k,s))}/h.`);});
     P.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>{const j=+b.dataset.lv,S=s.st[j],c=lvlCost(k,j,S.l,S.n),need=msNeed(j,S.l);if(cash<c)return done('Zu wenig Geld.');
       if(need&&haveN(need[0])<need[1])return done(`Für den Bonus brauchst du ${need[1]}× ${ITEMS[need[0]].n} – gibt's bei Heists.`);
-      bizCollect(k,1);cash-=c;if(need)for(let i=0;i<need[1];i++)STASH.splice(STASH.indexOf(need[0]),1);S.l++;sfx(need?'cash':'stamp');track('bizup');done(need?`⭐ MEILENSTEIN! ${X.st[j][0]} verdient jetzt doppelt.`:`${X.st[j][0]} auf Level ${S.l}.`);});
+      bizCollect(k,1);cash-=c;if(need)takeMat(need[0],need[1]);S.l++;sfx(need?'cash':'stamp');track('bizup');done(need?`⭐ MEILENSTEIN! ${X.st[j][0]} verdient jetzt doppelt.`:`${X.st[j][0]} auf Level ${S.l}.`);});
     P.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{const tr=b.dataset.tr,l=s.up[tr],c=upCost(k,tr,l);if(cash<c)return done('Zu wenig Geld.');bizCollect(k,1);cash-=c;s.up[tr]++;sfx('stamp');track('bizup');crowd();done(`${UPN[tr][0]} ausgebaut!`);});
     P.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{const a=s.app[+b.dataset.hire];if(s.staff.length>=staffSlots(k))return done('Kein Platz mehr im Team. Laden-Rang erhöhen!');if(cash<a.w*5)return done('Zu wenig Geld für das Handgeld.');
       bizCollect(k,1);cash-=a.w*5;s.staff.push(a);s.app.splice(+b.dataset.hire,1);sfx('stamp');track('hired');done(`${a.n} fängt morgen an.`);});
@@ -2321,7 +2330,7 @@
     if(window.NHA){NHA.sfx('door');NHA.mood('action');}
     wipeTo(()=>document.body.appendChild(f));
   }
-  const XPB={viertel:120,werkstatt:35,apotheke:50,villa:75,golden:150,lagerhalle:55,juwelier:70,nachtclub:70,bank:220};
+  const XPB={boutique:60,viertel:120,werkstatt:35,apotheke:50,villa:75,golden:150,lagerhalle:55,juwelier:70,nachtclub:70,bank:220};
   window.addEventListener('message',e=>{
     const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
     const T=JSON.parse(f.dataset.t||'{}');
@@ -2335,7 +2344,7 @@
     if(T.kind!=='golden'&&!T.story){const i=TARGETS.findIndex(x=>x.seed===T.seed);if(i>=0)TARGETS.splice(i,1);}
     if(d.res==='escape'){
       const bag=(d.bag||[]).filter(known); const plans=bag.filter(id=>id==='bauplan').length; const items=bag.filter(id=>id!=='bauplan');
-      const val=items.reduce((s,id)=>s+(ITEMS[id].t==='mat'?0:ITEMS[id].v),0);
+      const val=items.reduce((s,id)=>s+(ITEMS[id].t==='mat'||ITEMS[id].t==='cloth'?0:ITEMS[id].v),0);
       items.forEach(id=>STASH.push(id));
       Object.values(d.lo||{}).forEach(id=>{if(id&&known(id))STASH.push(id);});
       Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null);
@@ -2345,7 +2354,7 @@
       const up=unlockPlans(plans);let pl=up.map(n=>n?`<b class="x">Neuer Bauplan: ${n}</b>`:'<b>Bauplan schon bekannt · +20 XP</b>').join('');
       if(up.some(n=>!n))addReward(0,20*up.filter(n=>!n).length,0);
       const mats={};items.filter(id=>ITEMS[id].t==='mat').forEach(id=>mats[id]=(mats[id]||0)+1);
-      const ml=Object.entries(mats).map(([k,v])=>`${v}× ${ITEMS[k].n}`).join(' · ');
+      const ml=Object.entries(mats).map(([k,v])=>`${v}× ${ITEMS[k].n}`).join(' · ');const cl=items.filter(id=>ITEMS[id].t==='cloth');if(cl.length)pl+=cl.map(id=>`<b class="x" style="color:${ITEMS[id].rare?'#ffe14d':'#7ff6ff'}">${ITEMS[id].rare?'★ SELTEN: ':'👕 '}${ITEMS[id].n}</b>`).join('');
       if(typ==='werkstatt'&&Q===2)Q=3; if(typ==='apotheke'&&Q===7)Q=8; if(typ==='golden'&&Q===10)Q=11;
       let rp=0;if(T.fac&&T.fac===FACTION)rp=addRep(FACTION,12);else if(FACTION&&typ===FACT[FACTION].btype)rp=addRep(FACTION,5);
       if(Q===13&&FACTION&&T.fac===FACTION){Q=14;} if(T.story==='bank'&&Q===17){Q=18;if(FACTION)rp+=addRep(FACTION,20);}
@@ -2353,7 +2362,7 @@
       if(T.raid&&window.NH_ONLINE){NH_ONLINE.raidFinish(T.raid,true).then(l=>{if(l>0){addReward(l,0,0);setTimeout(()=>toastMsg('TRESOR GEKNACKT: +$'+fmt(l)),1500);}else if(l===0)setTimeout(()=>toastMsg('TRESOR WAR LEER'),1500);});}
       if(FACTION&&window.NH_ONLINE)NH_ONLINE.factionPoints(Math.min(500,10+Math.round(val/100)+(typ==='bank'?150:0)));
       if(d.stolen&&VEHS[d.stolen]){track('stolen');if(GARAGE.includes(d.stolen)){const pv=Math.round(VEHS[d.stolen].v*.4);cash+=pv;pl+=`<b>🚗 ${VEHS[d.stolen].n} an Mags verkauft: +$${fmt(pv)}</b>`;}else{GARAGE.push(d.stolen);pl+=`<b class="x">🚗 Neu in der Garage: ${VEHS[d.stolen].n}</b>`;}}
-      html=`<div class="rbig">ENTKOMMEN!</div>${T.name}: erledigt.<div class="reward"><b>Beute $${val}</b><b class="x">+ ${xpG} XP</b>${d.heat?`<b class="h">+${d.heat} Heat</b>`:''}${pl}</div>${ml?`<div class="dsub">Material: ${ml}</div>`:''}${T.coup?'<div class="dsub">Coup des Tages: XP ×1,5 und $300 Bonus!</div>':''}${spindFull()?'<div class="dsub" style="color:#ff6f6f">⚠ Dein Spind ist übervoll – verkauf Beute oder bau ihn aus, bevor du wieder losziehst.</div>':''}<div class="dsub">Alles liegt im Spind. Beute verkaufst du bei Dee, Material verbaust du an der Werkbank.</div>`;
+      html=`<div class="rbig">ENTKOMMEN!</div>${T.name}: erledigt.<div class="reward"><b>Beute $${val}</b><b class="x">+ ${xpG} XP</b>${d.heat?`<b class="h">+${d.heat} Heat</b>`:''}${pl}</div>${ml?`<div class="dsub">Material ins Lager: ${ml}</div>`:''}${T.coup?'<div class="dsub">Coup des Tages: XP ×1,5 und $300 Bonus!</div>':''}${spindFull()?'<div class="dsub" style="color:#ff6f6f">⚠ Dein Spind ist übervoll – verkauf Beute oder bau ihn aus, bevor du wieder losziehst.</div>':''}<div class="dsub">Alles liegt im Spind. Beute verkaufst du bei Dee, Material verbaust du an der Werkbank.</div>`;
     } else {
       const lost=Object.values(LOADOUT).filter(x=>x).length; const safe=LOADOUT.safe;
       Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null); if(safe)STASH.push(safe);
