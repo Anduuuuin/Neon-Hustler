@@ -2,7 +2,7 @@
 (function(){
   const LS='nh_audio';
   const S=Object.assign({mu:.6,fx:.7},(()=>{try{return JSON.parse(localStorage.getItem(LS))||{};}catch(e){return {};}})());
-  let ctx=null,comp,mBus,fBus,rev,revIn,dly,started=false;
+  let cur=null,ctx=null,comp,mBus,fBus,rev,revIn,dly,started=false;
   const IN_FRAME=window.parent!==window;
   let mood='chill',nextMood='chill',station=S.st||0,radioOff=S.off===undefined?true:!!S.off;
   const STATIONS=['NEON 87.6','VICE FM','SUNSET WAVE'];
@@ -21,6 +21,7 @@
     // Echo
     dly=ctx.createDelay(1);const fb=ctx.createGain();fb.gain.value=.32;const df=ctx.createBiquadFilter();df.type='lowpass';df.frequency.value=2200;
     dly.connect(df);df.connect(fb);fb.connect(dly);df.connect(mBus);
+    cur=ctx.createGain();cur.connect(mBus);
     applyVol();
     return true;
   }
@@ -29,23 +30,23 @@
   function env(g,t,a,peak,d,sus=0.0001){g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(Math.max(sus,0.0001),t+a+d);}
 
   // ---------- Instrumente ----------
-  function kick(t,v=1){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(42,t+.12);env(g,t,.002,.9*v,.32);o.connect(g);g.connect(mBus);o.start(t);o.stop(t+.4);}
+  function kick(t,v=1){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(42,t+.12);env(g,t,.002,.9*v,.32);o.connect(g);g.connect(cur);o.start(t);o.stop(t+.4);}
   function snare(t,v=1){const n=ctx.createBufferSource();n.buffer=noise();const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1900;f.Q.value=.7;const g=ctx.createGain();env(g,t,.002,.45*v,.22);
-    n.connect(f);f.connect(g);g.connect(mBus);const s=ctx.createGain();s.gain.value=.6;g.connect(s);s.connect(revIn);n.start(t);n.stop(t+.3);
-    const o=ctx.createOscillator(),og=ctx.createGain();o.frequency.value=190;env(og,t,.002,.25*v,.09);o.connect(og);og.connect(mBus);o.start(t);o.stop(t+.15);}
-  function hat(t,v=1,open){const n=ctx.createBufferSource();n.buffer=noise();const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=7500;const g=ctx.createGain();env(g,t,.001,.13*v,open?.22:.045);n.connect(f);f.connect(g);g.connect(mBus);n.start(t);n.stop(t+.3);}
-  function tom(t,m,v=1){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(mtof(m),t);o.frequency.exponentialRampToValueAtTime(mtof(m)*.6,t+.25);env(g,t,.003,.4*v,.3);o.connect(g);g.connect(mBus);o.start(t);o.stop(t+.35);}
+    n.connect(f);f.connect(g);g.connect(cur);const s=ctx.createGain();s.gain.value=.6;g.connect(s);s.connect(revIn);n.start(t);n.stop(t+.3);
+    const o=ctx.createOscillator(),og=ctx.createGain();o.frequency.value=190;env(og,t,.002,.25*v,.09);o.connect(og);og.connect(cur);o.start(t);o.stop(t+.15);}
+  function hat(t,v=1,open){const n=ctx.createBufferSource();n.buffer=noise();const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=7500;const g=ctx.createGain();env(g,t,.001,.13*v,open?.22:.045);n.connect(f);f.connect(g);g.connect(cur);n.start(t);n.stop(t+.3);}
+  function tom(t,m,v=1){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(mtof(m),t);o.frequency.exponentialRampToValueAtTime(mtof(m)*.6,t+.25);env(g,t,.003,.4*v,.3);o.connect(g);g.connect(cur);o.start(t);o.stop(t+.35);}
   function bass(t,m,d,v=1,cut=700){const o=ctx.createOscillator(),s=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type='sawtooth';o.frequency.value=mtof(m);s.type='sine';s.frequency.value=mtof(m-12);
-    f.type='lowpass';f.Q.value=6;f.frequency.setValueAtTime(cut*2.2,t);f.frequency.exponentialRampToValueAtTime(cut*.5,t+d);env(g,t,.004,.32*v,d);o.connect(f);s.connect(f);f.connect(g);g.connect(mBus);o.start(t);s.start(t);o.stop(t+d+.05);s.stop(t+d+.05);}
+    f.type='lowpass';f.Q.value=6;f.frequency.setValueAtTime(cut*2.2,t);f.frequency.exponentialRampToValueAtTime(cut*.5,t+d);env(g,t,.004,.32*v,d);o.connect(f);s.connect(f);f.connect(g);g.connect(cur);o.start(t);s.start(t);o.stop(t+d+.05);s.stop(t+d+.05);}
   function pad(t,notes,d,v=1){const f=ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=1300;const g=ctx.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(.07*v,t+d*.3);g.gain.linearRampToValueAtTime(.0001,t+d);
-    f.connect(g);g.connect(mBus);const s=ctx.createGain();s.gain.value=.9;g.connect(s);s.connect(revIn);
+    f.connect(g);g.connect(cur);const s=ctx.createGain();s.gain.value=.9;g.connect(s);s.connect(revIn);
     notes.forEach(m=>[-7,7].forEach(dt=>{const o=ctx.createOscillator();o.type='sawtooth';o.frequency.value=mtof(m);o.detune.value=dt;o.connect(f);o.start(t);o.stop(t+d+.1);}));}
   function pluck(t,m,v=1,type='square'){const o=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type=type;o.frequency.value=mtof(m);f.type='lowpass';f.frequency.setValueAtTime(3200,t);f.frequency.exponentialRampToValueAtTime(700,t+.15);
-    env(g,t,.002,.07*v,.17);o.connect(f);f.connect(g);g.connect(mBus);const e=ctx.createGain();e.gain.value=.5;g.connect(e);e.connect(dly);o.start(t);o.stop(t+.25);}
+    env(g,t,.002,.07*v,.17);o.connect(f);f.connect(g);g.connect(cur);const e=ctx.createGain();e.gain.value=.5;g.connect(e);e.connect(dly);o.start(t);o.stop(t+.25);}
   function lead(t,m,d,v=1){const o=ctx.createOscillator(),o2=ctx.createOscillator(),l=ctx.createOscillator(),lg=ctx.createGain(),f=ctx.createBiquadFilter(),g=ctx.createGain();
     o.type='sawtooth';o2.type='square';o.frequency.value=mtof(m);o2.frequency.value=mtof(m);o2.detune.value=8;l.frequency.value=5.5;lg.gain.value=6;l.connect(lg);lg.connect(o.detune);lg.connect(o2.detune);
     f.type='lowpass';f.frequency.value=2600;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.06*v,t+.03);g.gain.setValueAtTime(.06*v,t+d*.8);g.gain.linearRampToValueAtTime(.0001,t+d);
-    o.connect(f);o2.connect(f);f.connect(g);g.connect(mBus);const e=ctx.createGain();e.gain.value=.6;g.connect(e);e.connect(dly);const r=ctx.createGain();r.gain.value=.4;g.connect(r);r.connect(revIn);
+    o.connect(f);o2.connect(f);f.connect(g);g.connect(cur);const e=ctx.createGain();e.gain.value=.6;g.connect(e);e.connect(dly);const r=ctx.createGain();r.gain.value=.4;g.connect(r);r.connect(revIn);
     [o,o2,l].forEach(x=>{x.start(t);x.stop(t+d+.05);});}
 
   // ---------- Komposition ----------
@@ -63,7 +64,7 @@
     tempo=(mood==='chill'&&radioOff)?70:BPM[mood][station%3];
     const base=[0,3,7,10,12,7,3,5];leadMotif=Array.from({length:8},()=>base[Math.floor(Math.random()*base.length)]);
   }
-  function clap(t,v=1){[0,.012,.024].forEach(d=>{const n=ctx.createBufferSource();n.buffer=noise();const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1200;f.Q.value=1.2;const g=ctx.createGain();env(g,t+d,.001,.3*v,.08);n.connect(f);f.connect(g);g.connect(mBus);const s=ctx.createGain();s.gain.value=.5;g.connect(s);s.connect(revIn);n.start(t+d);n.stop(t+d+.15);});}
+  function clap(t,v=1){[0,.012,.024].forEach(d=>{const n=ctx.createBufferSource();n.buffer=noise();const f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1200;f.Q.value=1.2;const g=ctx.createGain();env(g,t+d,.001,.3*v,.08);n.connect(f);f.connect(g);g.connect(cur);const s=ctx.createGain();s.gain.value=.5;g.connect(s);s.connect(revIn);n.start(t+d);n.stop(t+d+.15);});}
   function scheduleVice(t){ // Italo-Disco: Oktav-Bass, Offbeat-Hats, Claps
     const s16=step%16,ch=prog[bar%4],root=ch[0],tri=triad(root,ch[1]),fill=bar%8===7&&s16>=12;
     if(s16===0)pad(t,tri.map(n=>n+12),60/tempo*4,.7);
@@ -90,7 +91,8 @@
   function schedule(t){
     const s16=step%16,ci=Math.floor(bar%4),ch=prog[ci],root=ch[0],tri=triad(root,ch[1]);
     const act=mood!=='chill',alarm=mood==='alarm',fill=bar%8===7&&s16>=12;
-    if(!act){if(radioOff)return scheduleAmbient(t);if(station===1)return scheduleVice(t);if(station===2)return scheduleSunset(t);}
+    if(radioOff)return;
+    if(!act){if(station===1)return scheduleVice(t);if(station===2)return scheduleSunset(t);}
     // Pads am Taktanfang
     if(s16===0){pad(t,tri.map(n=>n+12),60/tempo*4,act?.8:1);}
     // Schlagzeug
@@ -115,9 +117,10 @@
     while(nextT<ctx.currentTime+.15){
       if(S.mu>0.001)schedule(nextT);
       nextT+=60/tempo/4;step++;
-      if(step%16===0){bar++;if(nextMood!==mood){mood=nextMood;bar=0;newSection();}else if(bar%8===0)newSection();}
+      if(step%16===0){bar++;if(nextMood!==mood){mood=nextMood;bar=0;cut();newSection();}else if(bar%8===0)newSection();}
     }
   }
+  function cut(){if(!ctx||!cur)return;const old=cur;old.gain.setTargetAtTime(0,ctx.currentTime,.06);setTimeout(()=>{try{old.disconnect();}catch(e){}},800);cur=ctx.createGain();cur.connect(mBus);}
   function start(){
     if(!init())return;
     if(IN_FRAME)return;
@@ -170,7 +173,7 @@
     // Radio: Sender 1 → 2 → 3 → Aus → Sender 1
     station(){if(radioOff){radioOff=false;station=0;}else if(station===STATIONS.length-1){radioOff=true;}else station++;
       S.st=station;S.off=radioOff;save();
-      if(started){sfx('tune');newSection();step=0;bar=0;nextT=ctx.currentTime+.08;}
+      if(started){cut();sfx('tune');newSection();step=0;bar=0;nextT=ctx.currentTime+.08;}
       return radioOff?'AUS':STATIONS[station];},
     stationName(){return radioOff?'AUS':STATIONS[station];}
   };
