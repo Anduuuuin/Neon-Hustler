@@ -15,6 +15,7 @@
   #hud .p{background:#000;border:2px solid #2fe0ea;padding:0 7px;font-size:13px;font-weight:700;white-space:nowrap}
   #hud .p.g{border-color:#7dffb2;color:#7dffb2}
   #hud .p.hp{border-color:#ff3d8b}
+  #raid.low{border-color:#ff3d3d;color:#ff6f6f;animation:bl .5s steps(1) infinite}
   #hud .al{height:9px;border:2px solid #000;background:#1d1030;position:relative;box-shadow:0 0 0 1px #ff3d8b}
   #hud .al i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#ffe14d,#ff3d3d)}
   #hud .info{display:flex;gap:5px;flex-wrap:wrap}
@@ -120,9 +121,9 @@
 <script src="pix.js"></script>
 <div id="joy"></div><div id="stick"><i></i></div>
 <div id="hud">
-  <div class="r"><div class="t" id="title">EINSATZ</div><div style="display:flex;gap:5px;align-items:center"><span class="p hp">♥ <b id="hp">100</b></span><span class="p g"><b id="bv">$0</b></span></div></div>
+  <div class="r"><div class="t" id="title">EINSATZ</div><div style="display:flex;gap:5px;align-items:center"><span class="p" id="raid">⏱ 8:00</span><span class="p hp">♥ <b id="hp">100</b></span><span class="p g"><b id="bv">$0</b></span></div></div>
   <div class="al"><i id="al"></i></div>
-  <div class="info"><span id="iCode" class="y"></span><span id="iLaser">LASER AUS</span><span id="iCam">KAMERAS AUS</span><span id="iAlarm">ALARMANLAGE AUS</span><span id="iJam" class="y">STÖRSENDER AKTIV</span></div>
+  <div class="info"><span id="iCode" class="y"></span><span id="iLaser">LASER AUS</span><span id="iCam">KAMERAS AUS</span><span id="iAlarm">ALARMANLAGE AUS</span><span id="iJam" class="y">STÖRSENDER AKTIV</span><span id="iBleed" style="border-color:#ff3d3d;color:#ff6f6f">🩸 BLUTUNG – VERBAND!</span></div>
 </div>
 <div id="cop"></div>
 <div id="pad">
@@ -155,9 +156,15 @@ const IT={
   chemie:{n:'Chemikalien',w:1,h:2,v:25,mat:1},platine:{n:'Platine',w:1,h:1,v:40,mat:1},pillen:{n:'Medikamente',w:1,h:1,v:45,mat:1},
   elektronik:{n:'Videorekorder',w:2,h:1,v:220},gemaelde:{n:'Gemälde',w:2,h:2,v:1400},goldkette:{n:'Goldkette',w:1,h:1,v:320},aktenkoffer:{n:'Aktenkoffer',w:2,h:1,v:650},
   zigarren:{n:'Zigarrenkiste',w:1,h:1,v:90},chips:{n:'Casino-Chips',w:1,h:1,v:260},
+  pistole:{n:'Pistole',w:2,h:1,v:500},schrotflinte:{n:'Schrotflinte',w:3,h:1,v:1200},uzi:{n:'Uzi',w:2,h:2,v:2000},
+  munition:{n:'Munition (20)',w:1,h:1,v:40},verband:{n:'Verband',w:1,h:1,v:20,use:1},diamant:{n:'Diamant',w:1,h:1,v:1800},goldstatue:{n:'Goldstatue',w:2,h:2,v:3800},
   bauplan:{n:'Bauplan',w:1,h:1,v:0,plan:1},karte:{n:'Key-Card',w:1,h:1,v:0,card:1}
 };
-const WEAP={schlaeger:{p:85},messer:{p:80},schlagring:{p:70},revolver:{p:100,loud:1}};
+const WEAP={schlaeger:{p:85},messer:{p:80},schlagring:{p:70}};
+const GUNS={revolver:{dmg:55,rate:.55,mag:6,spr:.04,rng:150,nz:260,pel:1,rl:1.6},pistole:{dmg:34,rate:.28,mag:12,spr:.06,rng:140,nz:220,pel:1,rl:1.2},
+  schrotflinte:{dmg:20,rate:.85,mag:4,spr:.26,rng:95,nz:320,pel:6,rl:2.2},uzi:{dmg:15,rate:.09,mag:25,spr:.13,rng:120,nz:250,pel:1,rl:1.7,auto:1}};
+const ARMED={werkstatt:[0,0,.3],apotheke:[0,.3,.5],villa:[.5,.7,1],lagerhalle:[.6,.8,1],juwelier:[.4,.7,1],nachtclub:[.6,.8,1],bank:[1,1,1]};
+let MAG=0,PART=0,reloadT=0,fireCd=0,firing=false,bullets=[],sparks=[],bleed=false,RAID=480,raidOver=false,uOpen=false,killed=0;
 let LO={weapon:'schlaeger',tool1:'dietrich',tool2:'bohrer',q1:'medkit',q2:'blend',safe:null};
 let PK={};
 let CFG={kind:'gen',type:'villa',seed:7,diff:3,bagW:5,bagH:4,heat:0,name:'TESTVILLA'};
@@ -172,7 +179,7 @@ let CODE='0000',codeKnown=false,lasersOn=false,hasLasers=false,camsOn=true,jamUn
 function grid(w,h,v){return Array.from({length:h},()=>Array(w).fill(v));}
 const at=(x,y)=>(G[y]&&G[y][x])||'#';
 function fillR(x0,y0,x1,y1,c,fl){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){G[y][x]=c;if(fl)FL[y][x]=fl;}}
-const CDEF={V:{n:'VITRINE',t:1.5,nz:24},S:{n:'REGAL',t:2,nz:6},C:{n:'KISTE',t:1.8,nz:8},D:{n:'SCHREIBTISCH',t:1.8,nz:6},X:{n:'SAFE',t:2,nz:6},Z:{n:'SPIND',t:1.6,nz:8},
+const CDEF={B:{n:'WACHMANN',t:1.2,nz:2},V:{n:'VITRINE',t:1.5,nz:24},S:{n:'REGAL',t:2,nz:6},C:{n:'KISTE',t:1.8,nz:8},D:{n:'SCHREIBTISCH',t:1.8,nz:6},X:{n:'SAFE',t:2,nz:6},Z:{n:'SPIND',t:1.6,nz:8},
   G:{n:'GOLDWAGEN',t:1.5,nz:4},Y:{n:'SCHLIESSFACH',t:2.5,nz:12},Q:{n:'KOMMODE',t:1.6,nz:6},R:{n:'WERKZEUGSCHRANK',t:1.8,nz:10},A:{n:'AUTO AUSSCHLACHTEN',t:3,nz:14},K:{n:'KÜHLSCHRANK',t:1.2,nz:4}};
 const KSIZE={V:[2,1],S:[2,1],C:[1,1],D:[2,1],X:[1,1],Z:[1,1],G:[1,1],Y:[1,1],Q:[2,1],R:[1,1],A:[3,2],K:[1,1],bed:[2,2],sofa:[2,1],table:[2,1],counter:[3,1],plant:[1,1],trash:[1,1],bush:[1,1],fuse:[1,1],mon:[1,1],panel:[1,1],lift:[2,2]};
 function place(kind,x,y){
@@ -184,13 +191,13 @@ function place(kind,x,y){
 }
 const LOOT={
   golden:{V:['ring','uhr','collier','ring','uhr'],S:['uhr','ring','geld','medkit'],C:['geld','medkit','rauch','ring','geld'],D:['geld','ring'],X:['collier','gold','geld'],Z:['medkit','rauch','geld','platine'],G:['gold','gold'],Y:['collier','gold','geld','ring']},
-  werkstatt:{A:['platine','kabel','metall','geld','kabel'],R:['metall','metall','kabel','klebeband','platine','metall'],C:['metall','kabel','klebeband','chemie','metall'],S:['klebeband','kabel','metall','chemie','klebeband'],D:['geld','klebeband','bauplan','geld'],X:['geld','geld','uhr','bauplan'],Z:['geld','schlagring','klebeband','medkit','geld']},
-  apotheke:{V:['pillen','pillen','geld','pillen'],S:['chemie','pillen','klebeband','chemie'],C:['chemie','pillen','klebeband','chemie'],D:['geld','bauplan','pillen'],X:['geld','geld','pillen','bauplan'],Z:['medkit','geld','rauch','klebeband'],K:['pillen','chemie']},
-  lagerhalle:{C:['metall','kabel','elektronik','geld','chemie','metall'],S:['elektronik','kabel','klebeband','platine','zigarren'],R:['metall','metall','kabel','klebeband'],A:['platine','kabel','metall','elektronik'],D:['geld','bauplan','aktenkoffer'],X:['geld','geld','revolver','goldkette','bauplan'],Z:['geld','medkit','rauch','zigarren'],K:['geld','zigarren']},
-  juwelier:{V:['ring','uhr','goldkette','collier','ring'],S:['uhr','ring','geld','goldkette'],C:['geld','klebeband','goldkette'],D:['geld','bauplan','ring'],X:['collier','gold','geld','bauplan'],Z:['geld','medkit','rauch'],Y:['collier','gold','ring','goldkette']},
+  werkstatt:{A:['platine','kabel','metall','geld','kabel','munition'],R:['metall','metall','kabel','klebeband','platine','metall'],C:['metall','kabel','klebeband','chemie','metall'],S:['klebeband','kabel','metall','chemie','klebeband'],D:['geld','klebeband','bauplan','geld'],X:['geld','geld','uhr','bauplan'],Z:['geld','schlagring','klebeband','medkit','geld']},
+  apotheke:{V:['pillen','pillen','geld','pillen','verband'],S:['chemie','pillen','klebeband','chemie'],C:['chemie','pillen','klebeband','chemie'],D:['geld','bauplan','pillen'],X:['geld','geld','pillen','bauplan'],Z:['medkit','geld','rauch','klebeband','verband'],K:['pillen','chemie','verband']},
+  lagerhalle:{C:['metall','kabel','elektronik','geld','chemie','metall','munition','munition'],S:['elektronik','kabel','klebeband','platine','zigarren'],R:['metall','metall','kabel','klebeband'],A:['platine','kabel','metall','elektronik'],D:['geld','bauplan','aktenkoffer'],X:['geld','geld','revolver','pistole','goldkette','bauplan'],Z:['geld','medkit','rauch','zigarren','munition','verband'],K:['geld','zigarren']},
+  juwelier:{V:['ring','uhr','goldkette','collier','ring','diamant'],S:['uhr','ring','geld','goldkette'],C:['geld','klebeband','goldkette'],D:['geld','bauplan','ring'],X:['collier','gold','geld','bauplan'],Z:['geld','medkit','rauch'],Y:['collier','gold','ring','goldkette']},
   nachtclub:{K:['zigarren','geld','chips'],Q:['geld','chips','goldkette','zigarren'],D:['geld','bauplan','chips','aktenkoffer'],X:['geld','geld','chips','goldkette','bauplan'],Z:['geld','zigarren','medkit','rauch'],S:['zigarren','chips','kabel','platine'],C:['zigarren','geld','kabel'],V:['chips','goldkette','uhr']},
-  bank:{V:['geld','geld','chips'],D:['geld','aktenkoffer','bauplan','geld'],X:['geld','gold','aktenkoffer','bauplan'],Y:['collier','gold','gemaelde','goldkette','uhr','aktenkoffer'],G:['gold','gold','gold'],Z:['medkit','rauch','platine','geld'],S:['aktenkoffer','geld','platine','kabel'],C:['geld','geld','kabel']},
-  villa:{V:['ring','uhr','collier','ring','gemaelde'],Q:['geld','ring','uhr','collier','geld'],D:['platine','geld','bauplan','uhr'],X:['collier','gold','geld','bauplan'],Z:['platine','kabel','rauch','medkit'],S:['kabel','metall','klebeband','platine'],C:['metall','kabel','geld','chemie'],K:['geld','pillen'],A:['platine','kabel','metall','geld']}
+  bank:{V:['geld','geld','chips','diamant'],D:['geld','aktenkoffer','bauplan','geld'],X:['geld','gold','aktenkoffer','bauplan'],Y:['collier','gold','gemaelde','goldkette','uhr','aktenkoffer','diamant','goldstatue'],G:['gold','gold','gold','goldstatue'],Z:['medkit','rauch','platine','geld','munition','verband'],S:['aktenkoffer','geld','platine','kabel'],C:['geld','geld','kabel']},
+  villa:{V:['ring','uhr','collier','ring','gemaelde','diamant','goldstatue'],Q:['geld','ring','uhr','collier','geld'],D:['platine','geld','bauplan','uhr'],X:['collier','gold','geld','bauplan'],Z:['platine','kabel','rauch','medkit'],S:['kabel','metall','klebeband','platine'],C:['metall','kabel','geld','chemie'],K:['geld','pillen'],A:['platine','kabel','metall','geld']}
 };
 // ---------- Golden Palm (handgebaut) ----------
 function buildGolden(){
@@ -292,6 +299,8 @@ function buildGen(cfg){
     if(path.length===1){const[cx,cy]=path[0];path.push([cx,cy-2],[cx,cy],[cx-3,cy],[cx+2,cy]);}
     else{const back=path.slice(1,-1).reverse();path.push(...back);}
     guards.push(mkG(path));}
+  // Kanaldeckel (zweiter Ausgang)
+  {const cand=rooms.filter(r=>r!==entry);const r=cand[Math.floor(rnd()*cand.length)];for(const[x,y]of[[r.x0+1,r.y0+2],[r.x0+6,r.y0+2],[r.x0+1,r.y0+4],[r.x0+6,r.y0+4]]){if(G[y][x]==='.'){G[y][x]='U';break;}}}
   // Safe-Code-Zettel
   const conts=OBJ.filter(o=>o.cont&&o.kind!=='X');if(OBJ.some(o=>o.kind==='X')&&conts.length)noteIn(pick(conts));
   fillLoot(cfg.type);
@@ -318,7 +327,7 @@ const hasCard=()=>BAG.some(p=>p.id==='karte');
 
 // ================= Figuren =================
 const P={x:0,y:0,face:-Math.PI/2,step:0,hp:100,moving:false};
-function mkG(path){return{x:path[0][0]*T,y:path[0][1]*T,dir:0,wp:0,path,sus:0,mode:'patrol',tx:0,ty:0,step:0,look:0,moving:false,down:false,stun:0,stuck:0};}
+function mkG(path){return{x:path[0][0]*T,y:path[0][1]*T,dir:0,wp:0,path,sus:0,mode:'patrol',tx:0,ty:0,step:0,look:0,moving:false,down:false,stun:0,stuck:0,hp:100,armed:false,shootCd:1};}
 let NSEARCH=0,NKO=0,MAXAL=0,alarm=0,cop=null,busy=null,state='load',rings=[],smokes=[],heat=0,flashes=[];
 const jammed=()=>performance.now()<jamUntil;
 const lasersActive=()=>lasersOn&&!jammed();
@@ -326,15 +335,16 @@ const camsActive=()=>camsOn&&!jammed();
 
 // ================= Eingabe =================
 const key={};
-addEventListener('keydown',e=>{const k=e.key.toLowerCase();key[k]=1;if(state!=='play')return;if(k==='e'||k===' ')doAct();if(k==='q')doAtk();if(k==='1')useQ('q1');if(k==='2')useQ('q2');if(k==='i'||k==='tab'){e.preventDefault();openBag();}});
-addEventListener('keyup',e=>key[e.key.toLowerCase()]=0);
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();key[k]=1;if(state!=='play')return;if(k==='e'||k===' ')doAct();if(k==='q'){doAtk();if(gun()&&gun().auto)firing=true;}if(k==='r')reload();if(k==='1')useQ('q1');if(k==='2')useQ('q2');if(k==='i'||k==='tab'){e.preventDefault();openBag();}});
+addEventListener('keyup',e=>{key[e.key.toLowerCase()]=0;if(e.key.toLowerCase()==='q')firing=false;});
 let jx=0,jy=0,jid=null,jcx=0,jcy=0;const st=$('stick'),sk=st.querySelector('i');
 $('joy').addEventListener('pointerdown',e=>{if(state!=='play')return;jid=e.pointerId;jcx=e.clientX;jcy=e.clientY;st.style.left=jcx+'px';st.style.top=jcy+'px';st.style.display='block';$('joy').setPointerCapture(jid);});
 $('joy').addEventListener('pointermove',e=>{if(e.pointerId!==jid)return;let dx=e.clientX-jcx,dy=e.clientY-jcy;const d=Math.hypot(dx,dy),m=46;if(d>m){dx*=m/d;dy*=m/d;}jx=dx/m;jy=dy/m;sk.style.transform=`translate(${dx}px,${dy}px)`;});
 const jend=e=>{if(e.pointerId!==jid)return;jid=null;jx=jy=0;st.style.display='none';sk.style.transform='';};
 $('joy').addEventListener('pointerup',jend);$('joy').addEventListener('pointercancel',jend);
 const tapBtn=(id,f)=>$(id).addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const b=$(id);b.classList.add('prs');setTimeout(()=>b.classList.remove('prs'),120);f();});
-tapBtn('act',()=>doAct());tapBtn('atk',()=>doAtk());tapBtn('bagb',()=>{if(state==='play')openBag();});tapBtn('q1',()=>useQ('q1'));tapBtn('q2',()=>useQ('q2'));
+tapBtn('act',()=>doAct());tapBtn('atk',()=>{doAtk();if(gun()&&gun().auto)firing=true;});
+['pointerup','pointercancel','pointerleave'].forEach(ev=>$('atk').addEventListener(ev,()=>{firing=false;}));tapBtn('bagb',()=>{if(state==='play')openBag();});tapBtn('q1',()=>useQ('q1'));tapBtn('q2',()=>useQ('q2'));
 
 // ================= Canvas =================
 const cv=$('game'),cx=cv.getContext('2d');let S=2,VW=0,VH=0;
@@ -422,9 +432,10 @@ function nearThing(){
     else if(c==='F'&&lasersOn){o={k:'fuse'};d=tileD();}
     else if(c==='M'&&camsOn){o={k:'mon'};d=tileD();}
     else if(c==='P'&&alarmPanel&&!disarmed){o={k:'panel'};d=tileD();}
+    else if(c==='U'&&!uOpen){o={k:'hole'};d=tileD()-6;}
     if(o&&d<13&&d<bd){bd=d;best=o;}}
   return best;}
-function onExit(){const c=at(...ptile());return EXITS.includes(c)?c:null;}
+function onExit(){const c=at(...ptile());if(c==='U')return uOpen?'U':null;return EXITS.includes(c)?c:null;}
 function nearGuard(){let best=null;guards.forEach(g=>{if(g.down)return;const d=Math.hypot(g.x-P.x,g.y-P.y);if(d<20&&(!best||d<best.d))best={g,d};});return best;}
 const angDiff=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d;};
 
@@ -442,6 +453,9 @@ function upd(dt){
   const run=ml>.6,sp=48*(run?1:.5);P.moving=ml>.05;
   if(ml>.05){moveBody(P,mx*sp*dt,my*sp*dt,4);P.face=Math.atan2(my,mx);P.step+=dt*8;if(run&&Math.random()<dt*(PK.quiet?.4:1.1))noise(PK.quiet?35:55);
     if(lasersActive()&&at(...ptile())==='B')tripLaser();}
+  updBullets(dt);
+  if(!raidOver){RAID-=dt;if(RAID<=60&&RAID+dt>60)toast('NOCH 60 SEKUNDEN!');if(RAID<=0){raidOver=true;RAID=0;toast('ZU LANGE! POLIZEI KOMMT');raise(100);}}
+  $('raid').textContent='⏱ '+Math.floor(RAID/60)+':'+String(Math.floor(RAID%60)).padStart(2,'0');$('raid').classList.toggle('low',RAID<60);
   // Alarmanlage
   if(armed&&!disarmed){const[,ty]=ptile();if(!alarmT&&ty<yardTop-1&&ty>0){alarmT=18;toast('ALARMANLAGE PIEPT!');SFX('beep');}
     if(alarmT>0&&!jammed()){const ob=Math.ceil(alarmT);alarmT-=dt;if(Math.ceil(alarmT)!==ob)SFX('beep');if(alarmT<=0){alarmT=-1;disarmed=true;raise(100);toast('ALARMANLAGE LÖST AUS!');}}}
@@ -463,6 +477,7 @@ function upd(dt){
     if(vd<range&&Math.abs(ang)<.55&&los(g.x,g.y-6,P.x,P.y-6)){g.sus=Math.min(100,g.sus+dt*((busy||state!=='play')?150:95)*(1.45-vd/range));if(g.mode==='patrol'&&g.sus>35){g.mode='check';g.tx=P.x;g.ty=P.y;g.look=0;}}
     else g.sus=Math.max(0,g.sus-dt*12);
     if(g.sus>=100&&g.mode!=='chase'){g.mode='chase';raise(100);toast('ENTDECKT!');SFX('alert');}
+    if(g.armed&&g.mode==='chase'&&vd<130&&vd>14&&state!=='end'){g.shootCd-=dt;if(g.shootCd<=0&&los(g.x,g.y-6,P.x,P.y-7)){g.shootCd=.85+Math.random()*.6;guardShoot(g);}}
     if(g.mode==='chase'&&vd<10){const dm=PK.vest?.55:1;if(!g.hitCd||g.hitCd<performance.now()){g.hitCd=performance.now()+700;SFX('hit');}P.hp-=dt*25*dm;if(P.hp<=0)busted('Der Wachmann ringt dich zu Boden. Handschellen klicken.');}
   });
   // Kameras
@@ -488,12 +503,14 @@ function updButtons(){
   const a=$('act'),k=$('atk');let label='—',on=false;
   if(state==='play'&&!busy){const ex=onExit(),th=nearThing();
     if(ex){label='ABHAUEN';on=true;}
-    else if(th){on=true;label=th.k==='cont'?(th.c.done?'ÖFFNEN':'DURCH-<br>SUCHEN'):th.k==='door'?(th.d.type==='W'?'FENSTER':'TÜR'):th.k==='fuse'?'STROM-<br>KASTEN':th.k==='mon'?'MONITOR':'ALARM-<br>ANLAGE';}}
+    else if(th){on=true;label=th.k==='cont'?(th.c.done?'ÖFFNEN':'DURCH-<br>SUCHEN'):th.k==='door'?(th.d.type==='W'?'FENSTER':'TÜR'):th.k==='fuse'?'STROM-<br>KASTEN':th.k==='mon'?'MONITOR':th.k==='hole'?'KANAL-<br>DECKEL':'ALARM-<br>ANLAGE';}}
   const ng=state==='play'&&!busy&&nearGuard();
-  const key_=label+on+!!ng+qKey()+LO.weapon;
+  const key_=label+on+!!ng+qKey()+LO.weapon+MAG+'/'+ammoLeft()+(reloadT>0)+bleed;
   if(key_===lastBtn)return;lastBtn=key_;
   a.innerHTML=label;a.classList.toggle('on',on);k.classList.toggle('off',!ng);
-  k.innerHTML=LO.weapon?`<img src="it_${LO.weapon}.webp" alt=""><small>${LO.weapon==='revolver'?'SCHUSS':'SCHLAG'}</small>`:'<small>FAUST</small>';
+  const G_=gun();
+  k.innerHTML=G_?`<img src="it_${LO.weapon}.webp" alt=""><small>${reloadT>0?'LÄDT…':MAG+'/'+ammoLeft()}</small>`:LO.weapon?`<img src="it_${LO.weapon}.webp" alt=""><small>SCHLAG</small>`:'<small>FAUST</small>';
+  if(G_)k.classList.remove('off');$('iBleed').classList.toggle('on',bleed);
   ['q1','q2'].forEach(q=>{const id=LO[q]||lastQ[q];const n=id?countOf(id):0;const b=$(q);
     if(id){b.innerHTML=`<img src="it_${id}.webp" alt=""><small>×${n}</small>`;b.classList.toggle('off',!n);}else{b.innerHTML='<small>leer</small>';b.classList.add('off');}});
 }
@@ -508,9 +525,11 @@ function consume(id){
   for(const k of['q1','q2','safe'])if(LO[k]===id){LO[k]=null;return true;}
   const p=BAG.find(p=>p.id===id);if(p){BAG.splice(BAG.indexOf(p),1);return true;}return false;}
 function useItem(id){
-  if(id==='medkit'&&P.hp>=100){toast('DU BIST FIT');return false;}
+  if(id==='medkit'&&P.hp>=100&&!bleed){toast('DU BIST FIT');return false;}
+  if(id==='verband'&&!bleed){toast('DU BLUTEST NICHT');return false;}
   if(!consume(id))return false;
-  if(id==='medkit'){SFX('heal');P.hp=Math.min(100,P.hp+50);toast('+50 GESUNDHEIT');}
+  if(id==='verband'){SFX('heal');bleed=false;P.hp=Math.min(100,P.hp+10);toast('BLUTUNG GESTOPPT');}
+  if(id==='medkit'){SFX('heal');bleed=false;P.hp=Math.min(100,P.hp+50);toast('+50 GESUNDHEIT');}
   if(id==='rauch'){SFX('smoke');smokes.push({x:P.x,y:P.y-4,r:6,t:8});guards.forEach(g=>{if(g.mode==='chase'){g.mode='check';g.tx=P.x;g.ty=P.y;g.look=0;g.sus=40;}});toast('RAUCH!');noise(40);}
   if(id==='blend'){SFX('flash');flashes.push({x:P.x+Math.cos(P.face)*24,y:P.y+Math.sin(P.face)*24,t:.5});let n=0;
     guards.forEach(g=>{if(g.down)return;const fx=P.x+Math.cos(P.face)*24,fy=P.y+Math.sin(P.face)*24;if(Math.hypot(g.x-fx,g.y-fy)<85&&los(fx,fy-4,g.x,g.y-6)){g.stun=6;g.mode='stun';n++;}});
@@ -531,6 +550,10 @@ function doAct(){
     const D=CDEF[C.type];noise(D.nz*4);startBusy(C.type==='A'?'AUSSCHLACHTEN …':'DURCHSUCHEN …',D.t,()=>{C.done=true;NSEARCH++;SFX('loot');if(C.note&&!codeKnown){codeKnown=true;$('iCode').textContent='SAFE-CODE: '+CODE;$('iCode').classList.add('on');toast('ZETTEL: SAFE-CODE '+CODE);}openLoot(C);},C.type==='A'?1:0,60);return;}
   if(th.k==='door'){doorMenu(th.d);return;}
   if(th.k==='fuse'){wireGame('STROMKASTEN','Gleiche Farben verbinden – dann sind die Laser aus.',()=>{lasersOn=false;$('iLaser').classList.add('on');toast('LASER AUS!');SFX('zip');});return;}
+  if(th.k==='hole'){const b=[];const op=()=>{uOpen=true;SFX('unlock');toast('KANAL OFFEN – LEISER AUSGANG!');};
+    if(hasLO('brecheisen'))b.push({t:'Aufstemmen<small>BRECHEISEN · 3 s · etwas laut</small>',f:()=>startBusy('AUFSTEMMEN …',3,op,1.5,90,'hit')});
+    b.push({t:'Mit bloßen Händen<small>8 s · leise</small>',f:()=>startBusy('ZIEHEN …',8,op,3,40,'hit')});
+    menu('KANALDECKEL','Ein schwerer Gullydeckel. Darunter: die Kanalisation – ein Ausgang, den keiner bewacht. Raus hier gibt −1 Heat.',b.concat([{t:'Zurück'}]));return;}
   if(th.k==='mon'){startBusy('KAMERAS HACKEN …',4,()=>{camsOn=false;$('iCam').classList.add('on');toast('KAMERAS AUS');SFX('zip');});return;}
   if(th.k==='panel'){if(jammed()){disarmed=true;$('iAlarm').classList.add('on');toast('ALARM AUS');return;}
     wireGame('ALARMANLAGE','Schnell! Kabel richtig verbinden, bevor sie auslöst.',()=>{disarmed=true;alarmT=0;$('iAlarm').classList.add('on');toast('ALARMANLAGE AUS');SFX('ok');});return;}
@@ -568,16 +591,54 @@ function safeMenu(C){
   b.push({t:'Zurück'});menu('SAFE','Ein Tresor mit Zahlenschloss.',b);
 }
 function doAtk(){
-  if(state!=='play'||busy)return;P.swing=.25;SFX('whoosh');const ng=nearGuard();if(!ng){noise(20);return;}const g=ng.g;P.face=Math.atan2(g.y-P.y,g.x-P.x);
+  if(state!=='play'||busy)return;
+  const ng0=nearGuard();
+  if(gun()&&!(ng0&&ng0.g.mode!=='chase'&&!ng0.g.stun)){fireGun();return;}
+  P.swing=.25;SFX('whoosh');const ng=ng0;if(!ng){noise(20);return;}const g=ng.g;P.face=Math.atan2(g.y-P.y,g.x-P.x);
   const ang=angDiff(Math.atan2(P.y-g.y,P.x-g.x),g.dir);
   const behind=Math.abs(ang)>1.1&&g.mode!=='chase';
   const w=WEAP[LO.weapon];let ch=w?w.p:45;if(!behind)ch-=35;if(g.stun>0)ch=100;
   const ok=Math.random()*100<ch;
-  if(w&&w.loud){noise(260);raise(Math.max(alarm,70));}else noise(45);
-  if(ok){SFX('hit');NKO++;g.down=true;g.mode='down';g.sus=0;toast(behind||g.stun>0?'AUSGESCHALTET!':'K.O.!');}
+  noise(45);
+  if(ok){SFX('hit');NKO++;g.down=true;g.mode='down';g.sus=0;makeBody(g);toast(behind||g.stun>0?'AUSGESCHALTET!':'K.O.!');}
   else{SFX('hit');SFX('alert');g.mode='chase';g.sus=100;g.stun=0;raise(100);P.hp-=20;toast('ER WEHRT SICH!');if(P.hp<=0)busted('Der Wachmann ist stärker als gedacht.');}
 }
 
+function makeBody(g){
+  const x=Math.floor(g.x/T),y=Math.floor(g.y/T);if(!CT[y]||CT[y][x])return;
+  const o={kind:'body',x,y,w:1,h:1,cont:{type:'B',items:[],done:false,cw:4,ch:3}};OBJ.push(o);CT[y][x]=o;
+  const add=id=>{const p=fit(o.cont.items,4,3,id);if(p)o.cont.items.push(p);};
+  if(g.armed){if(rnd()<.7)add('munition');if(rnd()<.4)add('munition');if(rnd()<.22)add('pistole');}
+  if(rnd()<.5)add('geld');if(rnd()<.25)add('verband');if(rnd()<.08)add('karte');
+}
+function kill(g){g.down=true;g.dead=true;g.mode='down';g.sus=0;killed++;NKO++;makeBody(g);toast('AUSGESCHALTET');}
+// ================= Schusswaffen =================
+const gun=()=>GUNS[LO.weapon];
+function ammoLeft(){return PART+20*countOf('munition');}
+function takeRounds(n){let got=0;while(got<n){if(PART>0){const k=Math.min(PART,n-got);PART-=k;got+=k;continue;}if(!consume('munition'))break;PART+=20;}lastBtn='';return got;}
+function reload(){const G_=gun();if(!G_||reloadT>0||MAG>=G_.mag)return;if(ammoLeft()<=0){toast('KEINE MUNITION');SFX('fail');return;}reloadT=G_.rl;SFX('reload');lastBtn='';}
+function fireGun(){const G_=gun();if(!G_||reloadT>0||fireCd>0)return;
+  if(MAG<=0){reload();return;}
+  let tg=null,bd=G_.rng;guards.forEach(g=>{if(g.down)return;const d=Math.hypot(g.x-P.x,g.y-P.y);if(d<bd&&los(P.x,P.y-7,g.x,g.y-6)){bd=d;tg=g;}});
+  const aim=tg?Math.atan2(tg.y-6-(P.y-7),tg.x-P.x):P.face;P.face=aim;
+  for(let i=0;i<G_.pel;i++){const a=aim+(Math.random()-.5)*2*G_.spr;bullets.push({x:P.x+Math.cos(aim)*6,y:P.y-7+Math.sin(aim)*6,vx:Math.cos(a)*300,vy:Math.sin(a)*300,life:G_.rng/300,dmg:G_.dmg,own:1});}
+  MAG--;fireCd=G_.rate;P.swing=.08;noise(G_.nz);raise(Math.max(alarm+20,70));SFX('shot');flashes.push({x:P.x,y:P.y,t:.04,muzzle:1});
+  if(MAG<=0&&ammoLeft()>0)setTimeout(reload,200);lastBtn='';}
+function guardShoot(g){const a=Math.atan2(P.y-7-(g.y-6),P.x-g.x)+(Math.random()-.5)*.24;bullets.push({x:g.x+Math.cos(a)*6,y:g.y-6+Math.sin(a)*6,vx:Math.cos(a)*240,vy:Math.sin(a)*240,life:.6,dmg:11,own:0});SFX('shot2');}
+function updBullets(dt){
+  if(fireCd>0)fireCd-=dt;
+  if(reloadT>0){reloadT-=dt;if(reloadT<=0){reloadT=0;const G_=gun();if(G_){MAG+=takeRounds(G_.mag-MAG);}lastBtn='';}}
+  if(firing&&state==='play'&&!busy){const G_=gun();if(G_){fireGun();if(!G_.auto)firing=false;}}
+  bullets.forEach(b=>{const steps=3;for(let s=0;s<steps&&b.life>0;s++){b.x+=b.vx*dt/steps;b.y+=b.vy*dt/steps;
+      if(blockedPx(b.x,b.y)){b.life=0;sparks.push({x:b.x,y:b.y,t:.15});break;}
+      if(b.own){for(const g of guards){if(g.down)continue;if(Math.hypot(g.x-b.x,g.y-6-b.y)<7){g.hp-=b.dmg;b.life=0;g.mode='chase';g.sus=100;g.stun=0;sparks.push({x:b.x,y:b.y,t:.2,blood:1});if(g.hp<=0)kill(g);break;}}}
+      else if(Math.hypot(P.x-b.x,P.y-7-b.y)<6){b.life=0;const dm=b.dmg*(PK.vest?.55:1);P.hp-=dm;SFX('hit');sparks.push({x:b.x,y:b.y,t:.2,blood:1});
+        if(!bleed&&Math.random()<.35){bleed=true;toast('DU BLUTEST!');lastBtn='';}if(navigator.vibrate)navigator.vibrate(40);
+        if(P.hp<=0)busted('Getroffen. Du sackst zusammen – das Letzte, was du hörst, sind Sirenen.');}}
+    b.life-=dt;});
+  bullets=bullets.filter(b=>b.life>0);sparks.forEach(s=>s.t-=dt);sparks=sparks.filter(s=>s.t>0);
+  if(bleed&&state!=='end'){P.hp-=1.3*dt;if(P.hp<=0)busted('Du bist verblutet, bevor du rauskamst.');}
+}
 // ================= Minispiele =================
 function lockGame(onOk,pro){
   state='mini';const pins=pro?3:4;let done=0,miss=0,pos=0,dirm=1,speed=pro?.6:.75,zone,raf,cool=0;
@@ -696,26 +757,30 @@ function draw(t){
   OBJ.forEach(o=>{if(!o.cont)return;const C=o.cont;if(!C.done&&o.kind==='V'&&Math.sin(t/300+o.x*3)>.6)px(cx,o.x*T+6+((t/200|0)%22),o.y*T+5,1,1,'#fff');
     if(C.done)px(cx,o.x*T+2,o.y*T+1,3,3,C.items.length?'#ffe14d':'#555');
     else if(C.note||o.kind==='X'){}});
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(G[y][x]==='U'){const X=x*T,Y=y*T;cx.fillStyle='#140a1c';cx.beginPath();cx.arc(X+8,Y+8,7,0,7);cx.fill();cx.fillStyle=uOpen?'#050208':'#5a5f6e';cx.beginPath();cx.arc(X+8,Y+8,6,0,7);cx.fill();if(!uOpen){px(cx,X+4,Y+6,8,1,'#3a3f4e');px(cx,X+4,Y+9,8,1,'#3a3f4e');}else{px(cx,X+6,Y+3,4,1,'#7dffb2');}}
   if(alarmPanel){const o=OBJ.find(o=>o.kind==='panel');if(o)px(cx,o.x*T+6,o.y*T+5,4,1,disarmed?'#3f3':(Math.sin(t/150)>0?'#f33':'#600'));}
   const cone=(x,y,dir,range,spread,col)=>{cx.fillStyle=col;cx.beginPath();cx.moveTo(x,y);const N=14;for(let i=0;i<=N;i++){const a=dir-spread+2*spread*i/N;let r=0;while(r<range&&!blockedPx(x+Math.cos(a)*r,y+Math.sin(a)*r)&&!smokeAt(x+Math.cos(a)*r,y+Math.sin(a)*r))r+=3;cx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r);}cx.closePath();cx.fill();};
   cams.forEach(c=>{if(camsActive())cone(c.x,c.y,c.dir,96,.42,c.sus>50?'rgba(255,80,80,.22)':'rgba(120,200,255,.13)');px(cx,c.x-3,c.y-3,6,4,'#333');px(cx,c.x-1,c.y-1,2,2,camsActive()?(c.sus>50?'#f33':'#3f3'):'#222');});
   guards.forEach(g=>{if(g.down||g.stun>0)return;cone(g.x,g.y-6,g.dir,g.mode==='chase'?150:88,.55,g.mode==='chase'?'rgba(255,60,60,.25)':g.sus>35?'rgba(255,160,60,.22)':'rgba(255,240,170,.15)');});
   rings.forEach(n=>{cx.strokeStyle=`rgba(255,225,77,${(1-n.r/n.max)*.9})`;cx.lineWidth=1;cx.beginPath();cx.arc(n.x,n.y,n.r,0,7);cx.stroke();});
   const ents=[{o:P,g:0}].concat(guards.map(g=>({o:g,g:1})));ents.sort((a,b)=>a.o.y-b.o.y).forEach(e=>{
-    if(e.g&&e.o.down){px(cx,e.o.x-8,e.o.y-3,16,6,'#24407e');px(cx,e.o.x+5,e.o.y-4,5,5,'#d9a07a');px(cx,e.o.x+6,e.o.y-5,4,2,'#1c2a5a');cx.fillStyle='#ffe14d';cx.font='bold 7px monospace';cx.fillText('zZ',e.o.x+6,e.o.y-8);return;}
+    if(e.g&&e.o.down){if(e.o.dead){cx.fillStyle='rgba(140,10,30,.75)';cx.beginPath();cx.ellipse(e.o.x,e.o.y,10,4,0,0,7);cx.fill();}px(cx,e.o.x-8,e.o.y-3,16,6,'#24407e');px(cx,e.o.x+5,e.o.y-4,5,5,'#d9a07a');px(cx,e.o.x+6,e.o.y-5,4,2,'#1c2a5a');if(!e.o.dead){cx.fillStyle='#ffe14d';cx.font='bold 7px monospace';cx.fillText('zZ',e.o.x+6,e.o.y-8);}return;}
     if(e.g)drawMan(cx,e.o.x,e.o.y,e.o.dir,e.o.step,1,e.o.moving);else drawHero(cx,P.x,P.y,P.face,P.step,P.moving,{weapon:LO.weapon,bag:1,swing:P.swing||0,outfit:CFG.outfit});
     if(e.g&&e.o.stun>0){for(let i=0;i<3;i++){const a=t/200+i*2.1;px(cx,e.o.x+Math.cos(a)*6-1,e.o.y-20+Math.sin(a)*2,2,2,'#ffe14d');}}});
   guards.forEach(g=>{if(g.down||g.stun>0)return;if(g.sus>5){px(cx,g.x-6,g.y-23,12,3,'#000');px(cx,g.x-5,g.y-22,Math.round(10*g.sus/100),1,g.sus>70?'#ff3d3d':'#ffe14d');}
     cx.font='bold 10px monospace';if(g.mode==='check'){cx.fillStyle='#ffe14d';cx.fillText('?',g.x-2,g.y-25);}if(g.mode==='chase'){cx.fillStyle='#ff3d3d';cx.fillText('!',g.x-2,g.y-25);}});
+  bullets.forEach(b=>{cx.strokeStyle=b.own?'rgba(255,240,150,.95)':'rgba(255,90,90,.95)';cx.lineWidth=1;cx.beginPath();cx.moveTo(b.x,b.y);cx.lineTo(b.x-b.vx*.02,b.y-b.vy*.02);cx.stroke();});
+  sparks.forEach(s=>{px(cx,s.x-1,s.y-1,2,2,s.blood?'#c0102a':'#ffe14d');if(s.blood)px(cx,s.x+1,s.y,1,1,'#c0102a');});
   smokes.forEach(s=>{for(let i=0;i<14;i++){const a=i*2.4+t/900,r=s.r*(.3+.7*((i*37)%10)/10);cx.fillStyle=`rgba(200,210,230,${Math.min(.75,s.t/3)})`;cx.beginPath();cx.arc(s.x+Math.cos(a)*r,s.y+Math.sin(a)*r*.7,10,0,7);cx.fill();}});
   cx.restore();
   dx.globalCompositeOperation='source-over';dx.fillStyle=cop?`rgba(${40+30*Math.sin(t/150)},2,${30+30*Math.cos(t/150)},.5)`:'rgba(8,2,20,.26)';dx.fillRect(0,0,VW,VH);
   dx.globalCompositeOperation='destination-out';
   const light=(x,y,r)=>{const g=dx.createRadialGradient(x-camx,y-camy,0,x-camx,y-camy,r);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');dx.fillStyle=g;dx.beginPath();dx.arc(x-camx,y-camy,r,0,7);dx.fill();};
-  light(P.x,P.y-6,PK.nv?120:80);guards.forEach(g=>{if(!g.down&&g.stun<=0)light(g.x+Math.cos(g.dir)*32,g.y+Math.sin(g.dir)*32,38);});
+  light(P.x,P.y-6,PK.nv?120:80);flashes.forEach(f=>{if(f.muzzle)light(f.x,f.y-7,60);});guards.forEach(g=>{if(!g.down&&g.stun<=0)light(g.x+Math.cos(g.dir)*32,g.y+Math.sin(g.dir)*32,38);});
   LIGHTS.forEach(([x,y],i)=>light(x*T,y*T,36+Math.sin(t/400+i)*3));
   dx.globalCompositeOperation='source-over';cx.drawImage(dark,0,0);
-  flashes.forEach(f=>{cx.fillStyle=`rgba(255,255,240,${Math.min(1,f.t*2)})`;cx.fillRect(0,0,VW,VH);});
+  flashes.forEach(f=>{if(f.muzzle){return;}cx.fillStyle=`rgba(255,255,240,${Math.min(1,f.t*2)})`;cx.fillRect(0,0,VW,VH);});
+  if(bleed||P.hp<35){const a=bleed?.18+.08*Math.sin(t/200):.12;const gr=cx.createRadialGradient(VW/2,VH/2,VH*.3,VW/2,VH/2,VH*.8);gr.addColorStop(0,'rgba(180,0,20,0)');gr.addColorStop(1,`rgba(180,0,20,${a+.2})`);cx.fillStyle=gr;cx.fillRect(0,0,VW,VH);}
 }
 
 // ================= Ende =================
@@ -724,14 +789,15 @@ function resultPanel(html){$('ov').className='ov mid on';$('ov').innerHTML=`<div
 function leaveFS(){try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();if(document.fullscreenElement)document.exitFullscreen();}catch(e){}}
 function sendEnd(res){
   leaveFS();
+  if(res==='escape'&&MAG+PART>=10){const p=fit(BAG,BW,BH,'munition');if(p)BAG.push(p);}
   const lo=Object.assign({},LO);
   const data={type:'heistEnd',res,kind:CFG.kind,btype:CFG.type,bag:BAG.map(p=>p.id).filter(id=>id!=='karte'),lo,heat,alarm:Math.round(MAXAL),val:bagVal(),searched:NSEARCH,ko:NKO};
   if(EMBED)window.parent.postMessage(data,'*');else location.reload();
 }
 function extract(kind){
-  state='end';heat=Math.max(0,(alarm>=60?1:0)+(kind==='O'?2:0)+(cop?1:0)-(PK.heat||0));const v=bagVal();lastBtn='';updButtons();
+  state='end';heat=Math.max(0,(alarm>=60?1:0)+(kind==='O'?2:0)+(cop?1:0)+(killed?1:0)-(PK.heat||0)-(kind==='U'?1:0));const v=bagVal();lastBtn='';updButtons();
   const items=BAG.filter(p=>p.id!=='karte');const mats=items.filter(p=>IT[p.id].mat).length,plans=items.filter(p=>IT[p.id].plan).length;
-  wipe(()=>resultPanel(`<div class="big">ENTKOMMEN!</div><p>${kind==='O'?'Du stürmst durch die Vordertür auf die Hauptstraße und tauchst in der Menge unter.':'Du springst in den Wagen. Reifen quietschen, die Neonlichter verschwimmen.'}</p>
+  wipe(()=>resultPanel(`<div class="big">ENTKOMMEN!</div><p>${kind==='O'?'Du stürmst durch die Vordertür auf die Hauptstraße und tauchst in der Menge unter.':kind==='U'?'Du verschwindest in der Kanalisation. Zwei Blocks weiter kletterst du aus einem Gully – keiner hat dich gesehen.':'Du springst in den Wagen. Reifen quietschen, die Neonlichter verschwimmen.'}</p>
     <div class="rw"><span>${items.length} Teile · $${v}</span>${mats?`<span>${mats}× Material</span>`:''}${plans?`<span>${plans}× Bauplan</span>`:''}${heat?`<span class="h">+${heat} Heat</span>`:''}</div>
     <div class="bt"><button type="button" class="p" id="fin">${EMBED?'ZURÜCK INS VERSTECK':'NOCHMAL'}</button></div>`));
   setTimeout(()=>{const b=$('fin');if(b)b.onclick=()=>sendEnd('escape');},600);
@@ -757,7 +823,7 @@ function intro(){
   const I=INTRO[CFG.kind==='golden'?'golden':CFG.type];
   const tl=[LO.tool1,LO.tool2].filter(Boolean).map(i=>IT[i].n).join(', ')||'kein Werkzeug';
   resultPanel(`<div class="big" style="font-size:34px">${CFG.name||I[0]}</div><p>${I[1]}</p>
-  <p style="font-size:13px;color:#cbbbe6">🕹️ Linke Hand: ziehen = laufen (wenig = schleichen). Rechte Hand: 🟡 Aktion · 🔴 Schlag (von hinten!) · Schnellslots · 🎒 Tasche.<br>Tipp: ${I[2]}</p>
+  <p style="font-size:13px;color:#cbbbe6">🕹️ Linke Hand: ziehen = laufen (wenig = schleichen). Rechte Hand: 🟡 Aktion · 🔴 Schlag von hinten – oder Feuer mit Schusswaffe (halten = Dauerfeuer, Taste R lädt) · Schnellslots · 🎒 Tasche.<br>Tipp: ${I[2]}</p>
   <p style="font-size:13px;color:#7ff6ff">Dabei: ${tl}${LO.weapon?' · '+IT[LO.weapon].n:''}</p>
   <div class="bt"><button type="button" class="p" id="go">LOS GEHT’S</button></div>`);
   $('go').onclick=async()=>{try{if(document.documentElement.requestFullscreen&&innerHeight>innerWidth){await document.documentElement.requestFullscreen();if(screen.orientation&&screen.orientation.lock)await screen.orientation.lock('landscape');}}catch(e){}
@@ -772,11 +838,14 @@ function begin(cfg){
   setupDoors();drawTiles();
   $('title').textContent=(CFG.name||'EINSATZ').toUpperCase();
   if(PK.code){codeKnown=true;$('iCode').textContent='SAFE-CODE: '+CODE;$('iCode').classList.add('on');}
+  const ar=CFG.kind==='golden'?1:(ARMED[CFG.type]||[0,0,0])[Math.max(0,Math.min(2,(CFG.diff||1)-1))];guards.forEach(g=>{g.armed=rnd()<ar;g.shootCd=1+rnd();});
+  RAID=CFG.kind==='golden'?600:CFG.type==='bank'?720:CFG.type==='villa'?600:480;raidOver=false;
+  MAG=0;PART=0;if(gun()){MAG=takeRounds(gun().mag);}
   if(PK.ko&&guards.length){const g=guards[Math.floor(rnd()*guards.length)];g.down=true;g.mode='down';}
   lastBtn='';updButtons();intro();
 }
 addEventListener('message',e=>{const d=e.data||{};if(d.type==='heistStart'){LO=Object.assign({weapon:null,tool1:null,tool2:null,q1:null,q2:null,safe:null},d.lo||{});begin(d.cfg);}});
-if(location.hash==='#dbg')window._h={P,get guards(){return guards},get conts(){return OBJ.filter(o=>o.cont)},get DOORS(){return DOORS},get G(){return G},doAct,useItem,get st(){return state},bag:()=>BAG,lo:()=>LO,flags:()=>({lasersOn,camsOn,codeKnown,alarm,armed,disarmed,alarmT,W,H,yardTop}),begin,get tiles(){return tiles}};
+if(location.hash==='#dbg')window._h={P,get guards(){return guards},get conts(){return OBJ.filter(o=>o.cont)},get DOORS(){return DOORS},get G(){return G},doAct,useItem,get st(){return state},bag:()=>BAG,lo:()=>LO,flags:()=>({lasersOn,camsOn,codeKnown,alarm,armed,disarmed,alarmT,W,H,yardTop}),begin,get tiles(){return tiles},get bullets(){return bullets}};
 if(!EMBED){const q=new URLSearchParams(location.search);begin({kind:q.get('k')||'gen',type:q.get('t')||'villa',diff:+(q.get('d')||2),seed:+(q.get('s')||Date.now()%1e6),name:q.get('k')==='golden'?'Golden Palm':'Testeinbruch'});}
 else window.parent.postMessage({type:'heistReady'},'*');
 resize();

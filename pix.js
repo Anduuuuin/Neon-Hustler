@@ -39,6 +39,9 @@ const WPN={
   messer:{px:[".k.","kwk","kwk","kwk","kWk","kkk","khk","khk",".k."],c:{w:'#eef3f8',W:'#b8c2cc',h:'#5a2a12',k:'#140a1c'}},
   schlagring:{px:["kkkkk","kykyk","kyyyk",".kyk."],c:{y:'#ffd34d',k:'#140a1c'}},
   revolver:{px:[".k..",".gk.",".gk.",".gk.","kggk","kgGk","khhk",".hk.",".kk."],c:{g:'#5a5f6e',G:'#8a90a0',h:'#6a3a20',k:'#140a1c'}},
+  pistole:{px:["kk.",".gk",".gk","kggk","kgGk","khk.","khk.",".k.."],c:{g:'#4a4f5e',G:'#8a90a0',h:'#2a2a30',k:'#140a1c'}},
+  schrotflinte:{px:[".k.","kgk","kgk","kgk","kgk","kgk","kwk","kwk","kwk","kwwk","kwwk",".kk."],c:{g:'#3a3f4e',w:'#8a4a20',k:'#140a1c'}},
+  uzi:{px:["k..","gk.","gkk","ggk","gGgk","kgkk","kh..","kh..",".k.."],c:{g:'#2a2e38',G:'#6a7080',h:'#1a1a1a',k:'#140a1c'}},
   brecheisen:{px:["kk.","rkk",".rk",".rk",".rk",".rk",".rk",".rk",".rk","rrk","kk."],c:{r:'#d23a3a',k:'#140a1c'}}
 };
 const wCache={};
