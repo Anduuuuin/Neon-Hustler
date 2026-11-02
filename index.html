@@ -697,6 +697,7 @@
     <button type="button" class="sst" id="sSt">📻 Sender: <b id="sStN"></b> – wechseln (AUS = leise Hintergrundmusik)</button></div>
   <button type="button" class="setb" id="sFull"><span>⛶</span><div><b>Vollbild</b><small>Browserleisten ausblenden (an/aus)</small></div></button>
   <button type="button" class="setb" id="sReset"><span>↺</span><div><b>Neues Spiel</b><small>Spielstand löschen und von vorn – automatisch gespeichert wird immer</small></div></button>
+  <div class="setsnd" id="onl"></div>
   <div class="setsnd"><div style="font-size:12px;color:#7ff6ff;margin-bottom:6px">🧪 TEST-HILFEN</div><div class="tsth"><button type="button" data-c="cash">+$500</button><button type="button" data-c="lvl">+1 Stufe</button><button type="button" data-c="nrg">Energie voll</button><button type="button" data-c="mat">Material</button></div></div>
   <div class="setv">Neon Hustler · Prototyp</div>
 </div></div>
@@ -1838,7 +1839,7 @@
   function continueGame(){loadGame();regen();wipeTo(()=>{show('hide');enterHideout();
       $('h-phone').classList.toggle('alert',job===0||CALLS.includes(Q));$('h-door').classList.toggle('alert',job===1||job===2);hud();renderJob();
       setTimeout(()=>{roll();if(loginState().can)openMeta('bonus');else toastMsg('WILLKOMMEN ZURÜCK');},900);});}
-  window.NH_GAME={hasSave,wipe:()=>{try{localStorage.removeItem(SKEY);}catch(e){}},cheat:(k)=>{if(k==='cash')addReward(500,0,0);if(k==='lvl'){addReward(0,100,0);}if(k==='nrg'){nrg=NMAX;hud();}if(k==='mat'){['metall','metall','kabel','kabel','klebeband','klebeband','chemie','platine','pillen'].forEach(i=>STASH.push(i));toastMsg('MATERIAL IM SPIND');}saveGame();},
+  window.NH_GAME={snap:()=>snap(),stats:()=>({lvl,prestige:PRESTIGE,loot:STAT.loot||0,heists:STAT.heists||0,faction:FACTION,cash}),writeSave:d=>{try{localStorage.setItem(SKEY,JSON.stringify(d));}catch(e){}},inGame:()=>scene!=='start'&&scene!=='intro',toast:t=>toastMsg(t),hasSave,wipe:()=>{try{localStorage.removeItem(SKEY);}catch(e){}},cheat:(k)=>{if(k==='cash')addReward(500,0,0);if(k==='lvl'){addReward(0,100,0);}if(k==='nrg'){nrg=NMAX;hud();}if(k==='mat'){['metall','metall','kabel','kabel','klebeband','klebeband','chemie','platine','pillen'].forEach(i=>STASH.push(i));toastMsg('MATERIAL IM SPIND');}saveGame();},
     info:()=>({lvl,Q,cash})};
   // ================= LANGZEIT: AUFGABEN, LOGIN, ERFOLGE, ALBUM, PRESTIGE, WERBUNG, SPIND =================
   const xpNeed=l=>100+(l-1)*20;
@@ -2217,5 +2218,6 @@
     const hide=vis('map')||!!document.getElementById('pixh')||vis('dlg')||vis('inv')||(sh&&sh.classList.contains('open'))||vis('paper')||vis('menu2');$('gear').style.display=hide?'none':'';const tr=$('trophy');if(tr)tr.style.display=(hide||vis('start')||vis('intro'))?'none':'';const em=$('empire');if(em)em.style.display=(hide||vis('start')||vis('intro'))?'none':'';const pb=$('phoneb');if(pb)pb.style.display=(hide||vis('start')||vis('intro'))?'none':'';},400);
 })();
 </script>
+<script src="online.js"></script>
 </body>
 </html>
