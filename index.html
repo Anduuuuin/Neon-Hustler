@@ -575,7 +575,29 @@
   #bizp{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:max(10px,env(safe-area-inset-top)) 10px max(12px,env(safe-area-inset-bottom));color:#fff;font-family:'Oswald',sans-serif}
   .bztop{display:flex;gap:10px;align-items:center}.bztop button{background:#fff;border:3px solid #000;box-shadow:3px 3px 0 #2fe0ea;font-family:'Bangers',cursive;font-size:18px;padding:3px 10px;cursor:pointer}
   .bztop b{display:block;font-family:'Bangers',cursive;font-size:24px;letter-spacing:1px;color:#ffe14d;-webkit-text-stroke:1px #000;paint-order:stroke fill;text-shadow:2px 2px 0 #ff3d8b}.bztop small{font-size:12px;color:#e4dcf5}
-  .bzbot{max-height:62vh;overflow:auto}
+  .bzbot{max-height:64vh;overflow:auto}
+  .bztabs{display:flex;gap:4px;margin-bottom:6px}.bztabs button{flex:1;background:#1d1030;border:2px solid #4b3a6e;color:#e4dcf5;font-family:'Bangers',cursive;font-size:15px;padding:6px 2px;border-radius:8px;cursor:pointer}.bztabs button.on{background:#ff3d8b;border-color:#000;color:#fff;box-shadow:2px 2px 0 #2fe0ea}
+  .bzwash{background:#0e2230;border:1px solid #2fe0ea;border-radius:8px;padding:6px 8px;margin-bottom:6px}.bzwash small{display:block;font-size:11px;color:#7ff6ff}.bzwash b{font-family:'Bangers',cursive;font-size:22px;color:#2fe0ea}.bzwash p{font-size:12px;margin:4px 0 0}
+  .bzbrk{background:#3a1010;border:1px solid #ff3d6e;border-radius:8px;padding:6px 8px;margin-bottom:6px;font-size:13px}.bzbrk button{display:block;margin-top:4px;background:#ff9f43;border:2px solid #000;font-family:'Bangers',cursive;font-size:15px;padding:4px 10px;border-radius:6px;cursor:pointer}
+  .bzst{position:relative;display:flex;gap:8px;align-items:center;background:#1d1030;border-radius:8px;padding:5px 8px;margin-bottom:4px}.bzst>div{flex:1}.bzst b{font-size:13px;display:block}.bzst small{font-size:11px;color:#7dffb2}
+  .bzico{font-size:26px;width:34px;text-align:center;flex:none}
+  .bzcyc{height:5px;background:#000;border-radius:3px;overflow:hidden;margin-top:3px}.bzcyc i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff3d8b,#ffe14d);transform-origin:left;animation:bzcy 3s linear infinite}.bzcyc.off i{animation:none;transform:scaleX(0)}
+  @keyframes bzcy{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .bzpop{position:absolute;right:10px;top:4px;font-style:normal;font-family:'Bangers',cursive;color:#7dffb2;font-size:16px;text-shadow:1px 1px 0 #000;animation:bzpop 1.1s ease-out forwards;pointer-events:none}
+  @keyframes bzpop{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-26px)}}
+  .bzsum{display:flex;flex-wrap:wrap;gap:6px;font-size:11px;color:#cbbbe6;margin-top:4px}
+  .bzdev{background:#1d1030;border:1px solid #4b3a6e;border-radius:8px;padding:6px 8px;margin-bottom:6px}.bzdh{display:flex;gap:8px;align-items:center}.bzdh b{display:block;font-size:14px}.bzdh small{font-size:11px;color:#cbbbe6}
+  .bzunits{display:flex;flex-wrap:wrap;gap:2px;margin:5px 0}.bzunits i{font-style:normal;font-size:17px;opacity:.18;filter:grayscale(1)}.bzunits i.on{opacity:1;filter:none}
+  .bzbtns{display:flex;gap:6px}.bzbtns button{flex:1;background:#ffe14d;border:2px solid #000;font-family:'Bangers',cursive;font-size:15px;padding:4px 6px;border-radius:6px;cursor:pointer;line-height:1.1}.bzbtns button small{display:block;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700}.bzbtns button.poor{opacity:.45}.bzbtns span{flex:1;text-align:center;color:#7dffb2;font-size:12px;align-self:center}
+  .bzms{display:block;font-size:10px;color:#ff9f43;margin-top:3px}.bztr.cl{opacity:.5}
+  .bzpp{display:flex;gap:6px;align-items:center;background:#1d1030;border-radius:8px;padding:5px 6px;margin-bottom:4px}.bzpp>div{flex:1;min-width:0}.bzpp b{font-size:13px;display:block}.bzpp small{font-size:10px;color:#cbbbe6;display:block}.bzpp.app{border:1px dashed #4b3a6e}
+  .bzloy{height:4px;background:#000;border-radius:2px;margin-top:3px}.bzloy i{display:block;height:100%;border-radius:2px}
+  .bzpb{display:flex;gap:3px}.bzpb button{background:#2fe0ea;border:2px solid #000;font-family:'Bangers',cursive;font-size:12px;padding:3px 5px;border-radius:6px;cursor:pointer;line-height:1.05}.bzpb button small{display:block;font-family:'Oswald',sans-serif;font-size:9px;font-weight:700}.bzpb button.red{background:#ff3d6e}.bzpb button.poor{opacity:.45}
+  #bzcrowd{position:absolute;inset:0;pointer-events:none;overflow:hidden}#bzcrowd span{position:absolute;left:-10%;font-size:30px;animation-name:bzwalk,bzbob;animation-timing-function:linear,ease-in-out;animation-iteration-count:infinite;filter:drop-shadow(2px 2px 0 #000)}
+  @keyframes bzwalk{from{left:-12%}to{left:108%}}@keyframes bzbob{from{margin-top:0}to{margin-top:-5px}}
+  .sellpay{display:flex;gap:6px;margin:6px 0}.sellpay button{flex:1;background:#1d1030;border:2px solid #4b3a6e;color:#fff;font-family:'Bangers',cursive;font-size:16px;padding:6px;border-radius:8px;cursor:pointer}.sellpay button small{display:block;font-family:'Oswald',sans-serif;font-size:10px;color:#cbbbe6}.sellpay button.on{border-color:#2fe0ea;background:#0e2230}
+  .pill.dirty{background:#0e2230;color:#2fe0ea}
+
   .bzbox{background:rgba(16,8,30,.95);border:2px solid #2fe0ea;border-radius:12px;padding:10px;box-shadow:0 0 0 2px #000}
   .bzbox.ev{border-color:#ff9f43}.bzbox .evt{font-family:'Bangers',cursive;font-size:24px;color:#ff9f43}.bzbox p{margin:6px 0;font-size:14px;line-height:1.35}
   .bzopt{display:block;width:100%;margin-top:6px;background:#1d1030;border:2px solid #2fe0ea;color:#fff;font-family:'Bangers',cursive;font-size:18px;padding:8px;border-radius:8px;cursor:pointer;text-align:left}
@@ -636,7 +658,7 @@
   </div>
   <div id="hud">
     <div class="who"><b>DU</b><small>Stufe <span id="lvl">1</span> · Kleinganove</small><div class="xp"><i id="xpbar"></i></div><div class="qst" id="quest"></div></div>
-    <div class="stats"><div class="pill cash">$ <span id="cash">40</span></div><div class="pill heat">Heat <span id="heat">☆☆☆☆☆</span></div><div class="pill">Energie <span id="nrg">10</span>/<span id="nmax">10</span></div><div class="pill buff" id="buff">Milchshake: Charme +15 %</div></div>
+    <div class="stats"><div class="pill cash">$ <span id="cash">40</span></div><div class="pill dirty" id="dirtyp" style="display:none">🧼 <span id="dirty">0</span></div><div class="pill heat">Heat <span id="heat">☆☆☆☆☆</span></div><div class="pill">Energie <span id="nrg">10</span>/<span id="nmax">10</span></div><div class="pill buff" id="buff">Milchshake: Charme +15 %</div></div>
   </div>
   <div id="toast"></div>
   <div id="sheet" role="dialog" aria-live="polite"></div>
@@ -904,7 +926,7 @@
 
 
   // ---------- Werte / HUD ----------
-  function hud(){ questTick(); if(window.__nhReady)saveGame(); const nm=document.getElementById('nmax');if(nm)nm.textContent=NMAX; $('cash').textContent=cash; $('nrg').textContent=nrg; $('lvl').textContent=lvl;
+  function hud(){ questTick(); if(window.__nhReady)saveGame(); const nm=document.getElementById('nmax');if(nm)nm.textContent=NMAX; $('cash').textContent=cash;{const dp=document.getElementById('dirtyp');if(dp&&typeof EMP!=='undefined'){if(EMP.dirty==null)EMP.dirty=0;dp.style.display=EMP.dirty>0?'':'none';$('dirty').textContent=Math.round(EMP.dirty||0).toLocaleString('de-DE');}} $('nrg').textContent=nrg; $('lvl').textContent=lvl;
     $('heat').textContent='★'.repeat(heat)+'☆'.repeat(5-heat); $('buff').style.display=buff?'block':'none'; $('xpbar').style.width=Math.min(100,xp/(100+(lvl-1)*20)*100)+'%'; if(window.__nhReady){albumScan();} }
   hud();
 
@@ -2044,12 +2066,11 @@
       if(L.cash){cash_+=Math.floor(Math.min(MODS[k].capH,(now-s.t)/36e5)*L.cash);}
       else{const n=Math.min(MODS[k].cap,Math.floor((now-s.t)/(L.min*6e4)));if(n)items[L.item]=(items[L.item]||0)+n;}});
     return {cash:cash_,items};}
-  function empCollect(){const p=empPending();const now=Date.now();
-    Object.values(EMP.biz).forEach(s=>{if(s.lv)s.t=now;});
+  function empCollect(){let bz=0;Object.keys(EMP.biz).forEach(k=>{if(EMP.biz[k].lv)bz+=bizCollect(k,1);});const p=empPending();const now=Date.now();
     Object.entries(EMP.mods).forEach(([k,s])=>{if(!s.lv)return;const L=MODS[k].lv[s.lv-1];if(L.cash){s.t=now;return;}const n=Math.floor((now-s.t)/(L.min*6e4));s.t=n>=MODS[k].cap?now:s.t+n*L.min*6e4;});
-    let txt=[];if(p.cash){cash+=p.cash;track('income',p.cash);txt.push('$'+fmt(p.cash));}
+    let txt=[];if(p.cash){cash+=p.cash;track('income',p.cash);}if(p.cash+bz)txt.push('$'+fmt(p.cash+bz));
     Object.entries(p.items).forEach(([id,n])=>{for(let i=0;i<n;i++)STASH.push(id==='_mat'?MATS[Math.floor(Math.random()*MATS.length)]:id);txt.push(n+'× '+(id==='_mat'?'Material':ITEMS[id].n));});
-    if(txt.length){sfx('cash');hud();EMP.last=p.cash;}return txt.join(' · ');}
+    if(txt.length){sfx('cash');hud();EMP.last=p.cash+bz;}return txt.join(' · ');}
   let empTab='biz';
   function openEmp(){$('empov').classList.add('on');renderEmp();}
   function closeEmp(){$('empov').classList.remove('on');saveGame();}
@@ -2057,8 +2078,8 @@
     const total=Object.entries(EMP.biz).reduce((s,[k,v])=>s+(v.lv?bizIncS(k,v):0),0)+Object.entries(EMP.mods).reduce((s,[k,v])=>s+(v.lv&&MODS[k].lv[v.lv-1].cash?MODS[k].lv[v.lv-1].cash:0),0);
     let body='';
     if(empTab==='biz'){body=`<div class="mh">TARNFIRMEN<small>Einnahmen auch offline · Kasse voll nach ein paar Stunden</small></div>`+Object.entries(BIZ).map(([k,b])=>{const s=EMP.biz[k]||{lv:0},lk=lvl<b.req;
-        const s2=s.lv?bst(k):null;const cp=s.lv?bizCapS(s2):6;const h=s.lv?Math.min(cp,(Date.now()-s.t)/36e5):0;const ups=s2?TRK.reduce((a,t)=>a+s2.up[t],0):0;
-        return `<div class="mrow ${lk?'cl':''}"><div><b>${b.n}${s.lv?' · Ausbau '+ups+'/25':''}</b><small>${b.where} · ${s.lv?'$'+fmt(bizIncS(k,s2))+'/h · Kasse '+Math.floor(h/cp*100)+' %':'$'+fmt(b.inc)+'/h'}</small>${s.lv?`<div class="pb"><i style="width:${h/cp*100}%"></i></div>`:''}</div>
+        const s2=s.lv?bst(k):null;const cp=s.lv?bizCapS(s2):6;const h=s.lv?Math.min(cp,(Date.now()-s.t)/36e5):0;const ups=s2?bizRank(k):0;
+        return `<div class="mrow ${lk?'cl':''}"><div><b>${b.n}${s.lv?' · Rang '+ups+'/10':''}</b><small>${b.where} · ${s.lv?'$'+fmt(bizIncS(k,s2))+'/h · Kasse '+Math.floor(h/cp*100)+' %':'$'+fmt(b.inc)+'/h'}</small>${s.lv?`<div class="pb"><i style="width:${h/cp*100}%"></i></div>`:''}</div>
           ${lk?`<span style="font-size:11px;color:#cbbbe6">ab Stufe ${b.req}</span>`:`<button type="button" data-visit="${k}">${s.lv?'BESUCHEN':'ANSEHEN'}<br><small>${s.lv?'ausbauen':'$'+fmt(b.cost)}</small></button>`}</div>`;}).join('');}
     if(empTab==='mods'){body=`<div class="mh">VERSTECK-MODULE<small>Produktion läuft rund um die Uhr</small></div>`+Object.entries(MODS).map(([k,m])=>{const s=EMP.mods[k]||{lv:0},lk=lvl<m.req,L=s.lv?m.lv[s.lv-1]:null,nx=m.lv[s.lv];
         const desc=L?(L.cash?`$${L.cash}/h`:`1× ${L.item==='_mat'?'Material':ITEMS[L.item].n} alle ${L.min} min (max ${m.cap})`):m.txt;
@@ -2145,66 +2166,150 @@
   document.getElementById('phone').addEventListener('click',e=>{if(e.target.id==='phone')phoneClose();});
   setInterval(()=>{const b=document.getElementById('phoneb');if(!b)return;rollOffers();const n=OFFERS.list.filter(o=>!o.taken).length+(CALLS.includes(Q)?1:0);b.dataset.n=n||'';},4000);
   TINFO.viertel={n:'Viertel (6 Gebäude)',req:3,e:5,loot:'Alles – plus Autos zum Klauen'};TNAMES.viertel=['Little Havana','Ocean Drive Block','Hafenviertel','Sunset Strip'];
-  // ================= LÄDEN BESUCHEN & AUSBAUEN (Tycoon) =================
+  // ================= LÄDEN 2.0: Geräte, Personal, Geldwäsche =================
   const BIZX={
-    wasch:{img:'biz_wasch.webp',fb:'pl_slum.webp',place:'m-slum',staff:['Rosa','Hector','Mrs. Kim','Lupe','Big Earl'],
-      tr:{a:['Waschmaschinen','Mehr Maschinen = mehr Kundschaft'],p:['Personal','Bügeln, Falten, Lieferservice'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Flyer in der ganzen Siedlung'],s:['Sicherheit','Kamera & Türsteher gegen Ärger']}},
-    autowasch:{img:'biz_autowasch.webp',fb:'pl_shop.webp',place:'m-shop',staff:['Tony','Chico','Jules','Marv','Dante'],
-      tr:{a:['Waschstraßen','Mehr Bürsten, mehr Autos pro Stunde'],p:['Personal','Polierer & Innenreinigung'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Neonschild am Boulevard'],s:['Sicherheit','Wachmann für die Nacht']}},
-    video:{img:'biz_video.webp',fb:'pl_towers.webp',place:'m-towers',staff:['Nerd-Kevin','Sandy','Phil','Trixie','Ray'],
-      tr:{a:['VHS-Regale','Mehr Filme, mehr Ausleihen'],p:['Personal','Nachtschicht & Beratung'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Kinoplakate & Radiospots'],s:['Sicherheit','Diebstahlsicherung']}},
-    club:{img:'biz_club.webp',fb:'pl_club.webp',place:'m-club',staff:['DJ Flash','Bunny','Rocco','Starla','Big Mo'],
-      tr:{a:['Licht & Bar','Lasershow, Champagner-Bar'],p:['Personal','Barkeeper, Tänzer, DJs'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','VIP-Gästeliste & Promis'],s:['Sicherheit','Türsteher-Team']}},
-    yacht:{img:'biz_yacht.webp',fb:'pl_yacht.webp',place:'m-yacht',staff:['Kapitän Ray','Marina','Skip','Coco','Admiral Burke'],
-      tr:{a:['Yachten','Größere Flotte'],p:['Personal','Crew & Kapitäne'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Prospekte in Luxushotels'],s:['Sicherheit','Hafenwache']}},
-    casino:{img:'biz_casino.webp',fb:'pl_casino.webp',place:'m-casino',staff:['Croupier Vic','Lady Luck','Sal Jr.','Mona','The Count'],
-      tr:{a:['Spieltische','Poker, Roulette, Black Jack'],p:['Personal','Croupiers & Kellner'],t:['Tresor','Kasse fasst mehr Stunden'],w:['Werbung','Flüsterpropaganda bei Reichen'],s:['Sicherheit','Bewaffnete Aufpasser']}}};
-  const TRK=['a','p','t','w','s'];const TMAX=5;
-  function bst(k){const s=EMP.biz[k];if(!s)return null;if(!s.up){s.up={a:Math.max(0,(s.lv||1)-1),p:0,t:0,w:0,s:0};}return s;}
-  function bizIncS(k,s){if(!s||!s.lv)return Math.round(BIZ[k].inc*1.5);const u=bst(k).up;return Math.round(BIZ[k].inc*1.5*(1+.3*u.a)*(1+.18*u.p)*(1+.15*u.w));}
-  function bizCapS(s){if(!s||!s.lv)return 6;const u=s.up||{p:0,t:0};return 6+3*u.t+u.p;}
-  function trCost(k,tr,l){const f={a:1,p:.8,t:.6,w:.7,s:.6}[tr];return Math.round(BIZ[k].cost*f*.35*Math.pow(l+1,1.45));}
-  function bizPending(k){const s=bst(k);if(!s||!s.lv)return 0;return Math.floor(Math.min(bizCapS(s),(Date.now()-s.t)/36e5)*bizIncS(k,s));}
-  function bizCollect(k){const v=bizPending(k);const s=bst(k);if(!v)return 0;s.t=Date.now();cash+=v;track('income',v);EMP.last=v;sfx('cash');hud();return v;}
-  let BZ=null,bzMsg='',bzEvent=null;
-  function openBiz(k){BZ=k;bzMsg='';const s=bst(k);bzEvent=null;
-    if(s&&s.lv&&(!s.ev||Date.now()-s.ev>36e5)&&Math.random()<.35){s.ev=Date.now();bzEvent=pickEvent(k);}
-    $('bizscr').classList.add('on');renderBiz();}
-  function closeBiz(){$('bizscr').classList.remove('on');BZ=null;saveGame();}
-  function pickEvent(k){const s=bst(k),sec=s.up.s;const reg=bizPending(k);const staff=BIZX[k].staff;
+    wasch:{img:'biz_wasch.webp',fb:'pl_slum.webp',place:'m-slum',cust:['🧺','👵','🧔','👩','👦'],tip:'apotheke',
+      st:[['Waschmaschine','🫧',12],['Trockner','🌀',8],['Wäsche-Lieferdienst','🛵',4]]},
+    autowasch:{img:'biz_autowasch.webp',fb:'pl_shop.webp',place:'m-shop',cust:['🚗','🚙','🏎','🚕'],tip:'werkstatt',
+      st:[['Waschplatz','🚿',8],['Polier-Station','✨',6],['Tuning-Ecke','🔩',4]]},
+    video:{img:'biz_video.webp',fb:'pl_towers.webp',place:'m-towers',cust:['🧑','👧','🤓','🧑‍🎤'],tip:'lagerhalle',
+      st:[['VHS-Regal','📼',12],['Spielautomat','🕹',6],['Hinterzimmer (Ü18)','🔞',3]]},
+    club:{img:'biz_club.webp',fb:'pl_club.webp',place:'m-club',cust:['💃','🕺','🧑‍🎤','👯'],tip:'nachtclub',
+      st:[['Bar-Theke','🍸',6],['Soundsystem','🔊',6],['VIP-Lounge','🛋',4]]},
+    yacht:{img:'biz_yacht.webp',fb:'pl_yacht.webp',place:'m-yacht',cust:['🕶','👙','🤵','🍹'],tip:'villa',
+      st:[['Jetski','🚤',8],['Charter-Yacht','🛥',6],['Party-Yacht','🛳',3]]},
+    casino:{img:'biz_casino.webp',fb:'pl_casino.webp',place:'m-casino',cust:['🤵','💰','👩‍🦰','🎩'],tip:'bank',
+      st:[['Slot-Maschine','🎰',12],['Spieltisch','🎲',8],['High-Roller-Raum','🃏',3]]}};
+  const SBASE=[.5,1.4,3.5],SUNIT=[.12,.55,1.8],SLVL=[.1,.35,1.1],SMAT=['kabel','metall','platine'],MSTONES=[10,25,50,75,100];
+  const ROLES={kasse:['Kassierer','💁','+8 % Umsatz je Stern'],tech:['Techniker','🔧','Weniger Pannen, billigere Reparatur'],tuer:['Türsteher','🕶','Schutz vor Gangs & Dieben'],
+    mgr:['Manager','👔','Kasse fasst +2 h je Stern'],buch:['Buchhalter','🧮','+25 % Geldwäsche je Stern, hält das Finanzamt fern']};
+  const PNAMES=['Rosa','Hector','Mrs. Kim','Lupe','Big Earl','Tony','Chico','Jules','Marv','Dante','Nerd-Kevin','Sandy','Phil','Trixie','Ray','DJ Flash','Bunny','Rocco','Starla','Big Mo',
+    'Marina','Skip','Coco','Vic','Lady Luck','Sal Jr.','Mona','The Count','Crockett-Fan Gary','Paulie','Rita','Benny','Dolores','Sonny','Gina','Fat Louie','Cherry','Manny','Esteban','Debbie','Lenny','Pepper','Raul','Wanda','Tito Jr.','Candy'];
+  const TRK=['t','s','w'];const TMAX=5;
+  const UPN={t:['Tresor','Kasse fasst +2 h'],s:['Sicherheit','Kameras & Schlösser gegen Ärger'],w:['Werbung','+20 % Kundschaft']};
+  if(EMP.dirty==null)EMP.dirty=0;
+  function bst(k){const s=EMP.biz[k];if(!s||!s.lv)return s||null;
+    if(!s.v2){const u=s.up||{a:Math.max(0,(s.lv||1)-1),t:0,s:0,w:0};s.st=[{n:Math.min(12,1+2*(u.a||0)),l:1+2*((u.p||0)+(u.w||0))},{n:0,l:1},{n:0,l:1}];s.up={t:u.t||0,s:u.s||0,w:u.w||0};s.staff=[];s.app=[];s.appT=0;s.brk=-1;s.v2=1;}
+    return s;}
+  const msMul=l=>Math.pow(2,MSTONES.filter(m=>l>=m).length);
+  function stInc(k,j,s){const S=s.st[j];if(!S.n)return 0;return BIZ[k].inc*SBASE[j]*S.n*(1+.2*(S.l-1))*msMul(S.l)*(s.brk===j?0:1);}
+  function staffEff(s,r){return (s.staff||[]).filter(p=>p.r===r).reduce((a,p)=>a+p.sk*(.5+p.loy/200),0);}
+  function bizRank(k){const s=bst(k);if(!s||!s.lv)return 0;const sc=s.st.reduce((a,S)=>a+S.n*2+S.l,0)+TRK.reduce((a,t)=>a+s.up[t]*3,0)+s.staff.length*3;return Math.min(10,1+Math.floor(sc/22));}
+  const staffSlots=k=>Math.min(5,1+Math.floor(bizRank(k)/2));
+  function bizGross(k,s){s=s||bst(k);if(!s||!s.lv)return 0;let g=0;for(let j=0;j<3;j++)g+=stInc(k,j,s);return g*(1+.2*s.up.w)*(1+.08*staffEff(s,'kasse'));}
+  const bizWages=s=>(s.staff||[]).reduce((a,p)=>a+p.w,0);
+  function bizIncS(k,s){s=s||bst(k);if(!s||!s.lv)return Math.round(BIZ[k].inc*SBASE[0]);return Math.max(0,Math.round(bizGross(k,s)-bizWages(s)));}
+  function bizCapS(s){if(!s||!s.lv)return 8;return 8+2*(s.up.t||0)+Math.round(2*staffEff(s,'mgr'));}
+  const bizWashH=(k,s)=>Math.round((bizGross(k,s)*.8+BIZ[k].inc*.5)*(1+.25*staffEff(s,'buch')));
+  function bizHours(s){return Math.min(bizCapS(s),(Date.now()-s.t)/36e5);}
+  function bizPending(k){const s=bst(k);if(!s||!s.lv)return 0;return Math.floor(bizHours(s)*bizIncS(k,s));}
+  function bizWashPending(k){const s=bst(k);if(!s||!s.lv)return 0;return Math.floor(Math.min(EMP.dirty||0,bizHours(s)*bizWashH(k,s)));}
+  const unitCost=(k,j,n)=>Math.round(BIZ[k].cost*SUNIT[j]*Math.pow(1.32,n));
+  const lvlCost=(k,j,l,n)=>Math.round(BIZ[k].cost*SLVL[j]*Math.pow(1.17,l-1)*(1+.15*((n||1)-1)));
+  function msNeed(j,l){const i=MSTONES.indexOf(l+1);return i<0?null:[SMAT[j],(i+1)*2];}
+  const upCost=(k,tr,l)=>Math.round(BIZ[k].cost*{t:.4,s:.45,w:.6}[tr]*Math.pow(l+1,1.5));
+  function bizCollect(k,quiet){const s=bst(k);if(!s||!s.lv)return 0;const h=bizHours(s);const net=Math.floor(h*bizIncS(k,s));const wash=bizWashPending(k);
+    if(!net&&!wash)return 0;s.t=Date.now();let stolen=0,thief=null;
+    if(net>0)(s.staff||[]).forEach(p=>{p.loy=Math.max(0,p.loy-Math.min(6,Math.round(h)));if(!thief&&p.loy<35&&Math.random()<(35-p.loy)/60*(1-.12*(s.up.s+staffEff(s,'tuer'))))thief=p;});
+    if(thief){stolen=Math.round(net*.2);s.thief=thief.n;}
+    if(s.brk<0&&h>=1&&Math.random()<Math.max(.05,.3-.06*staffEff(s,'tech'))){const own=[0,1,2].filter(j=>s.st[j].n);s.brk=own[Math.floor(Math.random()*own.length)];}
+    const got=net-stolen+wash;cash+=got;EMP.dirty=Math.max(0,(EMP.dirty||0)-wash);if(wash){s.wl=Date.now();track('laundered',wash);}track('income',net-stolen);EMP.last=net-stolen;
+    if(!quiet){sfx('cash');hud();}return got;}
+  // Bewerber
+  function mkApp(k){const roles=Object.keys(ROLES);const r=roles[Math.floor(Math.random()*roles.length)];const x=Math.random();const sk=x<.5?1:x<.8?2:x<.95?3:x<.99?4:5;
+    const used=Object.values(EMP.biz).flatMap(s=>(s.staff||[]).map(p=>p.n));const pool=PNAMES.filter(n=>!used.includes(n));
+    return {n:pool[Math.floor(Math.random()*pool.length)]||'Joe',r,sk,loy:45+Math.floor(Math.random()*40),w:Math.round(BIZ[k].inc*.07*sk*(.85+Math.random()*.3))};}
+  function refreshApps(k,force){const s=bst(k);if(force||!s.app||!s.app.length||Date.now()-(s.appT||0)>2*36e5){s.app=[mkApp(k),mkApp(k),mkApp(k)];s.appT=Date.now();}}
+  // Screen
+  let BZ=null,bzMsg='',bzEvent=null,bzTab='kasse',bzTick=null,bzFx=null;
+  function openBiz(k){BZ=k;bzMsg='';bzTab='kasse';const s=bst(k);bzEvent=null;
+    if(s&&s.lv){refreshApps(k);if(s.thief){bzEvent=thiefEvent(k,s.thief);s.thief=null;}
+      else if((!s.ev||Date.now()-s.ev>36e5)&&Math.random()<.35){s.ev=Date.now();bzEvent=pickEvent(k);}}
+    $('bizscr').classList.add('on');renderBiz();crowd();
+    clearInterval(bzTick);bzTick=setInterval(()=>{if(!BZ)return;const e=$('bzlive');if(e)e.textContent='$'+fmt(bizPending(BZ));const w=$('bzwlive');if(w)w.textContent='$'+fmt(bizWashPending(BZ));
+      const pb=$('bzlpb');if(pb){const s=bst(BZ);pb.style.width=(bizHours(s)/bizCapS(s)*100)+'%';}},1000);
+    clearInterval(bzFx);bzFx=setInterval(()=>{if(!BZ||bzTab!=='kasse')return;const s=bst(BZ);if(!s||!s.lv)return;const rows=[...document.querySelectorAll('.bzst[data-j]')];if(!rows.length)return;
+      const r=rows[Math.floor(Math.random()*rows.length)];const j=+r.dataset.j;if(s.brk===j)return;const f=document.createElement('i');f.className='bzpop';f.textContent='+$'+fmt(Math.max(1,Math.round(stInc(BZ,j,s)/120)));r.appendChild(f);setTimeout(()=>f.remove(),1100);},700);}
+  function closeBiz(){$('bizscr').classList.remove('on');BZ=null;clearInterval(bzTick);clearInterval(bzFx);const c=$('bzcrowd');if(c)c.innerHTML='';saveGame();}
+  function crowd(){let c=$('bzcrowd');if(!c){c=document.createElement('div');c.id='bzcrowd';$('bizscr').insertBefore(c,$('bizp'));}
+    const s=bst(BZ);const n=s&&s.lv?Math.min(9,1+bizRank(BZ)+(s.up.w||0)):0;const X=BIZX[BZ];
+    c.innerHTML=Array.from({length:n},(_,i)=>`<span style="top:${30+Math.random()*16}%;animation-duration:${7+Math.random()*7}s,.5s;animation-delay:-${Math.random()*12}s,0s;${Math.random()<.5?'animation-direction:reverse,alternate;':''}">${X.cust[i%X.cust.length]}</span>`).join('');}
+  function tipTarget(k){let ty=BIZX[k].tip;if(!TINFO[ty]||lvl<TINFO[ty].req)ty='werkstatt';const T=mkTarget(ty);T.name='Tipp: '+T.name;T.diff=Math.max(1,T.diff-1);TARGETS.unshift(T);return T;}
+  function thiefEvent(k,name){const s=bst(k);const p=s.staff.find(x=>x.n===name);if(!p)return null;
+    return {t:'💸 Griff in die Kasse',d:`${ROLES[p.r][1]} <b>${p.n}</b> hat 20 % der letzten Einnahmen eingesteckt. ${s.up.s>=2?'Die Kamera hat alles aufgezeichnet.':'Beweisen kannst du nichts.'}`,o:[
+      {t:'Rauswerfen',f:()=>{s.staff=s.staff.filter(x=>x!==p);return `${p.n} ist raus. Such dir Ersatz unter PERSONAL.`;}},
+      {t:`Gehaltserhöhung · Lohn +30 %`,f:()=>{p.w=Math.round(p.w*1.3);p.loy=Math.min(100,p.loy+40);return `${p.n} schwört, dass es nie wieder vorkommt. (Loyalität +40)`;}},
+      {t:'Ernstes Gespräch · Muskeln',f:()=>{const ch=40+(statVal('Muskeln')-10)*3+s.up.s*8;if(Math.random()*100<ch){p.loy=Math.min(100,p.loy+30);addReward(0,15,0);return `${p.n} gibt das Geld zurück und spurt jetzt. (+15 XP)`;}p.loy=Math.max(0,p.loy-10);return `${p.n} grinst nur. Die Stimmung ist im Keller.`;}}]};}
+  function pickEvent(k){const s=bst(k),sec=s.up.s+staffEff(s,'tuer');const staff=s.staff||[];
     const E=[
-      {t:'🔧 Kaputt!',d:`Eine ${k==='wasch'?'Waschmaschine':'Anlage'} ist ausgefallen. Reparatur sofort oder die Kundschaft bleibt weg.`,o:[
-        {t:`Reparieren · $${Math.round(BIZ[k].inc*1.5)}`,f:()=>{const c=Math.round(BIZ[k].inc*1.5);if(cash<c)return 'Zu wenig Geld.';cash-=c;hud();return 'Läuft wieder wie geschmiert.';}},
-        {t:'Ignorieren · Kasse −40 %',f:()=>{s.t+=Math.min(Date.now()-s.t,bizCapS(s)*36e5)*.4;return 'Die Kundschaft ist sauer und geht woanders hin.';}}]},
-      {t:'💸 Griff in die Kasse',d:`${staff[Math.min(s.up.p,staff.length-1)]} hat Geld aus der Kasse genommen. ${sec>=2?'Deine Kamera hat alles aufgezeichnet.':''}`,o:[
-        {t:'Rauswerfen',f:()=>{if(s.up.p>0&&sec<2){s.up.p--;return 'Weg ist er – und mit ihm ein Stück Personal (Personal −1).';}return 'Rausgeworfen. Dank Kamera holst du das Geld zurück.';}},
-        {t:'Ernstes Gespräch · Charme',f:()=>{const ch=40+(statVal('Charme')-10)*3+sec*10;if(Math.random()*100<ch){addReward(0,15,0);return 'Er gibt alles zurück und arbeitet jetzt doppelt so hart. (+15 XP)';}s.t+=Math.min(Date.now()-s.t,bizCapS(s)*36e5)*.3;return 'Er lacht dich aus. Ein Teil der Kasse ist weg.';}}]},
-      {t:'🕶 Schutzgeld',d:'Zwei Typen von einer Gang stehen im Laden: „Schöner Laden. Wäre schade, wenn ihm was passiert.“',o:[
-        {t:`Zahlen · $${Math.round(BIZ[k].inc*2)}`,f:()=>{const c=Math.round(BIZ[k].inc*2);if(cash<c)return 'Du hast nicht genug – sie nehmen sich die Kasse.';cash-=c;hud();return 'Sie ziehen ab. Für heute.';}},
+      {t:'🕶 Schutzgeld',d:'Zwei Typen von einer Gang stehen im Laden: „Schöner Laden. Wäre schade, wenn ihm was passiert.“'+(staffEff(s,'tuer')?' Dein Türsteher baut sich schon vor ihnen auf.':''),o:[
+        {t:`Zahlen · $${fmt(Math.round(BIZ[k].inc*2))}`,f:()=>{const c=Math.round(BIZ[k].inc*2);if(cash<c){s.t=Date.now();return 'Du hast nicht genug – sie nehmen sich die Kasse.';}cash-=c;hud();return 'Sie ziehen ab. Für heute.';}},
         {t:'Rauswerfen · Muskeln',f:()=>{const ch=35+(statVal('Muskeln')-10)*3+sec*12;if(Math.random()*100<ch){addReward(0,25,0);return 'Die kommen so schnell nicht wieder. (+25 XP)';}s.t=Date.now();heat=Math.min(5,heat+1);hud();return 'Prügelei! Die Kasse ist leer und die Polizei war da (+1 Heat).';}}]},
-      {t:'⭐ Stammkunde',d:'Ein reicher Stammkunde ist begeistert und will investieren.',o:[
-        {t:'Annehmen',f:()=>{const v=Math.round(BIZ[k].inc*(2+s.up.w));cash+=v;hud();sfx('cash');return `Er legt $${fmt(v)} auf den Tisch.`;}}]}];
-    if(reg<BIZ[k].inc*.5)E.splice(1,1);
+      {t:'⭐ Redseliger Stammgast',d:'Ein Stammgast hat zu viel getrunken und plaudert über einen Laden mit lausiger Sicherheit …',o:[
+        {t:'Zuhören (Heist-Tipp)',f:()=>{const T=tipTarget(k);return `Neues Ziel auf deiner Karte: <b>${T.name}</b> – leichter als sonst.`;}},
+        {t:'Ihm eine Runde ausgeben · Investor',f:()=>{const v=Math.round(BIZ[k].inc*(2+s.up.w));cash+=v;hud();sfx('cash');return `Er ist so begeistert, dass er $${fmt(v)} investiert.`;}}]}];
+    if(s.wl&&Date.now()-s.wl<6*36e5)E.push({t:'🧾 Finanzamt',d:'Ein Steuerprüfer mit Aktenkoffer: „Ihre Umsätze sind … bemerkenswert. Ich hätte da Fragen.“',o:[
+      ...(staffEff(s,'buch')?[{t:'Buchhalter vorschicken',f:()=>{const p=staff.find(x=>x.r==='buch');addReward(0,20,0);return `${p?p.n:'Dein Buchhalter'} zaubert saubere Bücher hervor. Der Prüfer geht. (+20 XP)`;}}]:[]),
+      {t:`Bestechen · $${fmt(BIZ[k].inc*3)}`,f:()=>{const c=BIZ[k].inc*3;if(cash<c){const l=Math.round((EMP.dirty||0)*.25);EMP.dirty-=l;hud();return `Kein Geld für Schmiergeld. Er beschlagnahmt $${fmt(l)} Schwarzgeld.`;}cash-=c;hud();return 'Der Umschlag verschwindet in seinem Koffer. Alles in Ordnung.';}},
+      {t:'Bluffen · Charme',f:()=>{const ch=40+(statVal('Charme')-10)*3;if(Math.random()*100<ch){addReward(0,15,0);return 'Du redest ihn schwindlig. Er klappt den Koffer zu. (+15 XP)';}const l=Math.round((EMP.dirty||0)*.3);EMP.dirty-=l;heat=Math.min(5,heat+1);hud();return `Er glaubt dir kein Wort: $${fmt(l)} Schwarzgeld beschlagnahmt, +1 Heat.`;}}]});
     return E[Math.floor(Math.random()*E.length)];}
+  const stars=(n,m)=>`<em class="stars">${'★'.repeat(n)}<s>${'★'.repeat(Math.max(0,m-n))}</s></em>`;
+  const haveN=id=>STASH.filter(x=>x===id).length;
   function renderBiz(){const k=BZ,B=BIZ[k],X=BIZX[k],s=bst(k),own=!!(s&&s.lv),P=$('bizp');
     $('bizimg').src=X.img;$('bizimg').onerror=function(){this.onerror=null;this.src=X.fb;};
-    const pend=bizPending(k),inc=bizIncS(k,s),cap=bizCapS(s),h=own?Math.min(cap,(Date.now()-s.t)/36e5):0;
-    let body='';
-    if(!own){body=`<div class="bzbox"><p>${B.where} · Startet mit <b>$${fmt(Math.round(B.inc*1.5))}/h</b>. Danach ausbauen: Ausstattung, Personal, Tresor, Werbung, Sicherheit.</p>${lvl<B.req?`<p>Ab Stufe ${B.req}.</p>`:`<button type="button" class="mbig" id="bzbuy">KAUFEN · $${fmt(B.cost)}</button>`}</div>`;}
+    let body='';const rk=own?bizRank(k):0;
+    if(!own){body=`<div class="bzbox"><p>${B.where} · Startet mit 1× ${X.st[0][1]} ${X.st[0][0]}. Danach Geräte kaufen und leveln, Personal einstellen und dein <b>Schwarzgeld</b> aus den Heists hier sauber waschen.</p>${lvl<B.req?`<p>Ab Stufe ${B.req}.</p>`:`<button type="button" class="mbig" id="bzbuy">KAUFEN · $${fmt(B.cost)}</button>`}</div>`;}
     else if(bzEvent){body=`<div class="bzbox ev"><b class="evt">${bzEvent.t}</b><p>${bzEvent.d}</p>${bzEvent.o.map((o,i)=>`<button type="button" class="bzopt" data-eo="${i}">${o.t}</button>`).join('')}</div>`;}
-    else{body=`<div class="bzbox"><div class="bzkasse"><div><small>KASSE</small><b>$${fmt(pend)}</b><div class="pb"><i style="width:${h/cap*100}%"></i></div><small>$${fmt(inc)}/h · voll nach ${cap} h</small></div><button type="button" id="bzcol" ${pend?'':'disabled'}>KASSIEREN</button></div>
-      ${bzMsg?`<div class="bzmsg">${bzMsg}</div>`:''}
-      ${TRK.map(tr=>{const l=s.up[tr],c=trCost(k,tr,l),[n,d]=X.tr[tr];const extra=tr==='p'?(l?' · '+X.staff.slice(0,l).join(', '):''):tr==='a'?` · ${k==='wasch'?(4+l*3)+' Maschinen':k==='yacht'?(1+l)+' Yachten':k==='casino'?(2+l*2)+' Tische':'Stufe '+l}`:'';
-        return `<div class="bztr"><div><b>${n} <em class="stars">${'★'.repeat(l)}<s>${'★'.repeat(TMAX-l)}</s></em></b><small>${d}${extra}</small></div>${l>=TMAX?'<span>MAX</span>':`<button type="button" data-tr="${tr}" ${cash<c?'class="poor"':''}>+1<br><small>$${fmt(c)}</small></button>`}</div>`;}).join('')}</div>`;}
-    P.innerHTML=`<div class="bztop"><button type="button" id="bzback">◂ ZURÜCK</button><div><b>${B.n}</b><small>${own?'Dein Laden · '+(s.up.a+s.up.p+s.up.t+s.up.w+s.up.s)+'/25 Ausbau':'Zu verkaufen'}</small></div></div><div class="bzbot">${body}</div>`;
+    else{const tabs=[['kasse','💰 Kasse'],['geraete','⚙ Geräte'],['personal','👥 Personal'],['ausbau','🏗 Laden']];
+      let tb='';
+      if(bzTab==='kasse'){const cap=bizCapS(s),h=bizHours(s),wh=bizWashH(k,s);
+        tb=`<div class="bzkasse"><div><small>KASSE · sauber</small><b id="bzlive">$${fmt(bizPending(k))}</b><div class="pb"><i id="bzlpb" style="width:${h/cap*100}%"></i></div><small>$${fmt(bizIncS(k,s))}/h netto · voll nach ${cap} h</small></div><button type="button" id="bzcol">KASSIEREN</button></div>
+          <div class="bzwash"><div><small>🧼 GELDWÄSCHE · $${fmt(wh)}/h</small><b id="bzwlive">$${fmt(bizWashPending(k))}</b><small>Schwarzgeld gesamt: $${fmt(EMP.dirty||0)}</small></div>${EMP.dirty?'':'<p>Verkaufe Beute bei Dee als <b>Schwarzgeld</b> (mehr Geld) – hier wird es sauber.</p>'}</div>
+          ${s.brk>=0?`<div class="bzbrk">🔧 <b>${X.st[s.brk][0]}</b> ist kaputt – bringt nichts ein! <button type="button" id="bzfix">Reparieren · $${fmt(Math.round(stInc(k,s.brk,Object.assign({},s,{brk:-1}))*2*(1-.15*Math.min(4,staffEff(s,'tech')))))}</button></div>`:''}
+          ${s.st.map((S,j)=>S.n?`<div class="bzst" data-j="${j}"><span class="bzico">${X.st[j][1]}</span><div><b>${S.n}× ${X.st[j][0]} · Lv ${S.l}</b><small>$${fmt(Math.round(stInc(k,j,s)))}/h</small><div class="bzcyc ${s.brk===j?'off':''}"><i style="animation-duration:${(3+j*2)}s"></i></div></div></div>`:'').join('')}
+          <div class="bzsum"><span>Löhne −$${fmt(bizWages(s))}/h</span><span>Werbung +${s.up.w*20} %</span><span>Kassierer +${Math.round(staffEff(s,'kasse')*8)} %</span></div>`;}
+      if(bzTab==='geraete'){tb=X.st.map(([n,ic,mx],j)=>{const S=s.st[j];const lockR=[1,2,4][j];
+        if(rk<lockR&&!S.n)return `<div class="bztr cl"><span class="bzico">${ic}</span><div><b>${n}</b><small>Ab Laden-Rang ${lockR}</small></div><span>🔒</span></div>`;
+        const uc=unitCost(k,j,S.n),need=msNeed(j,S.l),lc=lvlCost(k,j,S.l,S.n);const mOK=!need||haveN(need[0])>=need[1];
+        return `<div class="bzdev"><div class="bzdh"><span class="bzico">${ic}</span><div><b>${n}</b><small>${S.n}/${mx} Stück · Lv ${S.l}${msMul(S.l)>1?' · ×'+msMul(S.l)+' Bonus':''} · $${fmt(Math.round(stInc(k,j,s)))}/h</small></div></div>
+          <div class="bzunits">${Array.from({length:mx},(_,i)=>`<i class="${i<S.n?'on':''}">${ic}</i>`).join('')}</div>
+          <div class="bzbtns">${S.n<mx?`<button type="button" data-unit="${j}" ${cash<uc?'class="poor"':''}>${S.n?'+1 KAUFEN':'FREISCHALTEN'}<small>$${fmt(uc)}</small></button>`:'<span>VOLL</span>'}
+          ${S.n?(S.l>=100?'<span>MAX</span>':`<button type="button" data-lv="${j}" ${cash<lc||!mOK?'class="poor"':''}>LEVEL ${S.l+1}${need?' ★':''}<small>$${fmt(lc)}${need?` + ${need[1]}× ${ITEMS[need[0]].n} (${haveN(need[0])})`:''}</small></button>`):''}</div>
+          ${S.n&&S.l<100?`<small class="bzms">Nächster Bonus ×2 bei Lv ${MSTONES.find(m=>m>S.l)} · braucht Material aus Heists</small>`:''}</div>`;}).join('');}
+      if(bzTab==='personal'){const sl=staffSlots(k);
+        tb=`<div class="mh">TEAM ${s.staff.length}/${sl}<small>Mehr Plätze mit höherem Laden-Rang · Loyalität sinkt mit der Zeit – Unzufriedene klauen</small></div>`+
+          s.staff.map((p,i)=>`<div class="bzpp"><span class="bzico">${ROLES[p.r][1]}</span><div><b>${p.n} ${stars(p.sk,5)}</b><small>${ROLES[p.r][0]} · Lohn $${fmt(p.w)}/h</small><div class="bzloy"><i style="width:${p.loy}%;background:${p.loy<35?'#ff3d6e':p.loy<60?'#ffe14d':'#7dffb2'}"></i></div></div>
+            <div class="bzpb"><button type="button" data-bonus="${i}">Bonus<small>$${fmt(p.w*4)}</small></button>${p.sk<5?`<button type="button" data-train="${i}">Schulung<small>$${fmt(p.w*25*p.sk)}</small></button>`:''}<button type="button" class="red" data-fire="${i}">✕</button></div></div>`).join('')+
+          `<div class="mh">BEWERBER<small>Neue Bewerber alle 2 h</small></div>`+(s.app||[]).map((a,i)=>`<div class="bzpp app"><span class="bzico">${ROLES[a.r][1]}</span><div><b>${a.n} ${stars(a.sk,5)}</b><small>${ROLES[a.r][0]}: ${ROLES[a.r][2]} · Lohn $${fmt(a.w)}/h</small></div>
+            <div class="bzpb"><button type="button" data-hire="${i}" ${s.staff.length>=sl||cash<a.w*5?'class="poor"':''}>Einstellen<small>$${fmt(a.w*5)}</small></button></div></div>`).join('')+
+          `<button type="button" class="bzopt" id="bzads">📰 Stellenanzeige schalten · $${fmt(Math.round(BIZ[k].inc*1.5))}</button>`;}
+      if(bzTab==='ausbau'){tb=`<div class="mh">LADEN-RANG ${rk}/10<small>Steigt mit Geräten, Leveln, Ausbau und Personal</small></div>`+TRK.map(tr=>{const l=s.up[tr],c=upCost(k,tr,l),[n,d]=UPN[tr];
+        return `<div class="bztr"><div><b>${n} ${stars(l,TMAX)}</b><small>${d}</small></div>${l>=TMAX?'<span>MAX</span>':`<button type="button" data-tr="${tr}" ${cash<c?'class="poor"':''}>+1<br><small>$${fmt(c)}</small></button>`}</div>`;}).join('');}
+      body=`<div class="bztabs">${tabs.map(([t,n])=>`<button type="button" data-bt="${t}" class="${bzTab===t?'on':''}">${n}</button>`).join('')}</div>${bzMsg?`<div class="bzmsg">${bzMsg}</div>`:''}<div class="bzbox">${tb}</div>`;}
+    P.innerHTML=`<div class="bztop"><button type="button" id="bzback">◂ ZURÜCK</button><div><b>${B.n}</b><small>${own?'Dein Laden · Rang '+rk+'/10 · $'+fmt(bizIncS(k,s))+'/h':'Zu verkaufen'}</small></div></div><div class="bzbot">${body}</div>`;
     $('bzback').onclick=closeBiz;
-    const by=$('bzbuy');if(by)by.onclick=()=>{if(cash<B.cost){toastMsg('ZU WENIG GELD');return;}cash-=B.cost;EMP.biz[k]={lv:1,t:Date.now(),up:{a:0,p:0,t:0,w:0,s:0}};track('biz');sfx('stamp');hud();bzMsg='Glückwunsch – der Laden gehört dir!';renderBiz();};
-    const co=$('bzcol');if(co)co.onclick=()=>{const v=bizCollect(k);bzMsg=v?`+$${fmt(v)} kassiert.`:'';renderBiz();};
-    P.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{const tr=b.dataset.tr,l=s.up[tr],c=trCost(k,tr,l);if(cash<c){bzMsg='Zu wenig Geld für diesen Ausbau.';renderBiz();return;}
-      bizCollect(k);cash-=c;s.up[tr]++;sfx('stamp');hud();track('bizup');bzMsg=`${X.tr[tr][0]} ausgebaut! Jetzt $${fmt(bizIncS(k,s))}/h.`;renderBiz();});
-    P.querySelectorAll('[data-eo]').forEach(b=>b.onclick=()=>{const r=bzEvent.o[+b.dataset.eo].f();bzEvent=null;bzMsg=r;renderBiz();});
+    const done=m=>{bzMsg=m||'';hud();renderBiz();};
+    const by=$('bzbuy');if(by)by.onclick=()=>{if(cash<B.cost){toastMsg('ZU WENIG GELD');return;}cash-=B.cost;EMP.biz[k]={lv:1,t:Date.now(),v2:1,st:[{n:1,l:1},{n:0,l:1},{n:0,l:1}],up:{t:0,s:0,w:0},staff:[],app:[],appT:0,brk:-1};refreshApps(k,1);track('biz');sfx('stamp');crowd();done('Glückwunsch – der Laden gehört dir! Kauf mehr Geräte und stell Leute ein.');};
+    const co=$('bzcol');if(co)co.onclick=()=>{const v=bizCollect(k);if(!v)return done('Die Kasse ist noch leer.');bzMsg=`+$${fmt(v)} kassiert.`;if(s.thief){bzEvent=thiefEvent(k,s.thief);s.thief=null;}renderBiz();};
+    const fx=$('bzfix');if(fx)fx.onclick=()=>{const c=Math.round(stInc(k,s.brk,Object.assign({},s,{brk:-1}))*2*(1-.15*Math.min(4,staffEff(s,'tech'))));if(cash<c)return done('Zu wenig Geld für die Reparatur.');bizCollect(k,1);cash-=c;s.brk=-1;sfx('stamp');done('Repariert – läuft wieder!');};
+    P.querySelectorAll('[data-bt]').forEach(b=>b.onclick=()=>{bzTab=b.dataset.bt;bzMsg='';renderBiz();});
+    P.querySelectorAll('[data-unit]').forEach(b=>b.onclick=()=>{const j=+b.dataset.unit,S=s.st[j],c=unitCost(k,j,S.n);if(cash<c)return done('Zu wenig Geld.');bizCollect(k,1);cash-=c;S.n++;sfx('stamp');track('bizup');crowd();done(`${X.st[j][1]} ${X.st[j][0]} gekauft! Jetzt $${fmt(bizIncS(k,s))}/h.`);});
+    P.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>{const j=+b.dataset.lv,S=s.st[j],c=lvlCost(k,j,S.l,S.n),need=msNeed(j,S.l);if(cash<c)return done('Zu wenig Geld.');
+      if(need&&haveN(need[0])<need[1])return done(`Für den Bonus brauchst du ${need[1]}× ${ITEMS[need[0]].n} – gibt's bei Heists.`);
+      bizCollect(k,1);cash-=c;if(need)for(let i=0;i<need[1];i++)STASH.splice(STASH.indexOf(need[0]),1);S.l++;sfx(need?'cash':'stamp');track('bizup');done(need?`⭐ MEILENSTEIN! ${X.st[j][0]} verdient jetzt doppelt.`:`${X.st[j][0]} auf Level ${S.l}.`);});
+    P.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{const tr=b.dataset.tr,l=s.up[tr],c=upCost(k,tr,l);if(cash<c)return done('Zu wenig Geld.');bizCollect(k,1);cash-=c;s.up[tr]++;sfx('stamp');track('bizup');crowd();done(`${UPN[tr][0]} ausgebaut!`);});
+    P.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{const a=s.app[+b.dataset.hire];if(s.staff.length>=staffSlots(k))return done('Kein Platz mehr im Team. Laden-Rang erhöhen!');if(cash<a.w*5)return done('Zu wenig Geld für das Handgeld.');
+      bizCollect(k,1);cash-=a.w*5;s.staff.push(a);s.app.splice(+b.dataset.hire,1);sfx('stamp');track('hired');done(`${a.n} fängt morgen an.`);});
+    P.querySelectorAll('[data-fire]').forEach(b=>b.onclick=()=>{const p=s.staff[+b.dataset.fire];bizCollect(k,1);s.staff.splice(+b.dataset.fire,1);done(`${p.n} wurde gefeuert.`);});
+    P.querySelectorAll('[data-bonus]').forEach(b=>b.onclick=()=>{const p=s.staff[+b.dataset.bonus];if(cash<p.w*4)return done('Zu wenig Geld.');cash-=p.w*4;p.loy=Math.min(100,p.loy+25);sfx('cash');done(`${p.n} freut sich über den Umschlag. (Loyalität +25)`);});
+    P.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>{const p=s.staff[+b.dataset.train],c=p.w*25*p.sk;if(cash<c)return done('Zu wenig Geld.');bizCollect(k,1);cash-=c;p.sk++;p.w=Math.round(p.w*1.25);p.loy=Math.min(100,p.loy+10);sfx('stamp');done(`${p.n} ist jetzt ${p.sk}★ – verlangt aber mehr Lohn.`);});
+    const ad=$('bzads');if(ad)ad.onclick=()=>{const c=Math.round(BIZ[k].inc*1.5);if(cash<c)return done('Zu wenig Geld.');cash-=c;refreshApps(k,1);done('Neue Bewerber stehen Schlange.');};
+    P.querySelectorAll('[data-eo]').forEach(b=>b.onclick=()=>{const r=bzEvent.o[+b.dataset.eo].f();bzEvent=null;done(r);});
   }
-  ACHS.push(AC('bizmax','Ein Laden komplett ausgebaut',()=>Object.keys(BIZ).some(k=>{const s=EMP.biz[k];return s&&s.up&&TRK.every(t=>s.up[t]>=TMAX);}),{cash:15000,cloth:1}));
+  // Schwarzgeld-Razzia, wenn Heat hoch und viel Schwarzgeld herumliegt
+  setInterval(()=>{if(!window.__nhReady||(EMP.dirty||0)<2000||heat<4)return;if(EMP.rz&&Date.now()-EMP.rz<2*36e5)return;if(Math.random()<.04){EMP.rz=Date.now();const l=Math.round(EMP.dirty*.2);EMP.dirty-=l;hud();toastMsg('RAZZIA! $'+fmt(l)+' SCHWARZGELD WEG');}},30000);
+  ACHS.push(AC('bizmax','Ein Laden auf Rang 10',()=>Object.keys(BIZ).some(k=>EMP.biz[k]&&EMP.biz[k].lv&&bizRank(k)>=10),{cash:15000,cloth:1}),
+    AC('wash10k','$10.000 gewaschen',()=>(STAT.laundered||0)>=10000,{cash:2000}),AC('team5','5 Angestellte',()=>Object.values(EMP.biz).reduce((a,s)=>a+((s.staff||[]).length),0)>=5,{cash:3000}));
   window.__continue=continueGame;window.__nhReady=true;roll();
   if(hasSave()){try{const d=JSON.parse(localStorage.getItem(SKEY));$('tap').innerHTML='TIPPEN ZUM WEITERSPIELEN<br><small style="font-size:.55em">Spielstand: Stufe '+d.lvl+'</small>';}catch(e){}}
   // ---------- Pixel-Einsatz (iframe) ----------
@@ -2273,23 +2378,23 @@
   // Dee kauft Beute
   // ---------- Verkaufen mit Auswahl ----------
   let SELL={rate:.6,who:'dee',sel:{},after:null};
-  function openSell(rate,who,after){SELL={rate,who,sel:{},after};const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))];ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);
+  function openSell(rate,who,after){SELL={rate,who,sel:{},after,dirty:Object.values(EMP.biz).some(x=>x.lv)};const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))];ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);
     if(!ids.length){toastMsg('KEINE BEUTE IM SPIND');if(after)after(0);return;}$('sellov').classList.add('on');renderSell();}
   function renderSell(){const P=$('sellp');const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))].sort((a,b)=>ITEMS[b].v-ITEMS[a].v);
-    const tot=ids.reduce((s,id)=>s+Math.round(ITEMS[id].v*SELL.rate)*(SELL.sel[id]||0),0);
+    const R=SELL.dirty?Math.min(1,SELL.rate*1.4):SELL.rate;const tot=ids.reduce((s,id)=>s+Math.round(ITEMS[id].v*R)*(SELL.sel[id]||0),0);
     P.innerHTML=`<div class="seth"><b>${SELL.who==='dee'?'DEE – HEHLEREI':'HEHLER-KURIER'}</b><button type="button" id="sellx">✕</button></div>
-      <p class="mp">Wähle aus, was du verkaufst. Dee zahlt <b>${Math.round(SELL.rate*100)} %</b> vom Wert.</p>
+      <div class="sellpay"><button type="button" data-pay="0" class="${SELL.dirty?'':'on'}">💵 SAUBER<small>${Math.round(SELL.rate*100)} % vom Wert</small></button><button type="button" data-pay="1" class="${SELL.dirty?'on':''}">🧼 SCHWARZGELD<small>${Math.round(Math.min(1,SELL.rate*1.4)*100)} % · in deinen Läden waschen</small></button></div>
       <div class="sellbar"><button type="button" id="sall">Alles</button><button type="button" id="snone">Nichts</button></div>
       <div class="mbody">${ids.map(id=>{const have=STASH.filter(x=>x===id).length,n=SELL.sel[id]||0,p=Math.round(ITEMS[id].v*SELL.rate);
         return `<div class="srow ${n?'on':''}"><img src="${ico(id)}" alt=""><div><b>${ITEMS[id].n}</b><small>$${p} pro Stück · im Spind: ${have}</small></div>
         <div class="sq"><button type="button" data-sm="${id}">−</button><i>${n}</i><button type="button" data-sp="${id}">+</button></div></div>`;}).join('')}</div>
       <button type="button" class="mbig" id="sgo" ${tot?'':'disabled'}>VERKAUFEN · +$${fmt(tot)}</button>`;
-    $('sellx').onclick=closeSell;$('sall').onclick=()=>{ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);renderSell();};$('snone').onclick=()=>{ids.forEach(id=>SELL.sel[id]=0);renderSell();};
+    $('sellx').onclick=closeSell;P.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>{SELL.dirty=b.dataset.pay==='1';renderSell();});$('sall').onclick=()=>{ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);renderSell();};$('snone').onclick=()=>{ids.forEach(id=>SELL.sel[id]=0);renderSell();};
     P.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>{const id=b.dataset.sm;SELL.sel[id]=Math.max(0,(SELL.sel[id]||0)-1);renderSell();});
     P.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{const id=b.dataset.sp;SELL.sel[id]=Math.min(STASH.filter(x=>x===id).length,(SELL.sel[id]||0)+1);renderSell();});
     P.querySelectorAll('.srow img').forEach((im,i)=>im.onclick=()=>{const id=ids[i];const h=STASH.filter(x=>x===id).length;SELL.sel[id]=SELL.sel[id]?0:h;renderSell();});
-    $('sgo').onclick=()=>{let v=0,n=0;Object.entries(SELL.sel).forEach(([id,k])=>{for(let i=0;i<k;i++){const j=STASH.indexOf(id);if(j>=0){STASH.splice(j,1);v+=Math.round(ITEMS[id].v*SELL.rate);n++;}}});
-      if(!v)return;addReward(v,Math.min(30,5+n),0);track('sold',v);sfx('cash');toastMsg(`${n} TEILE VERKAUFT: +$${fmt(v)}`);const a=SELL.after;closeSell();if(a)a(v);};
+    $('sgo').onclick=()=>{let v=0,n=0;Object.entries(SELL.sel).forEach(([id,k])=>{for(let i=0;i<k;i++){const j=STASH.indexOf(id);if(j>=0){STASH.splice(j,1);v+=Math.round(ITEMS[id].v*R);n++;}}});
+      if(!v)return;if(SELL.dirty){EMP.dirty=(EMP.dirty||0)+v;addReward(0,Math.min(30,5+n),0);}else addReward(v,Math.min(30,5+n),0);track('sold',v);sfx('cash');toastMsg(`${n} TEILE VERKAUFT: +$${fmt(v)}${SELL.dirty?' SCHWARZGELD':''}`);const a=SELL.after;closeSell();if(a)a(v);};
   }
   function closeSell(){$('sellov').classList.remove('on');saveGame();if($('inv').classList.contains('on'))renderInv();}
   function sellLoot(){
