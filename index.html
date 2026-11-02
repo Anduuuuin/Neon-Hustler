@@ -2321,7 +2321,7 @@
   ACHS.push(AC('bizmax','Ein Laden auf Rang 10',()=>Object.keys(BIZ).some(k=>EMP.biz[k]&&EMP.biz[k].lv&&bizRank(k)>=10),{cash:15000,cloth:1}),
     AC('wash10k','$10.000 gewaschen',()=>(STAT.laundered||0)>=10000,{cash:2000}),AC('team5','5 Angestellte',()=>Object.values(EMP.biz).reduce((a,s)=>a+((s.staff||[]).length),0)>=5,{cash:3000}));
   // ================= UNTERSCHLUPF BAUEN (Feld für Feld) =================
-  const BW=12,BH=14,BEX=6;
+  let BW=12,BH=14,BEX=6;const BSIZE=[[12,14,0],[16,18,6000],[20,22,18000]];let BUNDO=[],bResetArm=0;
   const BT={
     '.':{n:'Abriss',ic:'⛏',p:0,c:'#2a1a36',d:'Feld wird wieder Boden'},
     '#':{n:'Wand',ic:'🧱',p:40,c:'#4a2a5c',d:'Blockiert den Weg'},
@@ -2336,9 +2336,11 @@
     'C':{n:'Attrappe',ic:'📦',p:120,c:'#5a4a2a',d:'Leere Kiste – kostet Zeit',max:6},
     'X':{n:'Tresor',ic:'💰',p:0,c:'#8a7a1a',d:'Dein Geld – genau 1 Stück',max:1}};
   const BORD=['#','d','L','B','T','c','g','h','C','F','X','.'];
-  function baseDefault(){const r=[];for(let y=0;y<BH;y++){let s='';for(let x=0;x<BW;x++){const edge=x===0||x===BW-1||y===0||y===BH-1;s+=edge?'#':'.';}r.push(s);}
-    const set=(x,y,c)=>{r[y]=r[y].slice(0,x)+c+r[y].slice(x+1);};for(let x=1;x<BW-1;x++)set(x,5,'#');set(6,5,'d');set(2,2,'X');set(BEX,BH-1,'E');return {w:BW,h:BH,t:r,v:1};}
-  function baseGet(){if(!EMP.base||!EMP.base.t||EMP.base.w!==BW)EMP.base=baseDefault();return EMP.base;}
+  function baseDefault(w,h){BW=w||12;BH=h||14;BEX=Math.floor(BW/2);const r=[];for(let y=0;y<BH;y++){let s='';for(let x=0;x<BW;x++){const edge=x===0||x===BW-1||y===0||y===BH-1;s+=edge?'#':'.';}r.push(s);}
+    const set=(x,y,c)=>{r[y]=r[y].slice(0,x)+c+r[y].slice(x+1);};for(let x=1;x<BW-1;x++)set(x,5,'#');set(BEX,5,'d');set(2,2,'X');set(BEX,BH-1,'E');return {lv:BSIZE.findIndex(z=>z[0]===BW),w:BW,h:BH,t:r,v:1};}
+  function baseGet(){if(!EMP.base||!EMP.base.t||!EMP.base.w)EMP.base=baseDefault();const B=EMP.base;BW=B.w;BH=B.h;BEX=Math.floor(BW/2);if(B.lv==null)B.lv=0;return B;}
+  const bMax=k=>{const B=baseGet(),m=BT[k].max;if(!m||k==='X'||k==='F')return m;return m+B.lv*(['g','h','c'].includes(k)?1:4);};
+  function bPush(d){const B=baseGet();BUNDO.push({t:B.t.slice(),w:B.w,h:B.h,lv:B.lv,d});if(BUNDO.length>60)BUNDO.shift();}
   const bAt=(B,x,y)=>B.t[y][x];
   function bSet(B,x,y,c){B.t[y]=B.t[y].slice(0,x)+c+B.t[y].slice(x+1);}
   const bLocked=(x,y)=>x===0||y===0||x===BW-1||y===BH-1;
@@ -2357,15 +2359,17 @@
   function closeBase(){$('baseov').classList.remove('on');saveGame();}
   function bPlace(x,y){const B=baseGet();if(bLocked(x,y)){bMsg='Außenmauer und Eingang lassen sich nicht ändern.';return renderBaseInfo();}
     const old=bAt(B,x,y),nw=BTOOL;if(old===nw)return;
-    const T=BT[nw];if(T.max&&nw!=='.'&&bCount(B,nw)>=T.max){if(nw==='X'||nw==='F'){B.t=B.t.map(r=>r.split(nw).join('.'));}else{bMsg=`Maximal ${T.max}× ${T.n}.`;return renderBaseInfo();}}
+    const T=BT[nw],before=B.t.slice();if(T.max&&nw!=='.'&&bCount(B,nw)>=bMax(nw)){if(nw==='X'||nw==='F'){B.t=B.t.map(r=>r.split(nw).join('.'));}else{bMsg=`Maximal ${bMax(nw)}× ${T.n} – größeres Grundstück = mehr erlaubt.`;return renderBaseInfo();}}
     const refund=Math.floor((BT[old]?BT[old].p:0)*.5),cost=T.p;
-    if(cash+refund<cost){bMsg='Zu wenig Geld.';return renderBaseInfo();}
+    if(cash+refund<cost){B.t=before;bMsg='Zu wenig Geld.';return renderBaseInfo();}
+    BUNDO.push({t:before,w:B.w,h:B.h,lv:B.lv,d:refund-cost});if(BUNDO.length>60)BUNDO.shift();bResetArm=0;
     cash+=refund-cost;bSet(B,x,y,nw);B.dirty=1;if(cost)track('basebuild');sfx(nw==='.'?'whoosh':'click');bMsg='';hud();drawBase();renderBaseInfo();}
   function renderBase(){const P=$('basep');
     P.innerHTML=`<div class="seth"><b>UNTERSCHLUPF</b><button type="button" id="basex">✕</button></div>
       <div class="bsub">Bau Feld für Feld. Freunde, die dich überfallen, laufen genau durch diese Base. Abriss gibt 50 % zurück.</div>
       <div class="bwrap"><canvas id="bcv"></canvas></div><div id="binfo"></div>
       <div class="btools">${BORD.map(k=>`<button type="button" data-bt="${k}" class="${BTOOL===k?'on':''}"><i>${BT[k].ic}</i><b>${BT[k].n}</b><small>${BT[k].p?'$'+fmt(BT[k].p):'gratis'}</small></button>`).join('')}</div>
+      <div class="bedit"><button type="button" id="bundo">↶ Rückgängig</button><button type="button" id="breset">🗑 Alles neu</button><button type="button" id="bgrow"></button></div>
       <div class="bbtns"><button type="button" id="btest">🏃 TESTLAUF</button><button type="button" id="bsave">☁ SPEICHERN &amp; ONLINE</button></div>`;
     $('basex').onclick=closeBase;
     P.querySelectorAll('[data-bt]').forEach(b=>b.onclick=()=>{BTOOL=b.dataset.bt;P.querySelectorAll('[data-bt]').forEach(x=>x.classList.toggle('on',x===b));bMsg=BT[BTOOL].d;renderBaseInfo();});
@@ -2373,6 +2377,13 @@
     cv.onpointerdown=e=>{e.preventDefault();bDrag=true;cv.setPointerCapture(e.pointerId);const[x,y]=pos(e);bLast=x+','+y;bPlace(x,y);};
     cv.onpointermove=e=>{if(!bDrag||!['#','.','d'].includes(BTOOL))return;const[x,y]=pos(e);if(x<0||y<0||x>=BW||y>=BH||bLast===x+','+y)return;bLast=x+','+y;bPlace(x,y);};
     cv.onpointerup=cv.onpointercancel=()=>{bDrag=false;};
+    $('bundo').onclick=()=>{const u=BUNDO.pop();if(!u){bMsg='Nichts mehr rückgängig zu machen.';return renderBaseInfo();}const B=baseGet();B.t=u.t;B.w=u.w;B.h=u.h;B.lv=u.lv;cash-=u.d;B.dirty=1;bResetArm=0;baseGet();sfx('whoosh');hud();bMsg='Rückgängig gemacht – Geld zurück.';renderBase();};
+    $('breset').onclick=()=>{const B=baseGet();if(!bResetArm){bResetArm=1;bMsg=`Wirklich alles abreißen? Du bekommst 50 % zurück ($${fmt(Math.floor(baseValue(B)*.5))}). Nochmal tippen zum Bestätigen – lässt sich rückgängig machen.`;return renderBaseInfo();}
+      const back=Math.floor(baseValue(B)*.5);BUNDO.push({t:B.t.slice(),w:B.w,h:B.h,lv:B.lv,d:back});const lv=B.lv;const nb=baseDefault(B.w,B.h);B.t=nb.t;B.lv=lv;B.dirty=1;cash+=back;bResetArm=0;hud();sfx('whoosh');bMsg='Alles neu – leg los!';renderBase();};
+    const gb=$('bgrow'),nx=BSIZE[baseGet().lv+1];if(!nx){gb.textContent='📐 Max. Größe';gb.disabled=true;}else{gb.innerHTML=`📐 ${nx[0]}×${nx[1]} · $${fmt(nx[2])}`;gb.onclick=()=>{const B=baseGet();if(cash<nx[2]){bMsg='Zu wenig Geld für das größere Grundstück.';return renderBaseInfo();}
+      cash-=nx[2];const ow=B.w,oh=B.h,nw=nx[0],nh=nx[1],ox=Math.floor((nw-ow)/2),oy=nh-oh;const nb=baseDefault(nw,nh).t.map((r,y)=>r.split('').map((c,x)=>(x===0||x===nw-1||y===0||y===nh-1)?(y===nh-1&&x===Math.floor(nw/2)?'E':'#'):'.'));
+      B.t.forEach((r,y)=>{for(let x=0;x<ow;x++){let c=r[x];const X=x+ox,Y=y+oy;if(Y===nh-1)continue;if(c==='E')c='d';nb[Y][X]=c;}});
+      B.t=nb.map(r=>r.join(''));B.w=nw;B.h=nh;B.lv++;B.dirty=1;BUNDO=[];baseGet();track('basebuild');sfx('cash');hud();bMsg=`Grundstück vergrößert auf ${nw}×${nh}! Die alte Außenmauer steht noch – reiß ab, was weg soll.`;renderBase();};}
     $('btest').onclick=()=>{const ck=bCheck(baseGet());if(!ck.ok){bMsg=ck.m;return renderBaseInfo();}closeBase();
       startPixHeist({kind:'base',type:'villa',name:'Testlauf: Dein Unterschlupf',diff:2,e:0,seed:Date.now()%1e6,base:JSON.parse(JSON.stringify(baseGet())),owner:'',practice:true});};
     $('bsave').onclick=async()=>{const B=baseGet(),ck=bCheck(B);if(!ck.ok){bMsg=ck.m;return renderBaseInfo();}
@@ -2381,7 +2392,7 @@
       bMsg=r===true?'✔ Online gespeichert – so sehen Angreifer deine Base.':'Hochladen fehlgeschlagen: '+r;saveGame();renderBaseInfo();};
     drawBase();renderBaseInfo();}
   function renderBaseInfo(){const B=baseGet(),ck=bCheck(B),e=$('binfo');if(!e)return;
-    const cnt=['g','h','c','T','B','L'].map(k=>`${BT[k].ic} ${bCount(B,k)}/${BT[k].max}`).join(' · ');
+    const cnt=['g','h','c','T','B','L'].map(k=>`${BT[k].ic} ${bCount(B,k)}/${bMax(k)}`).join(' · ');
     e.innerHTML=`<div class="bstat"><span>💵 $${fmt(cash)}</span><span>Wert $${fmt(baseValue(B))}</span><span class="${ck.ok?'ok':'bad'}">${ck.ok?'✔ Weg zum Tresor':'✖ '+ck.m}</span></div><div class="bcnt">${cnt}</div>${bMsg?`<div class="bmsg">${bMsg}</div>`:''}${B.dirty?'<div class="bmsg" style="color:#ff9f43">Änderungen noch nicht online.</div>':''}`;}
   function drawBase(){const cv=$('bcv');if(!cv)return;const B=baseGet();const box=cv.parentElement.getBoundingClientRect();
     const ts=Math.max(16,Math.floor(Math.min((box.width||340)/BW,(window.innerHeight*.48)/BH)));cv.width=BW*ts;cv.height=BH*ts;cv.style.width=BW*ts+'px';cv.style.height=BH*ts+'px';
@@ -2402,6 +2413,7 @@
       .bstat{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;margin-top:6px}.bstat .ok{color:#7dffb2}.bstat .bad{color:#ff6f6f}.bcnt{font-size:11px;color:#cbbbe6;margin-top:2px}.bmsg{font-size:12px;color:#ffe14d;margin-top:3px}
       .btools{display:flex;gap:4px;overflow-x:auto;padding:6px 0 4px;margin-top:4px}.btools button{flex:none;width:66px;background:#1d1030;border:2px solid #4b3a6e;color:#fff;border-radius:8px;padding:3px 2px;cursor:pointer;font-family:'Oswald',sans-serif}
       .btools button.on{border-color:#ffe14d;background:#3a2a10;box-shadow:0 0 8px rgba(255,225,77,.5)}.btools i{display:block;font-style:normal;font-size:20px}.btools b{display:block;font-size:10px;line-height:1.1}.btools small{display:block;font-size:9px;color:#7dffb2}
+      .bedit{display:flex;gap:4px;margin-top:4px}.bedit button{flex:1;background:#1d1030;border:2px solid #4b3a6e;color:#fff;font-family:'Oswald',sans-serif;font-size:12px;padding:6px 2px;border-radius:8px;cursor:pointer}.bedit button:disabled{opacity:.4}#bundo{border-color:#2fe0ea}#breset{border-color:#ff3d6e}#bgrow{border-color:#ffe14d}
       .bbtns{display:flex;gap:6px;margin-top:6px}.bbtns button{flex:1;font-family:'Bangers',cursive;font-size:18px;padding:9px 4px;border:3px solid #000;border-radius:8px;cursor:pointer}#btest{background:#2fe0ea}#bsave{background:#ff3d8b;color:#fff}`;
     document.head.appendChild(st);})();
   window.NH_BASE={open:openBase,get:()=>baseGet()};
