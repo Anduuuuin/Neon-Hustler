@@ -91,7 +91,7 @@
   function schedule(t){
     const s16=step%16,ci=Math.floor(bar%4),ch=prog[ci],root=ch[0],tri=triad(root,ch[1]);
     const act=mood!=='chill',alarm=mood==='alarm',fill=bar%8===7&&s16>=12;
-    if(radioOff)return;
+    if(radioOff&&!act)return;
     if(!act){if(station===1)return scheduleVice(t);if(station===2)return scheduleSunset(t);}
     // Pads am Taktanfang
     if(s16===0){pad(t,tri.map(n=>n+12),60/tempo*4,act?.8:1);}
@@ -159,7 +159,8 @@
     shot:()=>{nz(.18,1800,'lowpass',.7);tone(140,.12,'square',.25,0,50);nz(.05,6000,'highpass',.3);},
     shot2:()=>{nz(.15,1400,'lowpass',.45);tone(120,.1,'square',.15,0,50);},
     reload:()=>{nz(.04,3000,'bandpass',.25);nz(.05,2000,'bandpass',.25,.25);tone(700,.04,'square',.06,.3);},
-        tune:()=>{nz(.35,2500,'bandpass',.12,0,.4);tone(900,.3,'sine',.03,0,1400);},
+        step:()=>{nz(.05,500,'lowpass',.08);},
+    tune:()=>{nz(.35,2500,'bandpass',.12,0,.4);tone(900,.3,'sine',.03,0,1400);},
     siren:()=>{tone(700,.35,'triangle',.08,0,1000);tone(1000,.35,'triangle',.08,.35,700);},
   };
   function sfx(n){if(!init())return;if(ctx.state==='suspended')ctx.resume();if(S.fx<0.01)return;const f=FX[n];if(f)try{f();}catch(e){}}

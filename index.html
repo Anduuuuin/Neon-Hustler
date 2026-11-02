@@ -559,6 +559,12 @@
   .phnote{font-size:13px;color:#cbbbe6;background:#1d1030;border-radius:10px;padding:10px;margin:6px 0}
   .phbig{width:100%;background:#7dffb2;border:3px solid #000;color:#000;font-family:'Bangers',cursive;font-size:20px;letter-spacing:1px;padding:10px;border-radius:12px;cursor:pointer;margin:6px 0}.phbig.alt{background:#2fe0ea}
   .phmailt{display:flex;gap:8px;background:#1d1030;border-radius:10px;padding:8px}.phmailt img{width:44px;height:44px;border-radius:50%;object-fit:cover}.phmailt p{margin:0;font-size:13px;line-height:1.35}.phmailt small{display:block}
+
+  #sellov{position:fixed;inset:0;z-index:955;background:rgba(5,0,12,.85);display:none;align-items:center;justify-content:center;padding:12px}#sellov.on{display:flex}
+  .sellbar{display:flex;gap:6px;margin-bottom:6px}.sellbar button{flex:1;background:#0b0616;border:2px solid #4b3a6e;color:#fff;font-family:'Oswald',sans-serif;padding:6px;border-radius:6px;cursor:pointer}
+  .srow{display:flex;align-items:center;gap:8px;background:#1d1030;border:2px solid #4b3a6e;border-radius:8px;padding:6px 8px;margin-bottom:5px;opacity:.6}.srow.on{opacity:1;border-color:#7dffb2}
+  .srow img{width:38px;height:38px;object-fit:contain;cursor:pointer}.srow>div:nth-child(2){flex:1;min-width:0}.srow b{display:block;font-size:14px}.srow small{font-size:11px;color:#cbbbe6}
+  .sq{display:flex;align-items:center;gap:6px}.sq button{width:32px;height:32px;border-radius:50%;border:2px solid #000;background:#2fe0ea;font-size:18px;font-weight:700;cursor:pointer}.sq i{font-style:normal;min-width:20px;text-align:center;font-weight:700}
 </style>
 </head>
 <body>
@@ -688,6 +694,7 @@
 <button type="button" id="phoneb" aria-label="Handy">📱</button>
 <div id="phone"><div class="phwrap"><div class="phframe"><div class="phnotch"></div><div class="phscr" id="phscr"></div></div></div></div>
 <div id="empov"><div class="setp metap" id="empp"></div></div>
+<div id="sellov"><div class="setp metap" id="sellp"></div></div>
 <div id="metaov"><div class="setp metap" id="metap"></div></div>
 <div id="setov"><div class="setp">
   <div class="seth"><b>EINSTELLUNGEN</b><button type="button" id="setx">✕</button></div>
@@ -1406,7 +1413,8 @@
     dollStart();
     const su=o.querySelector('.spup');if(su)su.onclick=()=>{const nx=SPIND[(UPG.spind||0)+1];if(cash<nx[1]){$('itip').textContent='Zu wenig Geld für den Ausbau.';return;}addReward(-nx[1],0,0);UPG.spind=(UPG.spind||0)+1;sfx('cash');renderInv();};
     o.querySelector('.sptr').onclick=()=>{TRASH=!TRASH;renderInv();};
-    o.querySelector('.spsell').onclick=()=>{const loot=STASH.filter(id=>ITEMS[id].t==='loot');if(!loot.length){$('itip').textContent='Keine Beute im Spind.';return;}const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*(deeRate()-.1));STASH=STASH.filter(id=>ITEMS[id].t!=='loot');addReward(v,5,0);track('sold',v);sfx('cash');renderInv();$('itip').textContent=`Dees Kurier hat alles abgeholt: +$${v}`;};
+    o.querySelector('.spsell').onclick=()=>{openSell(deeRate()-.1,'kurier');};
+    const __old=()=>{const loot=STASH.filter(id=>ITEMS[id].t==='loot');if(!loot.length){$('itip').textContent='Keine Beute im Spind.';return;}const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*(deeRate()-.1));STASH=STASH.filter(id=>ITEMS[id].t!=='loot');addReward(v,5,0);track('sold',v);sfx('cash');renderInv();$('itip').textContent=`Dees Kurier hat alles abgeholt: +$${v}`;};
     o.querySelectorAll('.cell[data-i]').forEach(b=>b.onclick=()=>{
       const i=+b.dataset.i,id=STASH[i];
       if(TRASH){STASH.splice(i,1);sfx('whoosh');renderInv();return;}
@@ -1651,6 +1659,7 @@
     const types=Object.keys(TINFO);
     while(TARGETS.length<3){const av=types.filter(x=>lvl>=TINFO[x].req||(x==='apotheke'&&Q>=7));const ty=av[Math.floor(Math.random()*av.length)]||'werkstatt';TARGETS.push(mkTarget(ty));}
     if(Q===2&&!TARGETS.some(x=>x.type==='werkstatt'))TARGETS[0]=mkTarget('werkstatt');
+    if(lvl>=3&&TINFO.viertel&&!TARGETS.some(x=>x.type==='viertel'))TARGETS[TARGETS.length-1]=mkTarget('viertel');
     if(Q===7&&!TARGETS.some(x=>x.type==='apotheke')){TARGETS[0]=mkTarget('apotheke');TARGETS[0].req=1;}
     if(Q===7)TARGETS.forEach(x=>{if(x.type==='apotheke')x.req=Math.min(x.req,lvl);});
     if(Q===13&&FACTION){const bt=FACT[FACTION].btype;let x=TARGETS.find(x=>x.type===bt&&x.fac);if(!x){x=mkTarget(bt);x.req=1;x.fac=FACTION;x.name=FACT[FACTION].n+': '+x.name;TARGETS[0]=x;}}
@@ -2102,7 +2111,8 @@
     S_.querySelectorAll('[data-do]').forEach(b=>b.onclick=()=>{const d=b.dataset.do;
       if(d==='story'){phoneClose();storyCall();}
       if(d==='anon'){phoneClose();anonCall();}
-      if(d==='sell'){const loot=STASH.filter(id=>ITEMS[id].t==='loot');const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*(deeRate()-.1));STASH=STASH.filter(id=>ITEMS[id].t!=='loot');addReward(v,5,0);track('sold',v);sfx('cash');toastMsg('VERKAUFT: +$'+fmt(v));renderPhone();}
+      if(d==='sell'){phoneClose();openSell(deeRate()-.1,'kurier');return;}
+      if(d==='sellOld'){const loot=STASH.filter(id=>ITEMS[id].t==='loot');const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*(deeRate()-.1));STASH=STASH.filter(id=>ITEMS[id].t!=='loot');addReward(v,5,0);track('sold',v);sfx('cash');toastMsg('VERKAUFT: +$'+fmt(v));renderPhone();}
       if(d==='take'){const o=OFFERS.list[phDet];if(JOB){toastMsg('ERST DEN LAUFENDEN JOB BEENDEN');return;}const j=offerJob(o);if(nrg<j.e){toastMsg('ZU MÜDE');return;}o.taken=true;phoneClose();startJob(j,o.who,()=>closeDlg());}});
   }
   let phDet=0;
@@ -2176,7 +2186,32 @@
     say(npc,msg||({joe:'Schrott hab ich genug. Kostet aber.',tito:'Ich kenn da jemanden, der kennt jemanden. Was brauchst du?',sunny:'Bro, mit dem Look kommst du überall rein!',duke:'Qualität hat ihren Preis, Junge.'}[npc]),ch);
   }
   // Dee kauft Beute
+  // ---------- Verkaufen mit Auswahl ----------
+  let SELL={rate:.6,who:'dee',sel:{},after:null};
+  function openSell(rate,who,after){SELL={rate,who,sel:{},after};const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))];ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);
+    if(!ids.length){toastMsg('KEINE BEUTE IM SPIND');if(after)after(0);return;}$('sellov').classList.add('on');renderSell();}
+  function renderSell(){const P=$('sellp');const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))].sort((a,b)=>ITEMS[b].v-ITEMS[a].v);
+    const tot=ids.reduce((s,id)=>s+Math.round(ITEMS[id].v*SELL.rate)*(SELL.sel[id]||0),0);
+    P.innerHTML=`<div class="seth"><b>${SELL.who==='dee'?'DEE – HEHLEREI':'HEHLER-KURIER'}</b><button type="button" id="sellx">✕</button></div>
+      <p class="mp">Wähle aus, was du verkaufst. Dee zahlt <b>${Math.round(SELL.rate*100)} %</b> vom Wert.</p>
+      <div class="sellbar"><button type="button" id="sall">Alles</button><button type="button" id="snone">Nichts</button></div>
+      <div class="mbody">${ids.map(id=>{const have=STASH.filter(x=>x===id).length,n=SELL.sel[id]||0,p=Math.round(ITEMS[id].v*SELL.rate);
+        return `<div class="srow ${n?'on':''}"><img src="${ico(id)}" alt=""><div><b>${ITEMS[id].n}</b><small>$${p} pro Stück · im Spind: ${have}</small></div>
+        <div class="sq"><button type="button" data-sm="${id}">−</button><i>${n}</i><button type="button" data-sp="${id}">+</button></div></div>`;}).join('')}</div>
+      <button type="button" class="mbig" id="sgo" ${tot?'':'disabled'}>VERKAUFEN · +$${fmt(tot)}</button>`;
+    $('sellx').onclick=closeSell;$('sall').onclick=()=>{ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);renderSell();};$('snone').onclick=()=>{ids.forEach(id=>SELL.sel[id]=0);renderSell();};
+    P.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>{const id=b.dataset.sm;SELL.sel[id]=Math.max(0,(SELL.sel[id]||0)-1);renderSell();});
+    P.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{const id=b.dataset.sp;SELL.sel[id]=Math.min(STASH.filter(x=>x===id).length,(SELL.sel[id]||0)+1);renderSell();});
+    P.querySelectorAll('.srow img').forEach((im,i)=>im.onclick=()=>{const id=ids[i];const h=STASH.filter(x=>x===id).length;SELL.sel[id]=SELL.sel[id]?0:h;renderSell();});
+    $('sgo').onclick=()=>{let v=0,n=0;Object.entries(SELL.sel).forEach(([id,k])=>{for(let i=0;i<k;i++){const j=STASH.indexOf(id);if(j>=0){STASH.splice(j,1);v+=Math.round(ITEMS[id].v*SELL.rate);n++;}}});
+      if(!v)return;addReward(v,Math.min(30,5+n),0);track('sold',v);sfx('cash');toastMsg(`${n} TEILE VERKAUFT: +$${fmt(v)}`);const a=SELL.after;closeSell();if(a)a(v);};
+  }
+  function closeSell(){$('sellov').classList.remove('on');saveGame();if($('inv').classList.contains('on'))renderInv();}
   function sellLoot(){
+    if(!STASH.some(id=>ITEMS[id].t==='loot')){say('dee','Du hast nichts, was mich interessiert, Schätzchen.',[{t:'OK',f:()=>npcMenu('Sonst noch was?')}]);return;}
+    closeDlg();openSell(deeRate(),'dee',v=>{say('dee',v?'Angenehm, mit dir Geschäfte zu machen.':'Wie du meinst.',[{t:'Bis bald',f:closeDlg}]);});
+  }
+  function sellLootOld(){
     const loot=STASH.filter(id=>ITEMS[id].t==='loot'); if(!loot.length){say('dee','Du hast nichts, was mich interessiert, Schätzchen.',[{t:'OK',f:()=>npcMenu('Sonst noch was?')}]);return;}
     const v=Math.round(loot.reduce((s,id)=>s+ITEMS[id].v,0)*deeRate());
     say('dee',`${loot.length} Teile … heiße Ware. Ich geb dir ${v} Dollar. Keine Fragen, kein Feilschen.`,[

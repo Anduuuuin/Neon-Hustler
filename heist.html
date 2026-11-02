@@ -534,7 +534,7 @@ function upd(dt){
     if(busy.t>=busy.dur){const b=busy;busy=null;$('prog').style.display='none';b.done();}}
   if(P.swing>0)P.swing=Math.max(0,P.swing-dt);
   const run=ml>.6,sp=48*(run?1:.5);P.moving=ml>.05;
-  if(ml>.05){moveBody(P,mx*sp*dt,my*sp*dt,4);P.face=Math.atan2(my,mx);P.step+=dt*8;if(run&&Math.random()<dt*(PK.quiet?.4:1.1))noise(PK.quiet?35:55);
+  if(ml>.05){moveBody(P,mx*sp*dt,my*sp*dt,4);P.face=Math.atan2(my,mx);const os=Math.floor(P.step);P.step+=dt*8;if(Math.floor(P.step)!==os&&Math.floor(P.step)%2===0&&run)SFX('step');if(run&&Math.random()<dt*(PK.quiet?.4:1.1))noise(PK.quiet?35:55);
     if(lasersActive()&&at(...ptile())==='B')tripLaser();}
   updBullets(dt);
   if(!raidOver){RAID-=dt;if(RAID<=60&&RAID+dt>60)toast('NOCH 60 SEKUNDEN!');if(RAID<=0){raidOver=true;RAID=0;toast('ZU LANGE! POLIZEI KOMMT');raise(100);}}
@@ -872,7 +872,7 @@ function draw(t){
   sparks.forEach(s=>{px(cx,s.x-1,s.y-1,2,2,s.blood?'#c0102a':'#ffe14d');if(s.blood)px(cx,s.x+1,s.y,1,1,'#c0102a');});
   smokes.forEach(s=>{for(let i=0;i<14;i++){const a=i*2.4+t/900,r=s.r*(.3+.7*((i*37)%10)/10);cx.fillStyle=`rgba(200,210,230,${Math.min(.75,s.t/3)})`;cx.beginPath();cx.arc(s.x+Math.cos(a)*r,s.y+Math.sin(a)*r*.7,10,0,7);cx.fill();}});
   cx.restore();
-  dx.globalCompositeOperation='source-over';dx.fillStyle=cop?`rgba(${40+30*Math.sin(t/150)},2,${30+30*Math.cos(t/150)},.5)`:'rgba(8,2,20,.26)';dx.fillRect(0,0,VW,VH);
+  dx.globalCompositeOperation='source-over';dx.fillStyle=cop?`rgba(${40+30*Math.sin(t/150)},2,${30+30*Math.cos(t/150)},.5)`:'rgba(8,2,20,.18)';dx.fillRect(0,0,VW,VH);
   dx.globalCompositeOperation='destination-out';
   const light=(x,y,r)=>{const g=dx.createRadialGradient(x-camx,y-camy,0,x-camx,y-camy,r);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');dx.fillStyle=g;dx.beginPath();dx.arc(x-camx,y-camy,r,0,7);dx.fill();};
   light(P.x,P.y-6,PK.nv?120:80);flashes.forEach(f=>{if(f.muzzle)light(f.x,f.y-7,60);});guards.forEach(g=>{if(!g.down&&g.stun<=0)light(g.x+Math.cos(g.dir)*32,g.y+Math.sin(g.dir)*32,38);});
