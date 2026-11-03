@@ -1,5 +1,5 @@
 // Neon Hustler – Service Worker: erst Netz, bei Offline aus dem Cache
-const C='nh-v21';
+const C='nh-v22';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{

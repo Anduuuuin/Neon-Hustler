@@ -65,14 +65,15 @@ function drawWeapon(c,x,y,d,bob,id,swing){
 // ===== Kleidung =====
 const OUTFIT={
   jacke:{sakko_pink:{p:'#ff5fa8',P:'#c83c80',w:'#f4f1e8'},lederjacke:{p:'#4a3428',P:'#2a1c12',w:'#d8d0c0'},hawaiihemd:{p:'#2fc8a8',P:'#1f8a76',w:'#ffd34d'},
-    trainingsjacke:{p:'#3a5cd0',P:'#26398a',w:'#f4f1e8'},tarnweste:{p:'#55663f',P:'#36422a',w:'#2a2a2a'},anzug_weiss:{p:'#eeeae0',P:'#bfb8a8',w:'#7ff6ff'},anzug_gold:{p:'#e8c04a',P:'#a8801c',w:'#1a1020'}},
-  schuhe:{sneaker:{b:'#f4f1e8'},schleicher:{b:'#1a1a22'},loafer:{b:'#8a4a1a'},boots:{b:'#4a321e'},krokoschuhe:{b:'#3f7a34'}},
-  brille:{sonnenbrille:{g:'#111',c:'#2fe0ea'},nachtsicht:{g:'#2a3a1a',c:'#7dff5a'},nerdbrille:{g:'#3a2a1a',c:'#d8e8f0'},goldbrille:{g:'#d4a020',c:'#ff9f43'},_:{g:'#e8b088',c:'#3a2a1a'}},
+    trainingsjacke:{p:'#3a5cd0',P:'#26398a',w:'#f4f1e8'},tarnweste:{p:'#55663f',P:'#36422a',w:'#2a2a2a'},anzug_weiss:{p:'#eeeae0',P:'#bfb8a8',w:'#7ff6ff'},anzug_gold:{p:'#e8c04a',P:'#a8801c',w:'#1a1020'},neon_jacke:{p:'#ff3d8b',P:'#2fe0ea',w:'#1a1020'}},
+  schuhe:{sneaker:{b:'#f4f1e8'},schleicher:{b:'#1a1a22'},loafer:{b:'#8a4a1a'},boots:{b:'#4a321e'},krokoschuhe:{b:'#3f7a34'},neon_kicks:{b:'#7dff8a'}},
+  brille:{sonnenbrille:{g:'#111',c:'#2fe0ea'},nachtsicht:{g:'#2a3a1a',c:'#7dff5a'},nerdbrille:{g:'#3a2a1a',c:'#d8e8f0'},goldbrille:{g:'#d4a020',c:'#ff9f43'},neon_shades:{g:'#ff3d8b',c:'#ffe14d'},_:{g:'#e8b088',c:'#3a2a1a'}},
   hose:{_:{n:'#3a3a6a'}}
 };
 const HATS={
   cap:{c:{k:'#140a1c',r:'#ff3d8b',R:'#c8286a'},px:["....kkkkkk....","...krrrrrrk...","..krrrrrrrrk..","..kRRRRRRRRRRk"]},
   fedora:{c:{k:'#140a1c',f:'#3a2a20',F:'#ff5fa8'},px:["....kkkkkk....","...kffffffk...","..kFFFFFFFFk..","kkffffffffffkk"]},
+  neon_cap:{c:{k:'#140a1c',r:'#2fe0ea',R:'#ff3d8b'},px:["....kkkkkk....","...krrrrrrk...","..krrrrrrrrk..","..kRRRRRRRRRRk"]},
   panama:{c:{k:'#140a1c',f:'#efe2b8',F:'#2a1a12'},px:["....kkkkkk....","...kffffffk...","..kFFFFFFFFk..","kkffffffffffkk"]},
   bandana:{c:{k:'#140a1c',r:'#d82a2a'},px:["..............","....kkkkkk....","..krrrrrrrrkk.","...........rk."]},
 };
