@@ -489,8 +489,8 @@
   #metaov{position:fixed;inset:0;z-index:950;background:rgba(5,0,12,.85);display:none;align-items:center;justify-content:center;padding:12px}
   #metaov.on{display:flex}
   .metap{width:min(96vw,460px);max-height:calc(100vh - 24px);display:flex;flex-direction:column}
-  .mtabs{display:flex;gap:4px;margin-bottom:8px}
-  .mtabs button{flex:1;background:#0b0616;border:2px solid #4b3a6e;color:#cbbbe6;font-family:'Bangers',cursive;font-size:15px;letter-spacing:.5px;padding:6px 2px;cursor:pointer;border-radius:6px}
+  .mtabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+  .mtabs button{flex:1 1 22%;background:#0b0616;border:2px solid #4b3a6e;color:#cbbbe6;font-family:'Bangers',cursive;font-size:15px;letter-spacing:.5px;padding:6px 2px;cursor:pointer;border-radius:6px}
   .mtabs button.on{background:#ff3d8b;color:#fff;border-color:#000}
   .mbody{overflow:auto;flex:1;padding-right:2px}
   .mh{font-family:'Bangers',cursive;font-size:19px;letter-spacing:1px;color:#ffe14d;margin:8px 0 5px;display:flex;justify-content:space-between;align-items:baseline}
@@ -2012,7 +2012,7 @@
   function openMeta(t){if(t)metaTab=t;$('metaov').classList.add('on');renderMeta();}
   function closeMeta(){$('metaov').classList.remove('on');saveGame();}
   function renderMeta(){roll();const P=$('metap');if(!P)return;
-    const tabs=[['daily','Aufgaben'],['ach','Erfolge'],['album','Album'],['bonus','Bonus'],['stats','Profil']];
+    const tabs=[['daily','Aufgaben'],['season','Saison'],['ach','Erfolge'],['album','Album'],['pola','Fotos'],['bonus','Bonus'],['stats','Profil']];
     let body='';
     if(metaTab==='daily'){const sec=(title,box,pool,sub,stat)=>`<div class="mh">${title}<small>${sub}</small></div>`+box.ids.map(k=>{const M=pool.find(m=>m.k===k);const p=prog(M,box,k),done=p>=M.g,cl=box.cl.includes(k);
         return `<div class="mrow ${cl?'cl':''}"><div><b>${M.t}</b><div class="pb"><i style="width:${p/M.g*100}%"></i></div><small>${fmt(p)}/${fmt(M.g)} · ${rtxt(M.r)}</small></div>${cl?'<span>✔</span>':`<button type="button" ${done?'':'disabled'} data-mc="${stat}:${k}">HOLEN</button>`}</div>`;}).join('');
@@ -2031,8 +2031,9 @@
       body=`<div class="mh">DEIN PROFIL</div><div class="st2">${rows.map(r=>`<div><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}</div>
         <div class="mh">COMEBACK (PRESTIGE)<small>ab Stufe 15 nach Akt 2</small></div><p class="mp">Fang mit Stufe 1 neu an. Du behältst Kleidung, Baupläne, Crew, Ausbau und Album – und bekommst dauerhaft <b>+15 % XP</b> und <b>+5 % beim Hehler</b> pro Stern.</p>
         <button type="button" class="mbig" data-prest="1" ${canPrestige()?'':'disabled'}>${canPrestige()?'COMEBACK STARTEN ★'+(PRESTIGE+1):'Noch nicht freigeschaltet'}</button>`;}
+    body=metaExtra(metaTab)||body;
     P.innerHTML=`<div class="seth"><b>ZENTRALE</b><button type="button" id="metax">✕</button></div><div class="mtabs">${tabs.map(([k,n])=>`<button type="button" class="${k===metaTab?'on':''}" data-tab="${k}">${n}</button>`).join('')}</div><div class="mbody">${body}</div>`;
-    $('metax').onclick=closeMeta;
+    $('metax').onclick=closeMeta;metaExtraBind(P);
     P.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{metaTab=b.dataset.tab;renderMeta();});
     P.querySelectorAll('[data-mc]').forEach(b=>b.onclick=()=>{const[s,k]=b.dataset.mc.split(':');const box=s==='d'?DAILY:WEEKLY,M=(s==='d'?DPOOL:WPOOL).find(m=>m.k===k);if(box.cl.includes(k))return;box.cl.push(k);if(s==='d')track('daily');toastMsg(give(M.r));renderMeta();});
     P.querySelectorAll('[data-ma]').forEach(b=>b.onclick=()=>{const a=ACHS.find(x=>x.id===b.dataset.ma);if(ACH.includes(a.id))return;ACH.push(a.id);toastMsg('🏆 '+give(a.r));renderMeta();});
@@ -2424,6 +2425,19 @@
       .bbtns{display:flex;gap:6px;margin-top:6px}.bbtns button{flex:1;font-family:'Bangers',cursive;font-size:18px;padding:9px 4px;border:3px solid #000;border-radius:8px;cursor:pointer}#btest{background:#2fe0ea}#bsave{background:#ff3d8b;color:#fff}`;
     document.head.appendChild(st);})();
   window.NH_BASE={open:openBase,get:()=>baseGet()};
+  // ================= POLAROIDS =================
+  const POLA=[['pl_hafen','Containerhafen, 3 Uhr nachts'],['pl_beach','Strand nach dem Coup'],['pl_casino','Jackpot-Nacht'],['pl_club','Club Paradiso, VIP-Eingang'],['pl_junk','Joes Schrottplatz'],['pl_motel','Zimmer 12, keine Fragen'],
+    ['pl_pawn','Dees Pfandleihe'],['pl_pier','Übergabe am Pier'],['pl_police','Fast erwischt'],['pl_shop','Boulevard bei Neonlicht'],['pl_slum','Die Siedlung'],['pl_towers','Innenstadt-Türme'],['pl_villa','Villa am Wasser'],['pl_yacht','Auf der Yacht'],
+    ['h_tresor','Der Tresor'],['h_dach','Über den Dächern'],['h_gasse','Fluchtweg Gasse'],['h_lager','Lagerhalle 9'],['h_buero','Fremdes Büro'],['drive','Fahrt in den Sonnenuntergang'],['diner','Candys Diner'],['garage','Die Garage'],['hafen','Hafenlichter'],['bg','Vice Beach, 1986']];
+  function polaGet(){if(!EMP.pola)EMP.pola=[];return EMP.pola;}
+  function polaDrop(boost){const own=polaGet();const left=POLA.filter(p=>!own.includes(p[0]));if(!left.length)return null;if(Math.random()>(boost?1:.2))return null;const p=left[Math.floor(Math.random()*left.length)];own.push(p[0]);track('pola');return p;}
+  function polaHTML(){const own=polaGet();return `<div class="mh">POLAROIDS<small>${own.length}/${POLA.length} · Erinnerungen von deinen Einsätzen</small></div>
+    ${own.length>=POLA.length&&!EMP.polaDone?'<button type="button" class="mbig" data-polad="1">ALBUM KOMPLETT – $25.000 ABHOLEN</button>':''}
+    <div class="polas">${POLA.map(([id,c],i)=>own.includes(id)?`<div class="pola" style="transform:rotate(${(i%5-2)*1.6}deg)"><img src="${id}.webp" alt=""><span>${c}</span></div>`:`<div class="pola no" style="transform:rotate(${(i%5-2)*1.6}deg)"><i>?</i><span>Noch nicht gefunden</span></div>`).join('')}</div>`;}
+  const st9=document.createElement('style');st9.textContent=`.polas{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:6px 2px}.pola{background:#f4f1e8;padding:4px 4px 0;box-shadow:2px 3px 0 rgba(0,0,0,.6)}.pola img{width:100%;aspect-ratio:1;object-fit:cover;display:block;filter:saturate(1.2) contrast(1.05)}
+    .pola span{display:block;font-family:'Permanent Marker',cursive;color:#222;font-size:10px;line-height:1.1;padding:3px 1px 5px;min-height:24px}.pola.no{background:#2a1f3a}.pola.no i{display:flex;aspect-ratio:1;align-items:center;justify-content:center;font-style:normal;font-size:28px;color:#4b3a6e;background:#160d22}.pola.no span{color:#6b5a8e}`;document.head.appendChild(st9);
+  function metaExtra(t){if(t==='pola')return polaHTML();if(t==='season'&&window.seasonHTML)return seasonHTML();return '';}
+  function metaExtraBind(P){P.querySelectorAll('[data-polad]').forEach(b=>b.onclick=()=>{EMP.polaDone=1;cash+=25000;sfx('cash');hud();toastMsg('ALBUM KOMPLETT: +$25.000');renderMeta();});if(window.seasonBind)seasonBind(P);}
   window.__continue=continueGame;window.__nhReady=true;roll();
   if(hasSave()){try{const d=JSON.parse(localStorage.getItem(SKEY));$('tap').innerHTML='TIPPEN ZUM WEITERSPIELEN<br><small style="font-size:.55em">Spielstand: Stufe '+d.lvl+'</small>';}catch(e){}}
   // ---------- Pixel-Einsatz (iframe) ----------
@@ -2439,7 +2453,7 @@
   window.addEventListener('message',e=>{
     const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
     const T=JSON.parse(f.dataset.t||'{}');
-    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
+    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{tod:(()=>{const h=new Date().getHours();return h>=6&&h<19?'day':'night';})(),rain:Math.random()<.25,crew:CREW_ON.slice(),base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
     if(d.type==='sfx'){if(window.NHA)NHA.sfx(d.n);return;}
     if(d.type==='mood'){if(window.NHA)NHA.mood(d.m);return;}
     if(d.type!=='heistEnd')return;
@@ -2460,7 +2474,7 @@
       const up=unlockPlans(plans);let pl=up.map(n=>n?`<b class="x">Neuer Bauplan: ${n}</b>`:'<b>Bauplan schon bekannt · +20 XP</b>').join('');
       if(up.some(n=>!n))addReward(0,20*up.filter(n=>!n).length,0);
       const mats={};items.filter(id=>ITEMS[id].t==='mat').forEach(id=>mats[id]=(mats[id]||0)+1);
-      const ml=Object.entries(mats).map(([k,v])=>`${v}× ${ITEMS[k].n}`).join(' · ');const cl=items.filter(id=>ITEMS[id].t==='cloth');if(cl.length)pl+=cl.map(id=>`<b class="x" style="color:${ITEMS[id].rare?'#ffe14d':'#7ff6ff'}">${ITEMS[id].rare?'★ SELTEN: ':'👕 '}${ITEMS[id].n}</b>`).join('');
+      const ml=Object.entries(mats).map(([k,v])=>`${v}× ${ITEMS[k].n}`).join(' · ');{const po=polaDrop(typ==='golden'||T.boss);if(po)pl+=`<b class="x" style="color:#f4f1e8">📸 Polaroid: ${po[1]}</b>`;}const cl=items.filter(id=>ITEMS[id].t==='cloth');if(cl.length)pl+=cl.map(id=>`<b class="x" style="color:${ITEMS[id].rare?'#ffe14d':'#7ff6ff'}">${ITEMS[id].rare?'★ SELTEN: ':'👕 '}${ITEMS[id].n}</b>`).join('');
       if(typ==='werkstatt'&&Q===2)Q=3; if(typ==='apotheke'&&Q===7)Q=8; if(typ==='golden'&&Q===10)Q=11;
       let rp=0;if(T.fac&&T.fac===FACTION)rp=addRep(FACTION,12);else if(FACTION&&typ===FACT[FACTION].btype)rp=addRep(FACTION,5);
       if(Q===13&&FACTION&&T.fac===FACTION){Q=14;} if(T.story==='bank'&&Q===17){Q=18;if(FACTION)rp+=addRep(FACTION,20);}
