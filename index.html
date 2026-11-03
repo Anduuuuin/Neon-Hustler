@@ -2096,15 +2096,16 @@
         return `<div class="mrow ${lk?'cl':''}"><img src="${ico(m.ic)}" alt="" style="width:34px;height:34px;object-fit:contain"><div><b>${m.n}${s.lv?' · Stufe '+s.lv:''}</b><small>${desc}</small></div>
           ${lk?`<span style="font-size:11px;color:#cbbbe6">ab Stufe ${m.req}</span>`:!nx?'<span>MAX</span>':`<button type="button" data-mod="${k}">${s.lv?'AUSBAU':'BAUEN'}<br><small>$${fmt(nx.c)}</small></button>`}</div>`;}).join('')+
         `<div class="mh">AUSBAU-ÜBERSICHT</div><div class="st2"><div><small>Bett</small><b>${BEDS[UPG.bett][0]} · ${NMAX} ⚡</b></div><div><small>Werkbank</small><b>Stufe ${UPG.werkbank+1}</b></div><div><small>Spind</small><b>${spindCap()} Felder</b></div><div><small>Rucksack</small><b>${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]}</b></div></div>`;}
+    if(empTab==='turf')body=turfHTML();
     P.innerHTML=`<div class="seth"><b>IMPERIUM</b><button type="button" id="empx">✕</button></div>
       <div class="empsum"><div><small>EINNAHMEN</small><b>$${fmt(total)}/h</b></div><div><small>BEREIT</small><b>${p.cash?'$'+fmt(p.cash):''}${Object.entries(p.items).map(([id,n])=>' +'+n+'× '+(id==='_mat'?'Mat.':ITEMS[id].n)).join('')||(p.cash?'':'–')}</b></div>
       <button type="button" id="empc" ${pend?'':'disabled'}>KASSIEREN</button></div>
       ${EMP.last&&adsLeft()>0?`<button type="button" class="empad" id="empad">▶ Werbung: letzte Einnahme verdoppeln (+$${fmt(EMP.last)})</button>`:''}
-      <div class="mtabs"><button type="button" class="${empTab==='biz'?'on':''}" data-et="biz">Tarnfirmen</button><button type="button" class="${empTab==='mods'?'on':''}" data-et="mods">Versteck</button></div><div class="mbody">${body}</div>`;
+      <div class="mtabs"><button type="button" class="${empTab==='biz'?'on':''}" data-et="biz">Tarnfirmen</button><button type="button" class="${empTab==='mods'?'on':''}" data-et="mods">Versteck</button><button type="button" class="${empTab==='turf'?'on':''}" data-et="turf">Viertel</button></div><div class="mbody">${body}</div>`;
     $('empx').onclick=closeEmp;
     $('empc').onclick=()=>{const t=empCollect();if(t)toastMsg('KASSIERT: '+t);renderEmp();};
     const ad=$('empad');if(ad)ad.onclick=()=>{const v=EMP.last;EMP.last=0;watchAd({cash:v});setTimeout(renderEmp,3300);};
-    P.querySelectorAll('[data-et]').forEach(b=>b.onclick=()=>{empTab=b.dataset.et;renderEmp();});const eb=$('empbase');if(eb)eb.onclick=()=>{closeEmp();openBase();};
+    P.querySelectorAll('[data-et]').forEach(b=>b.onclick=()=>{empTab=b.dataset.et;renderEmp();});const eb=$('empbase');if(eb)eb.onclick=()=>{closeEmp();openBase();};P.querySelectorAll('[data-boss]').forEach(b=>b.onclick=()=>turfAttack(b.dataset.boss));
     P.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>{closeEmp();openBiz(b.dataset.visit);});
     P.querySelectorAll('[data-biz]').forEach(b=>b.onclick=()=>{const k=b.dataset.biz,s=EMP.biz[k]||{lv:0,t:Date.now()};const c=s.lv?bizUp(k,s.lv):BIZ[k].cost;if(cash<c){toastMsg('ZU WENIG GELD');return;}
       if(s.lv)empCollect();cash-=c;s.lv++;if(s.lv===1)s.t=Date.now();EMP.biz[k]=s;track('biz');sfx('stamp');hud();renderEmp();});
@@ -2207,7 +2208,7 @@
   function staffEff(s,r){return (s.staff||[]).filter(p=>p.r===r).reduce((a,p)=>a+p.sk*(.5+p.loy/200),0);}
   function bizRank(k){const s=bst(k);if(!s||!s.lv)return 0;const sc=s.st.reduce((a,S)=>a+S.n*2+S.l,0)+TRK.reduce((a,t)=>a+s.up[t]*3,0)+s.staff.length*3;return Math.min(10,1+Math.floor(sc/22));}
   const staffSlots=k=>Math.min(5,1+Math.floor(bizRank(k)/2));
-  function bizGross(k,s){s=s||bst(k);if(!s||!s.lv)return 0;let g=0;for(let j=0;j<3;j++)g+=stInc(k,j,s);return g*(1+.2*s.up.w)*(1+.08*staffEff(s,'kasse'));}
+  function bizGross(k,s){s=s||bst(k);if(!s||!s.lv)return 0;let g=0;for(let j=0;j<3;j++)g+=stInc(k,j,s);return g*(1+.2*s.up.w)*(1+.08*staffEff(s,'kasse'))*turfBonus(k);}
   const bizWages=s=>(s.staff||[]).reduce((a,p)=>a+p.w,0);
   function bizIncS(k,s){s=s||bst(k);if(!s||!s.lv)return Math.round(BIZ[k].inc*SBASE[0]);return Math.max(0,Math.round(bizGross(k,s)-bizWages(s)));}
   function bizCapS(s){if(!s||!s.lv)return 8;return 8+2*(s.up.t||0)+Math.round(2*staffEff(s,'mgr'));}
@@ -2425,6 +2426,34 @@
       .bbtns{display:flex;gap:6px;margin-top:6px}.bbtns button{flex:1;font-family:'Bangers',cursive;font-size:18px;padding:9px 4px;border:3px solid #000;border-radius:8px;cursor:pointer}#btest{background:#2fe0ea}#bsave{background:#ff3d8b;color:#fff}`;
     document.head.appendChild(st);})();
   window.NH_BASE={open:openBase,get:()=>baseGet()};
+  // ================= VIERTEL-BOSSE =================
+  const TURF={
+    slum:{n:'Die Siedlung',boss:'El Toro',type:'lagerhalle',req:4,biz:'wasch',ic:'🐂',txt:'Kontrolliert die Siedlung aus einem alten Lagerhaus. Seine Jungs sind schnell mit dem Messer.'},
+    shop:{n:'Boulevard',boss:'Slick Vinnie',type:'werkstatt',req:6,biz:'autowasch',ic:'🕶',txt:'Verschiebt geklaute Autos über seine Werkstatt am Boulevard.'},
+    club:{n:'Nachtclub-Meile',boss:'Velvet',type:'nachtclub',req:8,biz:'club',ic:'💋',txt:'Ihr gehört jede Tür auf der Meile. Ohne Velvet läuft kein Geschäft.'},
+    towers:{n:'Innenstadt',boss:'Der Anwalt',type:'bank',req:10,biz:'video',ic:'⚖️',txt:'Wäscht Geld für halb Vice Beach – sein Büro ist eine Festung.'},
+    yacht:{n:'Yachthafen',boss:'Kapitän Kane',type:'villa',req:12,biz:'yacht',ic:'⚓',txt:'Schmuggelkönig. Wohnt in der Villa über dem Hafen.'},
+    casino:{n:'Casino-Viertel',boss:'The Baron',type:'bank',req:15,biz:'casino',ic:'🎩',txt:'Der größte Fisch. Wer den Baron stürzt, regiert die Stadt.'}};
+  function turfGet(){if(!EMP.turf)EMP.turf={};return EMP.turf;}
+  function turfBonus(k){const t=Object.entries(TURF).find(([,v])=>v.biz===k);return t&&turfGet()[t[0]]?1.3:1;}
+  function turfHTML(){const T_=turfGet();const n=Object.keys(TURF).filter(k=>T_[k]).length;
+    return `<div class="mh">VIERTEL<small>${n}/6 erobert · Erobertes Viertel = +30 % für deinen Laden dort</small></div>`+Object.entries(TURF).map(([k,t])=>{const own=T_[k],lk=lvl<t.req;
+      return `<div class="mrow ${lk?'cl':''}"><span style="flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px;background:#0b0616;border-radius:6px;border:2px solid ${own?'#7dffb2':'#ff3d6e'}">${t.ic}</span><div><b>${t.n} · ${own?'✔ DEIN VIERTEL':'👑 '+t.boss}</b><small>${own?'Laden dort bringt +30 %':t.txt}</small></div>
+        ${own?'<span style="color:#7dffb2">EROBERT</span>':lk?`<span style="font-size:11px;color:#cbbbe6">ab Stufe ${t.req}</span>`:`<button type="button" data-boss="${k}">ANGRIFF<br><small>6 Energie</small></button>`}</div>`;}).join('');}
+  function turfAttack(k){const t=TURF[k];if(spindFull()){toastMsg('SPIND VOLL');return;}
+    PEND={kind:'gen',type:t.type,diff:3,e:6,name:'Boss: '+t.boss,seed:Math.floor(Math.random()*1e9),boss:1,bossName:t.boss,turf:k,story:'boss'};closeEmp();if(scene!=='hide'){show('hide');fitAll();}invOpen('heist');}
+  ACHS.push(AC('turf1','Erstes Viertel erobert',()=>Object.keys(turfGet()).length>=1,{cash:5000}),AC('turf6','Herrscher von Vice Beach',()=>Object.keys(TURF).every(k=>turfGet()[k]),{cash:100000,cloth:1}));
+  // ================= FAHNDUNG: Detective Doyle =================
+  function doyleEvent(){const bribe=400*heat+lvl*80;const brief=STASH.includes('aktenkoffer');
+    sayRaw('doyle',`<b>Detective Doyle</b> steht plötzlich vor dir. „Heat ${heat} von 5, Kleiner. Die ganze Stadt redet über dich. Wir zwei sollten uns unterhalten.“`,[
+      {t:`💵 Bestechen · $${fmt(bribe)} (Heat −2)`,f:()=>{if(cash<bribe){sayRaw('doyle','„Das reicht nicht mal für meinen Kaffee.“ Er notiert sich dein Gesicht. (+1 Heat)',[{t:'Mist',f:closeDlg}]);heat=Math.min(5,heat+1);hud();return;}cash-=bribe;heat=Math.max(0,heat-2);hud();sfx('cash');sayRaw('doyle','Der Umschlag verschwindet in seinem Mantel. „Ich hab dich nie gesehen.“',[{t:'Gut so',f:closeDlg}]);}},
+      {t:'🏃 Abhauen · Ausdauer',f:()=>{const ch=40+(statVal('Ausdauer')-10)*3;if(Math.random()*100<ch){heat=Math.max(0,heat-1);addReward(0,30,0);sayRaw('erz','Du verschwindest durch eine Hintertür und über drei Dächer. Doyle verliert deine Spur. (Heat −1, +30 XP)',[{t:'Puh',f:closeDlg}]);}
+        else{const l=Math.round(cash*.15);cash-=l;heat=Math.min(5,heat+1);hud();sayRaw('doyle',`Er erwischt dich am Kragen. Eine Nacht in der Zelle – und $${fmt(l)} „Bearbeitungsgebühr“. (+1 Heat)`,[{t:'Verdammt',f:closeDlg}]);}}},
+      {t:`📁 Erpressen · Köpfchen${brief?' (Aktenkoffer)':' – braucht Aktenkoffer'}`,f:()=>{if(!brief){sayRaw('doyle','„Du willst mir drohen? Womit denn?“ Er lacht dich aus.',[{t:'…',f:closeDlg}]);return;}
+        STASH.splice(STASH.indexOf('aktenkoffer'),1);const ch=50+(statVal('Köpfchen')-10)*3;if(Math.random()*100<ch){heat=0;EMP.doyleT=Date.now()+24*36e5;hud();addReward(0,60,0);sayRaw('doyle','Er blättert durch die Akten im Koffer. Sein Gesicht wird blass. „Ich… lass dich in Ruhe.“ (Heat 0 · 24 h Ruhe vor Doyle)',[{t:'Wusste ich doch',f:closeDlg}]);}
+        else{heat=Math.min(5,heat+1);hud();sayRaw('doyle','„Netter Versuch.“ Er nimmt den Koffer als Beweismittel mit. (+1 Heat)',[{t:'Mist',f:closeDlg}]);}}}]);}
+  setInterval(()=>{if(!window.__nhReady||heat<4||(scene!=='hide'&&scene!=='map'))return;if(document.getElementById('pixh'))return;const dl=$('dlg');if(dl&&dl.classList.contains('on'))return;
+    if(EMP.doyleT&&Date.now()<EMP.doyleT)return;if(EMP.doyleL&&Date.now()-EMP.doyleL<20*6e4)return;if(Math.random()<.5){EMP.doyleL=Date.now();doyleEvent();}},60000);
   // ================= POLAROIDS =================
   const POLA=[['pl_hafen','Containerhafen, 3 Uhr nachts'],['pl_beach','Strand nach dem Coup'],['pl_casino','Jackpot-Nacht'],['pl_club','Club Paradiso, VIP-Eingang'],['pl_junk','Joes Schrottplatz'],['pl_motel','Zimmer 12, keine Fragen'],
     ['pl_pawn','Dees Pfandleihe'],['pl_pier','Übergabe am Pier'],['pl_police','Fast erwischt'],['pl_shop','Boulevard bei Neonlicht'],['pl_slum','Die Siedlung'],['pl_towers','Innenstadt-Türme'],['pl_villa','Villa am Wasser'],['pl_yacht','Auf der Yacht'],
@@ -2453,7 +2482,7 @@
   window.addEventListener('message',e=>{
     const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
     const T=JSON.parse(f.dataset.t||'{}');
-    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{tod:(()=>{const h=new Date().getHours();return h>=6&&h<19?'day':'night';})(),rain:Math.random()<.25,crew:CREW_ON.slice(),base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
+    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{boss:T.boss,bossName:T.bossName,tod:(()=>{const h=new Date().getHours();return h>=6&&h<19?'day':'night';})(),rain:Math.random()<.25,crew:CREW_ON.slice(),base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
     if(d.type==='sfx'){if(window.NHA)NHA.sfx(d.n);return;}
     if(d.type==='mood'){if(window.NHA)NHA.mood(d.m);return;}
     if(d.type!=='heistEnd')return;
@@ -2475,6 +2504,7 @@
       if(up.some(n=>!n))addReward(0,20*up.filter(n=>!n).length,0);
       const mats={};items.filter(id=>ITEMS[id].t==='mat').forEach(id=>mats[id]=(mats[id]||0)+1);
       const ml=Object.entries(mats).map(([k,v])=>`${v}× ${ITEMS[k].n}`).join(' · ');{const po=polaDrop(typ==='golden'||T.boss);if(po)pl+=`<b class="x" style="color:#f4f1e8">📸 Polaroid: ${po[1]}</b>`;}const cl=items.filter(id=>ITEMS[id].t==='cloth');if(cl.length)pl+=cl.map(id=>`<b class="x" style="color:${ITEMS[id].rare?'#ffe14d':'#7ff6ff'}">${ITEMS[id].rare?'★ SELTEN: ':'👕 '}${ITEMS[id].n}</b>`).join('');
+      if(T.boss){if(d.boss){turfGet()[T.turf]=1;const rw=TURF[T.turf].req*1500;addReward(rw,300,0);pl+=`<b class="x" style="color:#ffd34d">👑 VIERTEL EROBERT: ${TURF[T.turf].n} · +$${fmt(rw)}</b>`;sfx('cash');}else pl+=`<b class="h">Der Boss lebt noch – ${TURF[T.turf].n} bleibt seins.</b>`;}
       if(typ==='werkstatt'&&Q===2)Q=3; if(typ==='apotheke'&&Q===7)Q=8; if(typ==='golden'&&Q===10)Q=11;
       let rp=0;if(T.fac&&T.fac===FACTION)rp=addRep(FACTION,12);else if(FACTION&&typ===FACT[FACTION].btype)rp=addRep(FACTION,5);
       if(Q===13&&FACTION&&T.fac===FACTION){Q=14;} if(T.story==='bank'&&Q===17){Q=18;if(FACTION)rp+=addRep(FACTION,20);}
