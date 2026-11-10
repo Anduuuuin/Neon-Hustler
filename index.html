@@ -1911,7 +1911,7 @@
   setInterval(regen,10000);
   // ---------- Speichern ----------
   const SKEY='nh_save_v1';let saveT=0;
-  function saveGame(){clearTimeout(saveT);saveT=setTimeout(()=>{if(scene==='start'||scene==='intro')return;
+  function saveGame(){clearTimeout(saveT);saveT=setTimeout(()=>{if(window.__nhWipe||scene==='start'||scene==='intro')return;
     try{localStorage.setItem(SKEY,JSON.stringify(snap()));}catch(e){}},400);}
   function snap(){return {v:1,t:Date.now(),cash,nrg,jobTaken,job,xp,lvl,heat,buff,Q,BAGLV,KNOWN,TARGETS,STASH,LOADOUT,OUTFIT_EQ,FACTION,REP,CREW,CREW_ON,UPG,NMAX,lastRegen,JOB,STAT,DAILY,WEEKLY,LOGIN,ACH,ALBUM,ALBUMC,PRESTIGE,ADS,DAILYCOUP,EMP,GARAGE,CAR,MAT};}
   function hasSave(){try{return !!localStorage.getItem(SKEY);}catch(e){return false;}}
@@ -1921,7 +1921,7 @@
     MAT=d.MAT||{};CREW.splice(0,CREW.length,...(d.CREW||[]));CREW_ON.splice(0,CREW_ON.length,...(d.CREW_ON||[]));TARGETS.splice(0,TARGETS.length,...(d.TARGETS||[]));
     if(d.JOB){JOB=d.JOB;clearInterval(jobTimer);jobTimer=setInterval(renderJob,250);}
     return true;}
-  window.addEventListener('pagehide',()=>{clearTimeout(saveT);if(scene!=='start'&&scene!=='intro')try{localStorage.setItem(SKEY,JSON.stringify(snap()));}catch(e){}});
+  window.addEventListener('pagehide',()=>{clearTimeout(saveT);if(window.__nhWipe)return;if(scene!=='start'&&scene!=='intro')try{localStorage.setItem(SKEY,JSON.stringify(snap()));}catch(e){}});
   function continueGame(){loadGame();regen();wipeTo(()=>{show('hide');enterHideout();
       $('h-phone').classList.toggle('alert',job===0||CALLS.includes(Q));$('h-door').classList.toggle('alert',job===1||job===2);hud();renderJob();
       setTimeout(()=>{roll();if(loginState().can)openMeta('bonus');else toastMsg('WILLKOMMEN ZURÜCK');},900);});}
@@ -2894,7 +2894,7 @@
     upd();$('sInstTxt').style.color='#ffe14d';};
   window.addEventListener('appinstalled',()=>{$('sInstTxt').textContent='Installiert ✔';});
   $('sFull').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){}};
-  let rs=0;$('sReset').onclick=()=>{if(rs){if(window.NH_GAME)NH_GAME.wipe();window.__nhReady=false;location.reload();return;}rs=1;$('sReset').querySelector('b').textContent='Nochmal tippen = alles löschen';setTimeout(()=>{rs=0;$('sReset').querySelector('b').textContent='Neues Spiel';},3000);};
+  let rs=0;$('sReset').onclick=()=>{if(rs){window.__nhWipe=true;if(window.NH_GAME)NH_GAME.wipe();window.__nhReady=false;location.reload();return;}rs=1;$('sReset').querySelector('b').textContent='Nochmal tippen = alles löschen';setTimeout(()=>{rs=0;$('sReset').querySelector('b').textContent='Neues Spiel';},3000);};
   document.querySelectorAll(".tsth button").forEach(b=>b.onclick=()=>{if(window.NH_GAME)NH_GAME.cheat(b.dataset.c);b.style.background='#7dffb2';setTimeout(()=>b.style.background='',300);});
   setInterval(()=>{const m=$('map'),s=$('start'),i=$('intro');const vis=id=>{const x=document.getElementById(id);return x&&x.classList.contains('on');};const sh=document.getElementById('sheet');
     const hide=vis('map')||!!document.getElementById('pixh')||vis('dlg')||vis('inv')||(sh&&sh.classList.contains('open'))||vis('paper')||vis('menu2');$('gear').style.display=hide?'none':'';const tr=$('trophy');if(tr)tr.style.display=(hide||vis('start')||vis('intro'))?'none':'';const em=$('empire');if(em)em.style.display=(hide||vis('start')||vis('intro'))?'none':'';const pb=$('phoneb');if(pb)pb.style.display=(hide||vis('start')||vis('intro'))?'none':'';},400);
