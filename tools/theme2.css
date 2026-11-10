@@ -82,3 +82,5 @@
 
 #hud .pill{white-space:nowrap}#hud .who{min-width:150px!important}
 .skb{border-radius:16px!important;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.2))!important;box-shadow:0 0 16px color-mix(in srgb,var(--c) 25%,transparent)}.skr{border-radius:12px!important;background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.08)}.skr button{border:0!important;border-radius:10px!important;box-shadow:0 3px 0 rgba(0,0,0,.6),0 0 12px var(--c)}.skpts{border-radius:12px!important}
+#sheet .tgt.plan.on{border-color:#7dffb2!important;background:linear-gradient(135deg,rgba(20,90,62,.75),rgba(29,16,48,.8))!important;box-shadow:0 0 14px rgba(125,255,178,.45)!important}
+#sheet .tgt.bcoup{border-color:#b98cff!important;box-shadow:0 0 14px rgba(185,140,255,.4)!important}
