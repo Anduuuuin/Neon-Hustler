@@ -533,6 +533,12 @@
   #sheet .bcst>button{flex:none;width:auto;height:36px;padding:0 12px;font-size:16px}
   #sheet .bcfin{margin-top:8px;border:2px solid #ffd34d;background:linear-gradient(135deg,#3a2400,#1d1030);padding:6px 10px;display:flex;flex-direction:column;text-align:left;font-size:12px;color:#e4dcf5}
   #sheet .bcfin b{font-family:'Bangers',cursive;font-size:19px;font-weight:400;letter-spacing:1px;color:#ffd34d}#sheet .bcfin small{color:#7ff6ff}
+
+  .kart{display:flex;gap:4px;margin-bottom:8px}.kart button{flex:1;height:34px;font-size:13px;background:#1d1030;color:#c9bfe6;border:2px solid #4b3a6e;font-family:'Oswald',sans-serif;font-weight:700}.kart button.on{border-color:#ffe14d;color:#ffe14d}
+  .vitb{background:#1d1030;border:2px solid #4b3a6e;border-radius:8px;padding:6px 8px;margin-bottom:6px}.vith b{font-family:'Bangers',cursive;font-weight:400;font-size:18px;letter-spacing:1px;color:#ffe14d}.vith b span{color:#ffd34d}.vith small{display:block;color:#7ff6ff;font-size:11px}
+  .vitg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:5px}.vitg button{height:auto;padding:4px 2px;background:#0d0618;border:2px solid #4b3a6e;color:#fff;display:flex;flex-direction:column;align-items:center;font-size:11px;box-shadow:none}
+  .vitg button img{width:34px;height:34px;object-fit:contain}.vitg button.ok{border-color:#7dffb2}.vitg button:disabled{opacity:.6}.vitg button:not(:disabled){border-color:#ffe14d}.vitg button small{color:#c9bfe6;font-size:9px;white-space:nowrap;overflow:hidden;max-width:100%}
+  #sheet .tgt.plan.nm{border-color:#ff3d3d}#sheet .tgt.plan.nm.on{background:linear-gradient(135deg,#4a0a0a,#1d1030);box-shadow:3px 3px 0 #ff3d3d}#sheet .tgt.plan.lock b i{color:#ff9f43}
   #sheet .tgt.coup{border-color:#ff9f43;background:linear-gradient(135deg,#3a1400,#1d1030)}
 
   #empire{position:fixed;left:calc(max(10px,env(safe-area-inset-left)) + 104px);bottom:max(12px,env(safe-area-inset-bottom));z-index:60;width:44px;height:44px;border-radius:50%;border:3px solid #000;background:#1d1030;font-size:20px;line-height:1;cursor:pointer;box-shadow:0 0 0 2px #7dffb2,0 0 14px rgba(125,255,178,.5);padding:0;opacity:.9}
@@ -1446,7 +1452,7 @@
   let LOADOUT={weapon:null,tool1:null,tool2:null,q1:null,q2:null,safe:null};
   const SLOTN={weapon:'WAFFE',tool1:'WERKZEUG',tool2:'WERKZEUG',q1:'SCHNELL',q2:'SCHNELL',safe:'SICHER (1×1)'};
   const BAGW=4,BAGH=3; let BAG=[]; // {id,x,y}
-  const ico=id=>`it_${id}.webp`;
+  const ico=id=>`it_${String(id).split('~')[0]}.webp`;
   function slotFits(slot,id){const t=ITEMS[id].t;
     if(slot==='weapon')return t==='weapon'; if(slot.startsWith('tool'))return t==='tool'; if(slot.startsWith('q'))return t==='cons';
     if(slot==='safe')return ITEMS[id].w*ITEMS[id].h===1; return false;}
@@ -1503,7 +1509,7 @@
 
   // ---------- Heist-Zustand ----------
   let H=null;
-  const has=id=>Object.values(LOADOUT).includes(id);
+  const has=id=>Object.values(LOADOUT).some(x=>x&&x.split('~')[0]===id);
   const hasT=t=>Object.values(LOADOUT).some(id=>id&&ITEMS[id].t===t);
   const ROOMS={
     gasse:{n:'HINTERGASSE',img:'h_gasse.webp',spots:[
@@ -1770,7 +1776,7 @@
   function craft(id){const r=RECIPES.find(x=>x.id===id);if(!r)return;
     if(!Object.entries(r.need).every(([k,v])=>cnt(k)>=v))return;
     Object.entries(r.need).forEach(([k,v])=>{if(MATL.includes(k))takeMat(k,v);else for(let i=0;i<v;i++)STASH.splice(STASH.indexOf(k),1);});
-    if(id==='_bag'){BAGLV=Math.min(BAGS.length-1,BAGLV+1);toastMsg('RUCKSACK GRÖSSER!');}else{STASH.push(id);toastMsg(rname(id).toUpperCase()+' GEBAUT');}
+    if(id==='_bag'){BAGLV=Math.min(BAGS.length-1,BAGLV+1);toastMsg('RUCKSACK GRÖSSER!');}else{const q=qRoll(id,1+.25*(UPG.werkbank||0));STASH.push(q);toastMsg(q!==id?'★ '+ITEMS[q].n.toUpperCase()+'!':rname(id).toUpperCase()+' GEBAUT');}
     sfx('click');addReward(0,8,0);track('crafted');
     if(hasSet('werkzeug')&&id!=='_bag'&&Math.random()<.25){STASH.push(id);setTimeout(()=>toastMsg('GLÜCK: DOPPELT GEBAUT!'),900);}
     if(Q===4){Q=5;}
@@ -1948,7 +1954,7 @@
     klamotten:{n:'Kleiderschrank',ids:Object.keys(CLOTH),bonus:'+1 auf alle Werte'}};
   const hasSet=k=>ALBUMC.includes(k);
   const deeRate=()=>(hasSet('schmuck')?.7:.6)+PRESTIGE*.05;
-  const xpMul=()=>1+PRESTIGE*.15;
+  const xpMul=()=>1+PRESTIGE*.15+(EMP.vit?.04*vitT('kunst'):0);
   function albumScan(){let ch=false;[...STASH,...Object.values(LOADOUT),...Object.values(OUTFIT_EQ)].forEach(id=>{if(id&&ITEMS[id]&&!ALBUM.includes(id)){ALBUM.push(id);ch=true;}});if(ch)metaBadge();}
   // ---------- Belohnungen ----------
   const MATS=['metall','kabel','klebeband','chemie','platine','pillen'];
@@ -2030,7 +2036,7 @@
   function openMeta(t){if(t)metaTab=t;$('metaov').classList.add('on');renderMeta();}
   function closeMeta(){$('metaov').classList.remove('on');saveGame();}
   function renderMeta(){roll();const P=$('metap');if(!P)return;
-    const tabs=[['daily','Aufgaben'],['skill','Skills'],['season','Saison'],['ach','Erfolge'],['album','Album'],['pola','Fotos'],['bonus','Bonus'],['stats','Profil']];
+    const tabs=[['daily','Aufgaben'],['skill','Skills'],['kar','Karriere'],['season','Saison'],['ach','Erfolge'],['album','Album'],['pola','Fotos'],['bonus','Bonus'],['stats','Profil']];
     let body='';
     if(metaTab==='daily'){const sec=(title,box,pool,sub,stat)=>`<div class="mh">${title}<small>${sub}</small></div>`+box.ids.map(k=>{const M=pool.find(m=>m.k===k);const p=prog(M,box,k),done=p>=M.g,cl=box.cl.includes(k);
         return `<div class="mrow ${cl?'cl':''}"><div><b>${M.t}</b><div class="pb"><i style="width:${p/M.g*100}%"></i></div><small>${fmt(p)}/${fmt(M.g)} · ${rtxt(M.r)}</small></div>${cl?'<span>✔</span>':`<button type="button" ${done?'':'disabled'} data-mc="${stat}:${k}">HOLEN</button>`}</div>`;}).join('');
@@ -2607,7 +2613,7 @@
   function gearGet(){if(!EMP.gear)EMP.gear={};return EMP.gear;}
   const gearLv=id=>gearGet()[id]||0;
   function gearCost(id,l){const v=Math.max(40,(ITEMS[id]&&ITEMS[id].v)||40);return {cash:Math.round(v*2.5*Math.pow(l+1,1.7)),need:l<2?{metall:3+l*2}:l<3?{metall:6,kabel:4}:{metall:8,platine:4}};}
-  const gearOwned=id=>STASH.includes(id)||Object.values(LOADOUT).includes(id);
+  const gearOwned=id=>STASH.some(x=>x.split('~')[0]===id)||Object.values(LOADOUT).some(x=>x&&x.split('~')[0]===id);
   function gearHTML(){const ids=Object.keys(GEARUP).filter(id=>ITEMS[id]&&(gearOwned(id)||gearLv(id)));
     if(!ids.length)return `<div class="rcp lock"><span class="ri">⬆</span><div><b>Ausrüstung aufwerten</b><small>Sobald du Waffen oder Werkzeug besitzt, kannst du sie hier verbessern.</small></div></div>`;
     return `<div class="gearh">⬆ AUSRÜSTUNG AUFWERTEN<small>Gilt für alle Teile dieser Sorte – auch für neu gebaute</small></div>`+ids.map(id=>{const l=gearLv(id),T=GTIER[l];
@@ -2635,26 +2641,30 @@
     {id:'kanal',i:'🕳️',n:'Kanal',d:'Der Gullydeckel ist schon offen – leiser Ausgang ohne Brecheisen.',c:140}];
   const PALARM={werkstatt:[0,0,1],lagerhalle:[0,1,1],viertel:[0,0,0]};
   const planKey=T=>T?(T.kind||'gen')+':'+(T.seed||T.name):'';
-  const planCost=(p,T)=>Math.round(p.c*(.6+.4*(T.diff||1))*(1+lvl*.08)/10)*10;
+  const planCost=(p,T)=>Math.round(p.c*(.6+.4*(T.diff||1))*(1+lvl*.08)*(1-.08*vitT('nacht'))*(masLv(T.type)>=3?.8:1)/10)*10;
   function planOk(p,T){if(p.id==='code')return T.kind!=='golden'&&!!(PALARM[T.type]||[1,1,1])[Math.max(0,Math.min(2,(T.diff||1)-1))];
     if(p.id==='kanal')return T.kind!=='golden';return true;}
-  let PLSEL={k:'',ids:[],paid:[]};const PLMAX=3;
-  function planFor(T){const o={};if(PLSEL.k===planKey(T)){PLSEL.paid.forEach(id=>o[id]=1);PLSEL={k:'',ids:[],paid:[]};}
+  let PLSEL={k:'',ids:[],paid:[]};const PLV={grundriss:3,ablenk:4,kanal:5,code:6,strom:8,insider:10};const plMax=()=>lvl>=12?3:lvl>=7?2:1;
+  function planFor(T){const o={};if(PLSEL.k===planKey(T)){PLSEL.paid.forEach(id=>o[id]=1);if(PLSEL.nm){o.nm=1;o.big=1;}PLSEL={k:'',ids:[],paid:[]};}
+    if(T.type&&T.kind!=='base'&&masLv(T.type)>=5)o.more=1;
     if(T.bfin){const c=bcGet();if(c.st[0])o.safecode=1;if(c.st[1])o.strom=1;if(c.st[2]){o.nochase=1;o.insider=1;}o.big=1;}
     return Object.keys(o).length?o:null;}
   function planHTML(){const T=PEND;const tot=PLSEL.ids.filter(id=>!PLSEL.paid.includes(id)).reduce((s,id)=>s+planCost(PLANS.find(p=>p.id===id),T),0);
-    const rows=PLANS.filter(p=>planOk(p,T)).map(p=>{const on=PLSEL.ids.includes(p.id),paid=PLSEL.paid.includes(p.id);
+    const nmOk=T.kind!=='golden'&&masLv(T.type)>=10&&!T.bfin;
+    const rows=(nmOk?`<button type="button" class="tgt plan nm ${PLSEL.nm?'on':''}" data-a="plnm"><b>☠ Albtraum-Modus<i>${PLSEL.nm?'AN':'AUS'}</i></b><span>Härtere, bewaffnete Wachen, Polizei schneller da – dafür doppelte Beute, XP ×2 und dreifache Meisterschaft.</span></button>`:'')+PLANS.filter(p=>planOk(p,T)).map(p=>{const on=PLSEL.ids.includes(p.id),paid=PLSEL.paid.includes(p.id);
+      if(lvl<PLV[p.id])return `<div class="tgt plan lock"><b>🔒 ${p.n}<i>ab Stufe ${PLV[p.id]}</i></b><span>${p.d}</span></div>`;
       return `<button type="button" class="tgt plan ${on?'on':''}" data-a="pltog" data-id="${p.id}"><b>${p.i} ${p.n}<i>${paid?'BEZAHLT':'$'+fmt(planCost(p,T))}</i></b><span>${p.d}</span></button>`;}).join('');
-    return `<h2>Planung</h2><p class="qline"><b style="color:#ffe14d">${T.name}</b> – Sal kennt Leute. Bis zu ${PLMAX} Vorbereitungen, bezahlt wird sofort.</p><div class="tlist">${rows}</div>
-      <div class="plsum"><span>${PLSEL.ids.length}/${PLMAX} gewählt</span><b>${tot?'Kosten: $'+fmt(tot):'Keine Kosten'}</b><span>Du hast $${fmt(cash)}</span></div>
+    return `<h2>Planung</h2><p class="qline"><b style="color:#ffe14d">${T.name}</b> – Sal kennt Leute. Bis zu ${plMax()} Vorbereitungen, bezahlt wird sofort.${plMax()<3?' Mehr Plätze ab Stufe '+(plMax()<2?7:12)+'.':''}</p><div class="tlist">${rows}</div>
+      <div class="plsum"><span>${PLSEL.ids.length}/${plMax()} gewählt</span><b>${tot?'Kosten: $'+fmt(tot):'Keine Kosten'}</b><span>Du hast $${fmt(cash)}</span></div>
       ${btns(PLSEL.ids.length?(tot?'Bezahlen':'Weiter'):'Ohne Plan rein','plgo')}`;}
   function openPlan(){const k=planKey(PEND);if(PLSEL.k!==k)PLSEL={k,ids:[],paid:[]};open(planHTML());}
   acts.pltog=a=>{const id=a.dataset.id;if(PLSEL.paid.includes(id)){toastMsg('SCHON BEZAHLT');return;}const i=PLSEL.ids.indexOf(id);
-    if(i>=0)PLSEL.ids.splice(i,1);else{if(PLSEL.ids.length>=PLMAX){toastMsg('MAXIMAL '+PLMAX+' VORBEREITUNGEN');return;}PLSEL.ids.push(id);}sfx('tick');open(planHTML());};
+    if(i>=0)PLSEL.ids.splice(i,1);else{if(PLSEL.ids.length>=plMax()){toastMsg(plMax()<3?'MEHR PLÄTZE AB STUFE '+(plMax()<2?7:12):'MAXIMAL 3 VORBEREITUNGEN');return;}PLSEL.ids.push(id);}sfx('tick');open(planHTML());};
+  acts.plnm=()=>{PLSEL.nm=!PLSEL.nm;sfx('stamp');open(planHTML());};
   acts.plgo=()=>{const T=PEND;const todo=PLSEL.ids.filter(id=>!PLSEL.paid.includes(id));const tot=todo.reduce((s,id)=>s+planCost(PLANS.find(p=>p.id===id),T),0);
     if(cash<tot){toastMsg('ZU WENIG GELD');return;}if(tot){addReward(-tot,0,0);sfx('cash');track('plans',todo.length);}PLSEL.paid.push(...todo);close();invOpen0('heist');};
   const invOpen0=invOpen;
-  invOpen=function(mode){if(mode==='heist'&&PEND&&PEND.kind!=='base'&&!PEND.practice){openPlan();return;}invOpen0(mode);};
+  invOpen=function(mode){if(mode==='heist'&&PEND&&PEND.kind!=='base'&&!PEND.practice&&lvl>=3){openPlan();return;}invOpen0(mode);};
 
   // ---------- Der große Coup (mehrstufig, wöchentlich) ----------
   const BCOUPS=[
@@ -2672,7 +2682,7 @@
   function bcGet(){const w=wkey();if(!EMP.bc||EMP.bc.w!==w){const R=srand('bc'+w);const av=BCOUPS.filter(c=>TINFO[c.t]&&lvl>=TINFO[c.t].req);const c=av[Math.floor(R()*av.length)]||BCOUPS[4];
       EMP.bc={w,id:BCOUPS.indexOf(c),st:[0,0,0],done:0,seed:1+Math.floor(R()*1e9)};}return EMP.bc;}
   const bcCash=()=>3000+lvl*600;
-  function bcCard(){if(Q<3)return '';const c=bcGet(),C=BCOUPS[c.id],n=c.st.filter(Boolean).length;
+  function bcCard(){if(Q<3)return '';if(lvl<5)return `<div class="tgt lock"><b>🔒 DER GROSSE COUP</b><span>Mehrstufiger Wochen-Coup mit Finale.</span><small>ab Stufe 5</small></div>`;const c=bcGet(),C=BCOUPS[c.id],n=c.st.filter(Boolean).length;
     return `<button type="button" class="tgt bcoup ${c.done?'lock':''}" data-a="bigcoup"><b>💎 DER GROSSE COUP: ${C.n.toUpperCase()}</b><span>${TINFO[C.t].n} · ★★★ · 3 Vorbereitungen + Finale</span><small>${c.done?'Diese Woche erledigt – Montag kommt der nächste':'Vorbereitung '+n+'/3 · Beute ×2 · $'+fmt(bcCash())+' Bonus'}</small></button>`;}
   function bcHTML(){const c=bcGet(),C=BCOUPS[c.id];const n=c.st.filter(Boolean).length;
     const steps=BSTEP.map((s,i)=>{const d=i===2?(bcCar()?'Klau im <b>Viertel</b> einen Wagen und fahr damit weg.':'Schalte <b>2 Wachen</b> aus und entkomme.'):s.d;
@@ -2698,6 +2708,54 @@
     const ok=i===0?(d.bag||[]).includes('coupakte'):i===1?(d.alarm||0)<100:(T.type==='viertel'?!!d.stolen:(d.ko||0)>=2);
     if(ok){c.st[i]=1;return `<b class="x" style="color:#ffd34d">💎 Vorbereitung „${BSTEP[i].n}“ erledigt – ${BSTEP[i].b}</b>`;}
     return `<b class="h">Coup-Ziel verfehlt: ${i===0?'Akte nicht dabei':i===1?'Die Polizei wurde gerufen':T.type==='viertel'?'Kein Wagen geklaut':'Keine 2 Wachen ausgeschaltet'} – versuch’s nochmal.</b>`;}
+
+  // ---------- Karriere: Freischaltungen, Meisterschaft, Vitrine, Qualität ----------
+  const UNL=[[2,'🎯','Meisterschaft','Jeder Zieltyp hat eigene Stufen und Vorteile.'],[3,'🗺️','Heist-Planung','Erste Vorbereitung: Grundriss (1 Platz).'],[4,'🚨','Planung: Ablenkung',''],[4,'🖼️','Vitrine','Beute ausstellen für dauerhafte Boni.'],
+    [5,'💎','Der große Coup','Wochen-Coup mit 3 Vorbereitungen und Finale.'],[5,'🕳️','Planung: Kanal',''],[6,'◆','Qualitätsstufen','Gebaute und gefundene Ausrüstung kann besser ausfallen.'],[6,'🔢','Planung: Alarm-Code',''],
+    [7,'➕','2. Planungs-Platz',''],[8,'⚡','Planung: Stromausfall',''],[10,'🤝','Planung: Insider',''],[12,'➕','3. Planungs-Platz','']];
+  {const _ar=addReward;addReward=function(m,x,h){const l0=lvl;_ar(m,x,h);if(lvl>l0&&window.__nhReady){UNL.filter(u=>u[0]>l0&&u[0]<=lvl).forEach((u,i)=>setTimeout(()=>{sfx('stamp');toastMsg('NEU: '+u[2].toUpperCase());},2300*(i+1)));}};}
+  // Meisterschaft
+  const MASP=[[1,'+4 % XP je Stufe bei diesem Ziel'],[3,'Planung 20 % billiger'],[5,'+1 Beutestück in jeder Kiste'],[7,'1 Energie weniger'],[10,'☠ Albtraum-Modus wählbar']];
+  const masNeed=l=>Math.round(50*Math.pow(l,1.55));
+  function masGet(){if(!EMP.mas)EMP.mas={};return EMP.mas;}
+  function masInfo(t){let x=masGet()[t]||0,l=0;while(l<10&&x>=masNeed(l+1)){x-=masNeed(l+1);l++;}return{l,x,n:l<10?masNeed(l+1):0};}
+  const masLv=t=>lvl>=2&&t?masInfo(t).l:0;
+  function masEnd(T,d,xpG){const t=T.kind==='golden'?'golden':T.type;if(lvl<2||!t||T.kind==='base'||!TINFO[t])return '';const nm=!!(T.plan&&T.plan.nm);
+    const l0=masInfo(t).l;const g=(20+10*(T.diff||1)+((d.alarm||0)<60?10:0))*(nm?3:1);masGet()[t]=(masGet()[t]||0)+g;const l1=masInfo(t).l;
+    let o='';const bx=Math.round(xpG*(.04*l0+(nm?1:0)));if(bx>0){addReward(0,bx,0);o+=`<b class="x">+${bx} XP ${nm?'Albtraum & ':''}Meisterschaft</b>`;}
+    o+=`<b style="color:#7ff6ff">🎯 ${TINFO[t].n}: +${g} Meisterschaft</b>`;
+    if(l1>l0){const pk=MASP.find(p=>p[0]===l1);o+=`<b class="x" style="color:#ffd34d">🎯 ${TINFO[t].n} MEISTER-STUFE ${l1}${pk?' – '+pk[1]:''}</b>`;track('mastery',l1-l0);}return o;}
+  {const _mk=mkTarget;mkTarget=function(type){const T=_mk(type);if(masLv(type)>=7)T.e=Math.max(1,T.e-1);return T;};}
+  // Vitrine
+  const VIT=[{k:'schmuck',i:'💍',n:'Schmuckkästchen',ids:['ring','goldkette','collier','uhr'],b:'Hehler zahlen +3 % je Stufe'},
+    {k:'kunst',i:'🖼️',n:'Kunstkammer',ids:['gemaelde','diamant','gold'],b:'+4 % XP auf alles je Stufe'},
+    {k:'nacht',i:'🎰',n:'Nachtleben',ids:['chips','zigarren','aktenkoffer','elektronik'],b:'Planung 8 % billiger je Stufe'}];
+  const VITN=[1,4,10];
+  function vitGet(){if(!EMP.vit)EMP.vit={};return EMP.vit;}
+  function vitT(k){if(lvl<4)return 0;const V=VIT.find(v=>v.k===k),g=vitGet();let t=0;while(t<3&&V.ids.every(id=>(g[id]||0)>=VITN[t]))t++;return t;}
+  // Qualität
+  const QN=[null,['Gut','#7dffb2'],['Meisterstück','#b98cff'],['Unikat','#ffd34d']];
+  const qb=id=>String(id).split('~')[0],qv=id=>+(String(id).split('~')[1]||0);
+  Object.keys(GEARUP).forEach(id=>{const B=ITEMS[id];if(!B)return;for(let q=1;q<=3;q++)ITEMS[id+'~'+q]=Object.assign({},B,{n:B.n+' '+'◆'.repeat(q),v:Math.round(B.v*(1+q*.8)),q,d:`${QN[q][0]}: wirkt im Einsatz wie +${q} Aufwertungsstufe${q>1?'n':''}. ${B.d||''}`});});
+  function qRoll(id,f){if(lvl<6||!GEARUP[id]||!ITEMS[id+'~1'])return id;const r=Math.random()/(f||1);const q=r<.012?3:r<.06?2:r<.2?1:0;if(q)track('quality');if(q===3)track('unikat');return q?id+'~'+q:id;}
+  function loBase(){const o={};Object.keys(LOADOUT).forEach(k=>o[k]=LOADOUT[k]?qb(LOADOUT[k]):null);return o;}
+  function gearQ(){const g=Object.assign({},EMP.gear||{});Object.values(LOADOUT).forEach(id=>{if(id&&qv(id))g[qb(id)]=(g[qb(id)]||0)+qv(id);});return g;}
+  // Karriere-Tab
+  let karTab='mas',karMsg='';
+  function karHTML(){const tb=[['mas','🎯 Meister'],['vit','🖼️ Vitrine'],['weg','🔓 Aufstieg']].map(([k,n])=>`<button type="button" class="${karTab===k?'on':''}" data-kt="${k}">${n}</button>`).join('');let b='';
+    if(karTab==='mas'){if(lvl<2)b='<div class="mrow"><div><b>🔒 Meisterschaft</b><small>ab Stufe 2</small></div></div>';else b=`<div class="mh">MEISTERSCHAFT<small>Jeder Einbruch zählt für seinen Zieltyp</small></div>`+Object.keys(TINFO).map(t=>{const m=masInfo(t);const nx=MASP.find(p=>p[0]>m.l);
+        return `<div class="mrow"><div><b>${TINFO[t].n} <span style="color:#7ff6ff">· Stufe ${m.l}${m.l>=10?' MAX':''}</span></b><div class="pb"><i style="width:${m.n?m.x/m.n*100:100}%"></i></div><small>${m.n?m.x+'/'+m.n:'Meister'}${nx?' · Stufe '+nx[0]+': '+nx[1]:''}</small></div></div>`;}).join('')+`<div class="mh">VORTEILE<small></small></div>`+MASP.map(p=>`<div class="mrow"><div><b>Stufe ${p[0]}</b><small>${p[1]}</small></div></div>`).join('');}
+    if(karTab==='vit'){if(lvl<4)b='<div class="mrow"><div><b>🔒 Vitrine</b><small>ab Stufe 4 – Beute ausstellen für dauerhafte Boni</small></div></div>';else{const g=vitGet();b=`<div class="mh">VITRINE<small>Ausgestellte Beute bleibt für immer dort</small></div>${karMsg?`<div class="mrow cl"><div><b>${karMsg}</b></div></div>`:''}`+VIT.map(V=>{const t=vitT(V.k);
+        return `<div class="vitb"><div class="vith"><b>${V.i} ${V.n} <span>${'★'.repeat(t)}${'☆'.repeat(3-t)}</span></b><small>${V.b}${t<3?' · nächste Stufe: je '+VITN[t]+' Stück':' · voll'}</small></div><div class="vitg">`+V.ids.map(id=>{const h=g[id]||0,own=STASH.filter(x=>x===id).length,need=t<3?VITN[t]:VITN[2];
+          return `<button type="button" class="${h>=need?'ok':''}" data-vit="${id}" ${own&&t<3&&h<VITN[2]?'':'disabled'}><img src="${ico(id)}" alt=""><b>${Math.min(h,need)}/${need}</b><small>${own?'+'+own+' im Spind':ITEMS[id].n}</small></button>`;}).join('')+`</div></div>`;}).join('');}}
+    if(karTab==='weg'){b=`<div class="mh">AUFSTIEG<small>Du bist Stufe ${lvl}</small></div>`+UNL.map(u=>`<div class="mrow ${lvl>=u[0]?'cl':''}"><div><b>${lvl>=u[0]?'✔':'🔒'} ${u[1]} ${u[2]}</b><small>Stufe ${u[0]}${u[3]?' · '+u[3]:''}</small></div></div>`).join('');}
+    return `<div class="kart">${tb}</div>${b}`;}
+  function karBind(P){P.querySelectorAll('[data-kt]').forEach(x=>x.onclick=()=>{karTab=x.dataset.kt;karMsg='';renderMeta();});
+    P.querySelectorAll('[data-vit]').forEach(x=>x.onclick=()=>{const id=x.dataset.vit,g=vitGet();const V=VIT.find(v=>v.ids.includes(id)),t0=vitT(V.k);let n=0;while(STASH.includes(id)&&(g[id]||0)<VITN[2]&&(g[id]||0)<VITN[Math.min(2,t0)]){STASH.splice(STASH.indexOf(id),1);g[id]=(g[id]||0)+1;n++;}
+      if(!n)return;sfx('stamp');track('vitrine',n);const t1=vitT(V.k);karMsg=t1>t0?`${V.n} Stufe ${t1}: ${V.b}`:`${n}× ${ITEMS[id].n} ausgestellt`;if(t1>t0){sfx('cash');addReward(0,60*t1,0);}saveGame();renderMeta();});}
+  {const _mx2=metaExtra,_mb2=metaExtraBind;metaExtra=function(t){return t==='kar'?karHTML():_mx2(t);};metaExtraBind=function(P){_mb2(P);karBind(P);};}
+  ACHS.push(AC('mas5','Meister-Stufe 5 bei einem Ziel',()=>Object.keys(TINFO).some(t=>masInfo(t).l>=5),{cash:4000}),AC('mas10','Meister-Stufe 10 bei einem Ziel',()=>Object.keys(TINFO).some(t=>masInfo(t).l>=10),{cash:20000}),
+    AC('vit1','Eine Vitrine auf Stufe 1',()=>VIT.some(V=>vitT(V.k)>=1),{cash:2000}),AC('vit3','Eine Vitrine voll',()=>VIT.some(V=>vitT(V.k)>=3),{cash:15000}),AC('unikat','Ein Unikat besitzen',()=>(STAT.unikat||0)>=1,{cash:8000}));
   window.__continue=continueGame;window.__nhReady=true;roll();
   if(hasSave()){try{const d=JSON.parse(localStorage.getItem(SKEY));$('tap').innerHTML='TIPPEN ZUM WEITERSPIELEN<br><small style="font-size:.55em">Spielstand: Stufe '+d.lvl+'</small>';}catch(e){}}
   // ---------- Pixel-Einsatz (iframe) ----------
@@ -2713,7 +2771,7 @@
   window.addEventListener('message',e=>{
     const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
     const T=JSON.parse(f.dataset.t||'{}');
-    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{gear:EMP.gear||{},plan:T.plan||null,obj:T.obj||null,boss:T.boss,bossName:T.bossName,tod:(()=>{const h=new Date().getHours();return h>=6&&h<19?'day':'night';})(),rain:Math.random()<.25,crew:CREW_ON.slice(),base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
+    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:loBase(),cfg:{gear:gearQ(),plan:T.plan||null,obj:T.obj||null,boss:T.boss,bossName:T.bossName,tod:(()=>{const h=new Date().getHours();return h>=6&&h<19?'day':'night';})(),rain:Math.random()<.25,crew:CREW_ON.slice(),base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
     if(d.type==='sfx'){if(window.NHA)NHA.sfx(d.n);return;}
     if(d.type==='mood'){if(window.NHA)NHA.mood(d.m);return;}
     if(d.type!=='heistEnd')return;
@@ -2725,8 +2783,8 @@
     if(d.res==='escape'){
       const bag=(d.bag||[]).filter(known); const plans=bag.filter(id=>id==='bauplan').length; const items=bag.filter(id=>id!=='bauplan');
       const val=items.reduce((s,id)=>s+(ITEMS[id].t==='mat'||ITEMS[id].t==='cloth'?0:ITEMS[id].v),0);
-      items.forEach(id=>STASH.push(id));
-      Object.values(d.lo||{}).forEach(id=>{if(id&&known(id))STASH.push(id);});
+      items.forEach(id=>STASH.push(qRoll(id,1.5)));
+      Object.entries(d.lo||{}).forEach(([k,id])=>{if(id&&known(id)){const o=LOADOUT[k];STASH.push(o&&qb(o)===id?o:id);}});
       Object.keys(LOADOUT).forEach(k=>LOADOUT[k]=null);
       track('heists');track('searched',d.searched||0);track('ko',d.ko||0);if((d.alarm||0)<60)track('clean');track('loot',val);
       let xpG=(XPB[typ]||40)+Math.min(80,Math.round(val/60));if(hasSet('luxus'))xpG=Math.round(xpG*1.1);if(T.coup){xpG=Math.round(xpG*1.5);cash+=300;DAILYCOUP=T.coup;}
@@ -2744,7 +2802,7 @@
       else if(T.raid&&window.NH_ONLINE){NH_ONLINE.raidFinish(T.raid,true).then(l=>{if(l>0){addReward(l,0,0);setTimeout(()=>toastMsg('TRESOR GEKNACKT: +$'+fmt(l)),1500);}else if(l===0)setTimeout(()=>toastMsg('TRESOR WAR LEER'),1500);});}
       if(FACTION&&window.NH_ONLINE)NH_ONLINE.factionPoints(Math.min(500,10+Math.round(val/100)+(typ==='bank'?150:0)));
       if(d.stolen&&VEHS[d.stolen]){track('stolen');if(GARAGE.includes(d.stolen)){const pv=Math.round(VEHS[d.stolen].v*.4);cash+=pv;pl+=`<b>🚗 ${VEHS[d.stolen].n} an Mags verkauft: +$${fmt(pv)}</b>`;}else{GARAGE.push(d.stolen);pl+=`<b class="x">🚗 Neu in der Garage: ${VEHS[d.stolen].n}</b>`;}}
-      pl+=bcEnd(T,d);
+      pl+=bcEnd(T,d)+masEnd(T,d,xpG);
       html=`<div class="rbig">ENTKOMMEN!</div>${T.name}: erledigt.<div class="reward"><b>Beute $${val}</b><b class="x">+ ${xpG} XP</b>${d.heat?`<b class="h">+${d.heat} Heat</b>`:''}${pl}</div>${ml?`<div class="dsub">Material ins Lager: ${ml}</div>`:''}${T.coup?'<div class="dsub">Coup des Tages: XP ×1,5 und $300 Bonus!</div>':''}${spindFull()?'<div class="dsub" style="color:#ff6f6f">⚠ Dein Spind ist übervoll – verkauf Beute oder bau ihn aus, bevor du wieder losziehst.</div>':''}<div class="dsub">Alles liegt im Spind. Beute verkaufst du bei Dee, Material verbaust du an der Werkbank.</div>`;
     } else {
       const lost=Object.values(LOADOUT).filter(x=>x).length; const safe=LOADOUT.safe;
@@ -2770,7 +2828,7 @@
   // Dee kauft Beute
   // ---------- Verkaufen mit Auswahl ----------
   let SELL={rate:.6,who:'dee',sel:{},after:null};
-  function openSell(rate,who,after){rate=Math.min(1,rate*(1+.04*skv('haendler')));SELL={rate,who,sel:{},after,dirty:Object.values(EMP.biz).some(x=>x.lv)};const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))];ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);
+  function openSell(rate,who,after){rate=Math.min(1,rate*(1+.04*skv('haendler'))*(1+.03*vitT('schmuck')));SELL={rate,who,sel:{},after,dirty:Object.values(EMP.biz).some(x=>x.lv)};const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))];ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);
     if(!ids.length){toastMsg('KEINE BEUTE IM SPIND');if(after)after(0);return;}$('sellov').classList.add('on');renderSell();}
   function renderSell(){const P=$('sellp');const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))].sort((a,b)=>ITEMS[b].v-ITEMS[a].v);
     const R=SELL.dirty?Math.min(1,SELL.rate*1.4):SELL.rate;const tot=ids.reduce((s,id)=>s+Math.round(ITEMS[id].v*R)*(SELL.sel[id]||0),0);
