@@ -1748,7 +1748,7 @@
       const need=Object.entries(r.need).map(([k,v])=>`<i class="${cnt(k)>=v?'y':'n'}"><img src="${ico(k)}" alt="">${cnt(k)}/${v}</i>`).join('');
       const sub=r.id==='_bag'?(maxed?'Maximal ausgebaut':`${BAGS[BAGLV][0]}×${BAGS[BAGLV][1]} → ${BAGS[BAGLV+1][0]}×${BAGS[BAGLV+1][1]}`):(ITEMS[r.id].d||'');
       return `<div class="rcp"><img class="ri" src="${ico(r.id==='_bag'?'tasche':r.id)}" alt=""><div><b>${rname(r.id)}</b><small>${sub}</small><div class="need">${need}</div></div><button type="button" class="ok mk" data-a="craft" data-r="${r.id}" ${ok?'':'disabled'}>BAUEN</button></div>`;}).join('');
-    return `<span class="tag">STUFE ${UPG.werkbank+1}</span><h2>Werkbank</h2><p class="qline">Material bringst du von Einbrüchen mit. Fertiges landet im Spind.</p><div class="rlist">${rows}</div>
+    return `<span class="tag">STUFE ${UPG.werkbank+1}</span><h2>Werkbank</h2><p class="qline">Material bringst du von Einbrüchen mit. Fertiges landet im Spind.</p><div class="rlist">${rows}${gearHTML()}</div>
       <div class="row"><button type="button" class="no" data-a="close">Zurück</button>${UPG.werkbank<1?'<button type="button" class="ok" data-a="benchup">Ausbau $600</button>':''}</div>`;
   }
   function craft(id){const r=RECIPES.find(x=>x.id===id);if(!r)return;
@@ -2014,7 +2014,7 @@
   function openMeta(t){if(t)metaTab=t;$('metaov').classList.add('on');renderMeta();}
   function closeMeta(){$('metaov').classList.remove('on');saveGame();}
   function renderMeta(){roll();const P=$('metap');if(!P)return;
-    const tabs=[['daily','Aufgaben'],['season','Saison'],['ach','Erfolge'],['album','Album'],['pola','Fotos'],['bonus','Bonus'],['stats','Profil']];
+    const tabs=[['daily','Aufgaben'],['skill','Skills'],['season','Saison'],['ach','Erfolge'],['album','Album'],['pola','Fotos'],['bonus','Bonus'],['stats','Profil']];
     let body='';
     if(metaTab==='daily'){const sec=(title,box,pool,sub,stat)=>`<div class="mh">${title}<small>${sub}</small></div>`+box.ids.map(k=>{const M=pool.find(m=>m.k===k);const p=prog(M,box,k),done=p>=M.g,cl=box.cl.includes(k);
         return `<div class="mrow ${cl?'cl':''}"><div><b>${M.t}</b><div class="pb"><i style="width:${p/M.g*100}%"></i></div><small>${fmt(p)}/${fmt(M.g)} · ${rtxt(M.r)}</small></div>${cl?'<span>✔</span>':`<button type="button" ${done?'':'disabled'} data-mc="${stat}:${k}">HOLEN</button>`}</div>`;}).join('');
@@ -2547,6 +2547,67 @@
     .pola span{display:block;font-family:'Permanent Marker',cursive;color:#222;font-size:10px;line-height:1.1;padding:3px 1px 5px;min-height:24px}.pola.no{background:#2a1f3a}.pola.no i{display:flex;aspect-ratio:1;align-items:center;justify-content:center;font-style:normal;font-size:28px;color:#4b3a6e;background:#160d22}.pola.no span{color:#6b5a8e}`;document.head.appendChild(st9);
   function metaExtra(t){if(t==='pola')return polaHTML();if(t==='season'&&window.seasonHTML)return seasonHTML();return '';}
   function metaExtraBind(P){P.querySelectorAll('[data-polad]').forEach(b=>b.onclick=()=>{EMP.polaDone=1;cash+=25000;sfx('cash');hud();toastMsg('ALBUM KOMPLETT: +$25.000');renderMeta();});if(window.seasonBind)seasonBind(P);}
+  // ================= FÄHIGKEITEN =================
+  const SKB={stealth:{n:'SCHLEICHER',ic:'🥷',c:'#2fe0ea'},brawl:{n:'SCHLÄGER',ic:'👊',c:'#ff3d6e'},tech:{n:'TECHNIKER',ic:'🛠',c:'#ffe14d'}};
+  const SKL={
+    leise:['stealth','Leise Sohlen','👟','Deine Geräusche tragen 15 % weniger weit',3,0],
+    finger:['stealth','Flinke Finger','🖐','Durchsuchen geht 12 % schneller',3,0],
+    schatten:['stealth','Im Schatten','🌑','Wachen sehen 7 % weniger weit',3,2],
+    dietrich:['stealth','Meisterdieb','🗝','Größeres Feld beim Schlossknacken',3,4],
+    geist:['stealth','Geist','👻','Wachen werden 15 % langsamer misstrauisch',3,6],
+    hart:['brawl','Harter Hund','❤️','+15 Gesundheit im Einsatz',3,0],
+    wucht:['brawl','Wucht','💥','+8 % Trefferchance im Nahkampf',3,0],
+    sprint:['brawl','Sprinter','🏃','5 % schneller unterwegs',3,2],
+    schuetze:['brawl','Scharfschütze','🎯','+12 % Schaden mit Schusswaffen',3,4],
+    adrenalin:['brawl','Adrenalin','⚡','Unter 35 Gesundheit 15 % weniger Schaden',3,6],
+    zeit:['tech','Zeitplan','⏱','+30 Sekunden Einsatzzeit',3,0],
+    haendler:['tech','Händler','🤝','Hehler zahlen 4 % mehr',3,0],
+    hacker:['tech','Hacker','📹','Kameras erkennen dich 20 % langsamer',3,2],
+    funk:['tech','Polizeifunk','📻','Polizei braucht 6 Sekunden länger',3,4],
+    fahrer:['tech','Fluchtfahrer','🚗','+1 Leben in der Verfolgungsjagd',2,6]};
+  function skGet(){if(!EMP.sk)EMP.sk={};return EMP.sk;}
+  const skv=k=>skGet()[k]||0;
+  const skSpent=b=>Object.entries(skGet()).reduce((a,[k,v])=>a+(SKL[k]&&(!b||SKL[k][0]===b)?v:0),0);
+  const skPoints=()=>Math.max(0,lvl-1-skSpent());
+  let skMsg='';
+  function skillHTML(){const pts=skPoints();
+    return `<div class="mh">FÄHIGKEITEN<small>1 Punkt pro Stufe · spätere Fähigkeiten brauchen Punkte im selben Weg</small></div>
+      <div class="skpts ${pts?'has':''}">${pts?`<b>${pts}</b> ${pts===1?'Punkt':'Punkte'} frei`:'Keine Punkte frei – steig auf für mehr'}</div>${skMsg?`<div class="bzmsg">${skMsg}</div>`:''}
+      ${Object.entries(SKB).map(([b,B])=>`<div class="skb" style="--c:${B.c}"><div class="skh"><span>${B.ic}</span><b>${B.n}</b><small>${skSpent(b)} Punkte</small></div>
+        ${Object.entries(SKL).filter(([,s])=>s[0]===b).map(([k,s])=>{const r=skv(k),lock=skSpent(b)<s[5],max=r>=s[4];
+          return `<div class="skr ${lock?'lock':''} ${max?'max':''}"><span class="ski">${s[2]}</span><div><b>${s[1]}</b><small>${lock?`Braucht ${s[5]} Punkte in ${B.n}`:s[3]+' je Rang'}</small><div class="skd">${Array.from({length:s[4]},(_,i)=>`<i class="${i<r?'on':''}"></i>`).join('')}</div></div>
+            ${max?'<em>MAX</em>':lock?'<em>🔒</em>':`<button type="button" data-sk="${k}" ${pts?'':'disabled'}>+1</button>`}</div>`;}).join('')}</div>`).join('')}
+      ${skSpent()?`<button type="button" class="bzopt" data-skr="1">↺ Alle Punkte zurücksetzen · $${fmt(400*lvl)}</button>`:''}`;}
+  function skillBind(P){P.querySelectorAll('[data-sk]').forEach(b=>b.onclick=()=>{const k=b.dataset.sk,s=SKL[k];if(!skPoints()||skv(k)>=s[4]||skSpent(s[0])<s[5])return;skGet()[k]=skv(k)+1;sfx('stamp');track('skill');skMsg=`${s[2]} ${s[1]} – Rang ${skv(k)}`;renderMeta();metaBadge();});
+    P.querySelectorAll('[data-skr]').forEach(b=>b.onclick=()=>{const c=400*lvl;if(cash<c){skMsg='Zu wenig Geld zum Zurücksetzen.';return renderMeta();}cash-=c;EMP.sk={};sfx('whoosh');hud();skMsg='Alle Punkte sind wieder frei.';renderMeta();});}
+  const _mx=metaExtra,_mb=metaExtraBind;
+  metaExtra=function(t){return t==='skill'?skillHTML():_mx(t);};
+  metaExtraBind=function(P){_mb(P);skillBind(P);};
+  const _hp=heistPerks;heistPerks=function(){const p=_hp();p.sk=Object.assign({},skGet());return p;};
+  // ================= AUSRÜSTUNG AUFWERTEN =================
+  const GTIER=[['Standard','#cbbbe6'],['Verbessert','#7dffb2'],['Profi','#2fe0ea'],['Elite','#b98cff'],['Legendär','#ffd34d']];
+  const GEARUP={schlaeger:'+6 % Trefferchance',messer:'+6 % Trefferchance',schlagring:'+6 % Trefferchance',revolver:'+10 % Schaden',pistole:'+10 % Schaden',schrotflinte:'+10 % Schaden',uzi:'+10 % Schaden',
+    dietrich:'Größeres Feld beim Knacken',dietrich2:'Größeres Feld beim Knacken',brecheisen:'10 % schneller',bohrer:'10 % schneller'};
+  function gearGet(){if(!EMP.gear)EMP.gear={};return EMP.gear;}
+  const gearLv=id=>gearGet()[id]||0;
+  function gearCost(id,l){const v=Math.max(40,(ITEMS[id]&&ITEMS[id].v)||40);return {cash:Math.round(v*2.5*Math.pow(l+1,1.7)),need:l<2?{metall:3+l*2}:l<3?{metall:6,kabel:4}:{metall:8,platine:4}};}
+  const gearOwned=id=>STASH.includes(id)||Object.values(LOADOUT).includes(id);
+  function gearHTML(){const ids=Object.keys(GEARUP).filter(id=>ITEMS[id]&&(gearOwned(id)||gearLv(id)));
+    if(!ids.length)return `<div class="rcp lock"><span class="ri">⬆</span><div><b>Ausrüstung aufwerten</b><small>Sobald du Waffen oder Werkzeug besitzt, kannst du sie hier verbessern.</small></div></div>`;
+    return `<div class="gearh">⬆ AUSRÜSTUNG AUFWERTEN<small>Gilt für alle Teile dieser Sorte – auch für neu gebaute</small></div>`+ids.map(id=>{const l=gearLv(id),T=GTIER[l];
+      if(l>=4)return `<div class="rcp"><img class="ri" src="${ico(id)}" alt=""><div><b>${ITEMS[id].n} <span style="color:${T[1]}">· ${T[0]}</span></b><small>${GEARUP[id]} je Stufe · voll ausgebaut</small></div><span style="color:#ffd34d;font-family:Bangers,cursive">MAX</span></div>`;
+      const c=gearCost(id,l),ok=cash>=c.cash&&Object.entries(c.need).every(([k,v])=>cnt(k)>=v);
+      const need=Object.entries(c.need).map(([k,v])=>`<i class="${cnt(k)>=v?'y':'n'}"><img src="${ico(k)}" alt="">${cnt(k)}/${v}</i>`).join('')+`<i class="${cash>=c.cash?'y':'n'}">$${fmt(c.cash)}</i>`;
+      return `<div class="rcp"><img class="ri" src="${ico(id)}" alt=""><div><b>${ITEMS[id].n} <span style="color:${T[1]}">· ${T[0]}</span></b><small>${GEARUP[id]} je Stufe → <span style="color:${GTIER[l+1][1]}">${GTIER[l+1][0]}</span></small><div class="need">${need}</div></div><button type="button" class="ok mk" data-a="gearup" data-r="${id}" ${ok?'':'disabled'}>⬆</button></div>`;}).join('');}
+  acts.gearup=a=>{const id=a.dataset.r,l=gearLv(id);if(l>=4)return;const c=gearCost(id,l);if(cash<c.cash||!Object.entries(c.need).every(([k,v])=>cnt(k)>=v))return;
+    cash-=c.cash;Object.entries(c.need).forEach(([k,v])=>takeMat(k,v));gearGet()[id]=l+1;sfx('stamp');track('gearup');hud();open(benchHTML());toastMsg(`${ITEMS[id].n.toUpperCase()}: ${GTIER[l+1][0].toUpperCase()}`);};
+  ACHS.push(AC('sk5','5 Fähigkeitspunkte verteilt',()=>skSpent()>=5,{cash:1500}),AC('gearmax','Ein Teil auf Legendär',()=>Object.values(gearGet()).some(v=>v>=4),{cash:10000}));
+  const st12=document.createElement('style');st12.textContent=`.skpts{text-align:center;font-size:13px;color:#cbbbe6;background:#1d1030;border:1px solid #4b3a6e;border-radius:8px;padding:5px;margin-bottom:6px}.skpts.has{border-color:#ffe14d;color:#fff;box-shadow:0 0 12px rgba(255,225,77,.35)}.skpts b{font-family:'Bangers',cursive;font-size:22px;color:#ffe14d}
+    .skb{border:1px solid var(--c);border-radius:10px;padding:6px;margin-bottom:8px;background:rgba(0,0,0,.25)}.skh{display:flex;align-items:center;gap:6px;margin-bottom:4px}.skh span{font-size:20px}.skh b{font-family:'Bangers',cursive;font-size:19px;letter-spacing:1px;color:var(--c);flex:1}.skh small{font-size:11px;color:#cbbbe6}
+    .skr{display:flex;align-items:center;gap:8px;background:#1d1030;border-radius:8px;padding:5px 8px;margin-bottom:4px}.skr.lock{opacity:.45}.skr>div{flex:1;min-width:0}.skr b{display:block;font-size:13px}.skr small{display:block;font-size:10.5px;color:#cbbbe6;line-height:1.2}.ski{font-size:22px;width:28px;text-align:center}
+    .skd{display:flex;gap:3px;margin-top:3px}.skd i{width:16px;height:5px;border-radius:3px;background:#07030f;border:1px solid #4b3a6e}.skd i.on{background:var(--c);border-color:var(--c);box-shadow:0 0 6px var(--c)}
+    .skr button{background:var(--c);border:2px solid #000;border-radius:8px;font-family:'Bangers',cursive;font-size:18px;width:42px;height:34px;cursor:pointer}.skr button:disabled{opacity:.35}.skr em{font-style:normal;font-family:'Bangers',cursive;color:var(--c);font-size:14px}
+    .gearh{font-family:'Bangers',cursive;font-size:18px;letter-spacing:1px;color:#ffe14d;margin-top:8px}.gearh small{display:block;font-family:'Oswald',sans-serif;font-size:11px;color:#cbbbe6;letter-spacing:0}`;document.head.appendChild(st12);
   window.__continue=continueGame;window.__nhReady=true;roll();
   if(hasSave()){try{const d=JSON.parse(localStorage.getItem(SKEY));$('tap').innerHTML='TIPPEN ZUM WEITERSPIELEN<br><small style="font-size:.55em">Spielstand: Stufe '+d.lvl+'</small>';}catch(e){}}
   // ---------- Pixel-Einsatz (iframe) ----------
@@ -2562,7 +2623,7 @@
   window.addEventListener('message',e=>{
     const d=e.data||{}; const f=$('pixh'); if(!f||e.source!==f.contentWindow)return;
     const T=JSON.parse(f.dataset.t||'{}');
-    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{boss:T.boss,bossName:T.bossName,tod:(()=>{const h=new Date().getHours();return h>=6&&h<19?'day':'night';})(),rain:Math.random()<.25,crew:CREW_ON.slice(),base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
+    if(d.type==='heistReady'){f.contentWindow.postMessage({type:'heistStart',lo:Object.assign({},LOADOUT),cfg:{gear:EMP.gear||{},boss:T.boss,bossName:T.bossName,tod:(()=>{const h=new Date().getHours();return h>=6&&h<19?'day':'night';})(),rain:Math.random()<.25,crew:CREW_ON.slice(),base:T.base,owner:T.owner,kind:T.kind,type:T.type,diff:T.diff,seed:T.seed||Math.floor(Math.random()*1e9),name:T.name,bagW:BAGS[BAGLV][0],bagH:BAGS[BAGLV][1]+(heistPerks().bag?1:0),heat,perks:Object.assign(heistPerks(),{heat:(heistPerks().heat||0)+(VEHS[CAR].heat||0)}),outfit:Object.assign({},OUTFIT_EQ),car:carCfg()}},'*');return;}
     if(d.type==='sfx'){if(window.NHA)NHA.sfx(d.n);return;}
     if(d.type==='mood'){if(window.NHA)NHA.mood(d.m);return;}
     if(d.type!=='heistEnd')return;
@@ -2618,7 +2679,7 @@
   // Dee kauft Beute
   // ---------- Verkaufen mit Auswahl ----------
   let SELL={rate:.6,who:'dee',sel:{},after:null};
-  function openSell(rate,who,after){SELL={rate,who,sel:{},after,dirty:Object.values(EMP.biz).some(x=>x.lv)};const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))];ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);
+  function openSell(rate,who,after){rate=Math.min(1,rate*(1+.04*skv('haendler')));SELL={rate,who,sel:{},after,dirty:Object.values(EMP.biz).some(x=>x.lv)};const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))];ids.forEach(id=>SELL.sel[id]=STASH.filter(x=>x===id).length);
     if(!ids.length){toastMsg('KEINE BEUTE IM SPIND');if(after)after(0);return;}$('sellov').classList.add('on');renderSell();}
   function renderSell(){const P=$('sellp');const ids=[...new Set(STASH.filter(id=>ITEMS[id]&&ITEMS[id].t==='loot'))].sort((a,b)=>ITEMS[b].v-ITEMS[a].v);
     const R=SELL.dirty?Math.min(1,SELL.rate*1.4):SELL.rate;const tot=ids.reduce((s,id)=>s+Math.round(ITEMS[id].v*R)*(SELL.sel[id]||0),0);

@@ -17,5 +17,7 @@ fx=os.path.join(d,'tools/fx2.html')
 if os.path.exists(fx):
     assert '</body>' in i
     i=i.replace('</body>',open(fx,encoding='utf-8').read()+'\n</body>',1)
+th=os.path.join(d,'tools/theme2.css')
+if os.path.exists(th):i=i.replace('</body>','<style>\n'+open(th,encoding='utf-8').read()+'\n</style>\n</body>',1)
 open(os.path.join(d,'next.html'),'w',encoding='utf-8').write(i)
 print('ok',len(h),len(i))
