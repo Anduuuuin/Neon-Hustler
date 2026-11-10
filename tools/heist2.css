@@ -1,0 +1,18 @@
+  /* NEXT: HUD-Feinschliff */
+  #hud .p{border-radius:7px;background:rgba(8,2,18,.78);box-shadow:0 0 10px rgba(47,224,234,.45),inset 0 0 8px rgba(47,224,234,.15);padding:1px 8px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  #hud .p.g{box-shadow:0 0 10px rgba(125,255,178,.45),inset 0 0 8px rgba(125,255,178,.15)}
+  #hud .p.hp{box-shadow:0 0 10px rgba(255,61,139,.5),inset 0 0 8px rgba(255,61,139,.15)}
+  #hud .al{border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px #ff3d8b,0 0 10px rgba(255,61,139,.5)}
+  #hud .al i{transition:width .35s;background:linear-gradient(90deg,#ffe14d,#ff9f43 50%,#ff3d3d);box-shadow:0 0 10px #ff3d3d}
+  #toast.on{animation:tpop .34s cubic-bezier(.2,1.7,.4,1)}
+  @keyframes tpop{0%{scale:.4;opacity:0}100%{scale:1;opacity:1}}
+  .ab{transition:transform .08s,box-shadow .15s;background-image:radial-gradient(circle at 35% 28%,rgba(255,255,255,.28),transparent 55%)}
+  #act.on{animation:actp 1.1s ease-in-out infinite}
+  @keyframes actp{50%{box-shadow:0 0 0 3px #ff3d8b,0 0 34px rgba(255,225,77,.95)}}
+  #prog div{border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px #2fe0ea,0 0 14px rgba(47,224,234,.6)}
+  #prog i{background:linear-gradient(90deg,#2fe0ea,#7dffb2);box-shadow:0 0 10px #2fe0ea}
+  .ov.on .lp{animation:lpop .3s cubic-bezier(.2,1.3,.4,1)}
+  @keyframes lpop{0%{transform:translateY(30px) scale(.92);opacity:0}100%{transform:none;opacity:1}}
+  .lp .big{animation:bigp .55s cubic-bezier(.2,1.6,.4,1) both}
+  @keyframes bigp{0%{transform:scale(.3) rotate(-8deg);opacity:0}100%{transform:none;opacity:1}}
+  #stick{box-shadow:0 0 18px rgba(47,224,234,.5),inset 0 0 14px rgba(47,224,234,.25)}
